@@ -2,4 +2,5 @@ name: 'Zero EntityWrapper'
 type: module
 description: 'Base EntityWrapper module'
 core: 8.x
-package: 'zero'
+package: zero
+version: 0.2.0

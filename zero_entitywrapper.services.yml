@@ -1,0 +1,3 @@
+services:
+  zero.entitywrapper.static:
+    class: Drupal\zero_entitywrapper\Service\StaticWrapperService
