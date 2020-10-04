@@ -3,12 +3,15 @@
 use Drupal\zero_entitywrapper\Service\StaticWrapperService;
 
 function zero_entitywrapper_page_attachments(array &$attachments) {
+  /** @var StaticWrapperService $cache */
+  $cache = Drupal::service('zero.entitywrapper.static');
 
+  $cache->applyAttachments($attachments);
 }
 
 function zero_entitywrapper_preprocess_page(&$variables) {
   /** @var StaticWrapperService $cache */
   $cache = Drupal::service('zero.entitywrapper.static');
 
-  $cache->apply($variables, TRUE);
+  $cache->applyCache($variables, TRUE);
 }
