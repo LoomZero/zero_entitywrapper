@@ -1,13 +1,11 @@
 <?php
 
-namespace Drupal\zero_entitywrapper\Wrapper;
+namespace Drupal\zero_entitywrapper\Content;
 
 use DateInterval;
 use DateTime;
 use DateTimeZone;
-use Drupal;
 use Drupal\Core\Entity\ContentEntityBase;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -17,16 +15,19 @@ use Drupal\Core\Url;
 use Drupal\file\FileInterface;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\zero_entitywrapper\Base\ItemWrapperInterface;
+use Drupal\zero_entitywrapper\Views\ViewWrapper;
+use Drupal\zero_entitywrapper\Wrapper\BaseWrapper;
+use Drupal\zero_entitywrapper\Wrapper\ContentViewWrapper;
 
-class ContentWrapper implements ItemWrapperInterface, Drupal\zero_entitywrapper\Base\EntityWrapperInterface {
+class ContentWrapper extends BaseWrapper implements ItemWrapperInterface {
 
   /**
    * @param ContentEntityBase|ContentWrapper $entity
-   * @param ContentWrapper|null $parent
+   * @param BaseWrapper|null $parent
    *
    * @return ContentWrapper
    */
-  public static function create($entity, ContentWrapper $parent = NULL): ContentWrapper {
+  public static function create($entity, BaseWrapper $parent = NULL): ContentWrapper {
     if ($entity instanceof ContentWrapper) return $entity;
     return new ContentWrapper($entity, NULL, $parent);
   }
@@ -34,21 +35,21 @@ class ContentWrapper implements ItemWrapperInterface, Drupal\zero_entitywrapper\
   /**
    * @param string $entity_type
    * @param int|string $entity_id
-   * @param ContentWrapper|null $parent
+   * @param BaseWrapper|null $parent
    *
    * @return ContentWrapper
    */
-  public static function load(string $entity_type, $entity_id, ContentWrapper $parent = NULL): ContentWrapper {
+  public static function load(string $entity_type, $entity_id, BaseWrapper $parent = NULL): ContentWrapper {
     return new ContentWrapper($entity_type, $entity_id, $parent);
   }
 
   /**
    * @param string[]|ContentEntityBase[] $entities Item can by either a string <strong>[entity_type]:[entity_id]</strong> or a <strong>ContentEntityBase</strong>
-   * @param ContentWrapper|null $parent
+   * @param BaseWrapper|null $parent
    *
    * @return ContentWrapper[]
    */
-  public static function multi(array $entities, ContentWrapper $parent = NULL): array {
+  public static function multi(array $entities, BaseWrapper $parent = NULL): array {
     $wrappers = [];
     foreach ($entities as $delta => $entity) {
       if (is_string($entity)) {
@@ -61,42 +62,44 @@ class ContentWrapper implements ItemWrapperInterface, Drupal\zero_entitywrapper\
     return $wrappers;
   }
 
-  /** @var ContentEntityBase */
-  protected $entity;
-  /** @var ContentWrapper */
-  protected $parent;
-  /** @var FieldViewWrapper */
+  /** @var ContentViewWrapper */
   protected $view;
-  /** @var RenderContextWrapper */
-  protected $renderContext;
-  /** @var array */
-  protected $vars;
 
   /**
    * @param ContentEntityBase|string $entity_type
-   * @param int|string $entity_id
-   * @param ContentWrapper|null $parent
+   * @param int|string|null $entity_id
+   * @param BaseWrapper|null $parent
    */
-  private function __construct($entity_type, $entity_id, $parent = NULL) {
-    if ($entity_type instanceof ContentEntityBase) {
-      $this->entity = $entity_type;
-    } else {
-      Drupal::entityTypeManager()->getStorage($entity_type)->load($entity_id);
+  private function __construct($entity_type, $entity_id = NULL, $parent = NULL) {
+    parent::__construct($entity_type, $entity_id);
+    if ($parent !== NULL) {
+      $this->setParent($parent);
+      $this->renderContext()->cacheAddEntity($this->entity());
     }
-    $this->parent = $parent;
   }
 
-  public function setRenderContext(array &$vars): ContentWrapper {
-    $this->vars = &$vars;
-    return $this;
+  /**
+   * @return ContentEntityBase
+   * @noinspection PhpIncompatibleReturnTypeInspection
+   */
+  public function entity() {
+    return $this->entity;
+  }
+
+  public function langcode(): ?string {
+    return $this->entity->get('langcode')->getString();
+  }
+
+  public function url(array $options = [], string $rel = 'canonical'): ?Url {
+    return $this->entity()->toUrl($rel, $options);
   }
 
   public function metaItems(string $field): FieldItemListInterface {
-    return $this->entity->get($field);
+    return $this->entity()->get($field);
   }
 
   public function metaItem(string $field, int $index): ?TypedDataInterface {
-    return $this->entity->get($field)->get($index);
+    return $this->entity()->get($field)->get($index);
   }
 
   protected function metaForeach(callable $callable, string $field, ...$params) {
@@ -125,61 +128,25 @@ class ContentWrapper implements ItemWrapperInterface, Drupal\zero_entitywrapper\
       ->getSetting('allowed_values');
   }
 
-  public function view(): FieldViewWrapper {
+  public function view(): ContentViewWrapper {
     if ($this->view === NULL) {
-      $this->view = new FieldViewWrapper($this);
+      $this->view = new ContentViewWrapper($this);
     }
     return $this->view;
   }
 
-  public function renderContext(): RenderContextWrapper {
-    $root = $this->root();
-    if ($root->renderContext === NULL) {
-      $root->renderContext = new RenderContextWrapper($root->vars);
-    }
-    return $root->renderContext;
-  }
-
-  public function entity(): EntityInterface {
-    return $this->entity;
-  }
-
-  public function type(): string {
-    return $this->entity->getEntityTypeId();
-  }
-
-  public function bundle(): string {
-    return $this->entity->bundle();
-  }
-
-  public function id() {
-    return $this->entity->id();
-  }
-
-  public function parent(): ?ContentWrapper {
-    return $this->parent;
-  }
-
-  public function root(): ContentWrapper {
-    $root = $this;
-    while ($root->parent !== NULL) {
-      $root = $root->parent;
-    }
-    return $root;
-  }
-
-  public function getRaw(string $field, int $index = 0, string $propertie = NULL) {
+  public function getRaw(string $field, int $index = 0, string $property = NULL) {
     $item = $this->metaItem($field, $index);
     if ($item === NULL) return NULL;
 
-    if ($propertie === NULL) {
+    if ($property === NULL) {
       return $item->getValue();
     }
-    return $item->getValue()[$propertie];
+    return $item->getValue()[$property];
   }
 
-  public function getRaws(string $field, string $propertie = NULL): array {
-    return $this->metaForeach([$this, 'getRaw'], $field, $propertie);
+  public function getRaws(string $field, string $property = NULL): array {
+    return $this->metaForeach([$this, 'getRaw'], $field, $property);
   }
 
   public function getValue(string $field, int $index = 0) {
@@ -261,6 +228,11 @@ class ContentWrapper implements ItemWrapperInterface, Drupal\zero_entitywrapper\
     return $this->metaForeach([$this, 'getUrl'], $field, $options);
   }
 
+  public function setUrl(string $field, Url $url): ContentWrapper {
+    $this->entity()->set($field, [$url]);
+    return $this;
+  }
+
   public function getLink(string $field, int $index = 0, array $options = [], string $title_overwrite = NULL): ?Link {
     /** @var FieldItemInterface */
     $item = $this->metaItem($field, $index);
@@ -318,6 +290,12 @@ class ContentWrapper implements ItemWrapperInterface, Drupal\zero_entitywrapper\
 
   public function getUTCDates(string $field, string $property = 'value'): array {
     return $this->metaForeach([$this, 'getUTCDate'], $field, $property);
+  }
+
+  public function getView(string $field, string $explode = ':'): ?ViewWrapper {
+    $value = $this->getValue($field);
+    [$view, $display] = explode($explode, $value);
+    return new ViewWrapper($view, $display);
   }
 
 }

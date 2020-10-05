@@ -19,6 +19,14 @@ class RenderContextWrapper {
     $this->render_array = &$render_array;
   }
 
+  public function getViewMode(): ?string {
+    if (isset($this->render_array['view_mode'])) {
+      return $this->render_array['view_mode'];
+    } else {
+      return NULL;
+    }
+  }
+
   private function getStaticPageCache(): StaticWrapperService {
     if ($this->staticPageCache === NULL) {
       $this->staticPageCache = Drupal::service('zero.entitywrapper.static');

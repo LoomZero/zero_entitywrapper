@@ -6,7 +6,7 @@ use Drupal\Core\Field\FieldItemInterface;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 use Drupal\zero_entitywrapper\Base\ItemWrapperInterface;
 
-class FieldViewWrapper {
+class ContentViewWrapper {
 
   /** @var ItemWrapperInterface */
   private $wrapper;

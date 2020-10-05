@@ -2,11 +2,9 @@
 
 namespace Drupal\zero_entitywrapper\Base;
 
-use Drupal\Core\Entity\EntityInterface;
-
 interface EntityWrapperInterface {
 
-  public function entity(): EntityInterface;
+  public function entity();
 
   public function type(): string;
 
