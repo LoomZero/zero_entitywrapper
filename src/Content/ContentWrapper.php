@@ -113,6 +113,24 @@ class ContentWrapper extends BaseWrapper implements ItemWrapperInterface {
     return $values;
   }
 
+  public function metaFieldType(string $field): string {
+    return $this->metaItems($field)->getFieldDefinition()->getType();
+  }
+
+  public function metaFieldSettings(string $field, string $property = NULL) {
+    if ($property === NULL) {
+      $settings = $this->metaItems($field)->getFieldDefinition()->getSettings();
+      $settings += $this->metaItems($field)->getFieldDefinition()->getFieldStorageDefinition()->getSettings();
+      return $settings;
+    } else {
+      $value = $this->metaItems($field)->getFieldDefinition()->getSetting($property);
+      if ($value === NULL) {
+        $value = $this->metaItems($field)->getFieldDefinition()->getFieldStorageDefinition()->getSetting($property);
+      }
+      return $value;
+    }
+  }
+
   public function metaMainProperty(string $field): string {
     return $this
       ->metaItems($field)
@@ -122,10 +140,15 @@ class ContentWrapper extends BaseWrapper implements ItemWrapperInterface {
   }
 
   public function metaListOptions(string $field): array {
-    return $this
-      ->metaItems($field)
-      ->getFieldDefinition()
-      ->getSetting('allowed_values');
+    return $this->metaFieldSettings($field, 'allowed_values');
+  }
+
+  public function metaReferenceTargetType(string $field): string {
+    return $this->metaFieldSettings($field, 'target_type');
+  }
+
+  public function metaReferenceTargetBundles(string $field): array {
+    return $this->metaFieldSettings($field, 'handler_settings')['target_bundles'];
   }
 
   public function view(): ContentViewWrapper {
