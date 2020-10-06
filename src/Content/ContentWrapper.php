@@ -17,7 +17,7 @@ use Drupal\image\Entity\ImageStyle;
 use Drupal\zero_entitywrapper\Base\ItemWrapperInterface;
 use Drupal\zero_entitywrapper\View\ViewWrapper;
 use Drupal\zero_entitywrapper\Wrapper\BaseWrapper;
-use Drupal\zero_entitywrapper\Wrapper\ContentViewWrapper;
+use Drupal\zero_entitywrapper\Content\ContentViewWrapper;
 
 class ContentWrapper extends BaseWrapper implements ItemWrapperInterface {
 
@@ -139,16 +139,20 @@ class ContentWrapper extends BaseWrapper implements ItemWrapperInterface {
       ->getMainPropertyName();
   }
 
-  public function metaListOptions(string $field): array {
+  public function metaListOptions(string $field): ?array {
     return $this->metaFieldSettings($field, 'allowed_values');
   }
 
-  public function metaReferenceTargetType(string $field): string {
+  public function metaReferenceTargetType(string $field): ?string {
     return $this->metaFieldSettings($field, 'target_type');
   }
 
-  public function metaReferenceTargetBundles(string $field): array {
+  public function metaReferenceTargetBundles(string $field): ?array {
     return $this->metaFieldSettings($field, 'handler_settings')['target_bundles'];
+  }
+
+  public function metaMediaSourceField(): ?string {
+    return $this->entity()->getSource()->getConfiguration()['source_field'];
   }
 
   public function view(): ContentViewWrapper {
@@ -231,12 +235,22 @@ class ContentWrapper extends BaseWrapper implements ItemWrapperInterface {
     $items = $this->metaItems($field);
 
     if ($items instanceof EntityReferenceFieldItemListInterface) {
-      $entity = $this->getEntity($field, $index)->entity();
+      $wrapper = $this->getEntity($field, $index);
+      $entity = $wrapper->entity();
 
       if ($entity instanceof FileInterface) {
+        $raw = $this->getRaw($field);
+        if (!empty($raw['alt'])) {
+          $options['attributes']['alt'] = $raw['alt'];
+        }
+        if (!empty($raw['title'])) {
+          $options['attributes']['title'] = $raw['title'];
+        }
         return Url::fromUri(file_create_url($entity->getFileUri()), $options);
+      } else if ($wrapper->type() === 'media') {
+        return $wrapper->getUrl($wrapper->metaMediaSourceField(), 0, $options);
       } else {
-        return $entity->toUrl('canonical', $options);
+        return $wrapper->url($options);
       }
     }
 
@@ -262,7 +276,8 @@ class ContentWrapper extends BaseWrapper implements ItemWrapperInterface {
     if ($item === NULL) return NULL;
 
     $values = $item->getValue();
-    return Link::fromTextAndUrl($title_overwrite ?? $values['title'], Url::fromUri($values['uri'], $options));
+    $url = $this->getUrl($field, $index, $options);
+    return Link::fromTextAndUrl($title_overwrite ?? $values['title'] ?? $url->toString(), $url);
   }
 
   public function getLinks(string $field, array $options = [], string $title_overwrite = NULL): array {
@@ -271,12 +286,17 @@ class ContentWrapper extends BaseWrapper implements ItemWrapperInterface {
 
   public function getImageUrl(string $field, int $index = 0, string $image_style = ''): ?Url {
     if ($image_style) {
-      /** @var ImageStyle $style */
-      $style = ImageStyle::load($image_style);
-
+      $wrapper = $this->getEntity($field, $index);
       /** @var FileInterface $image */
-      $image = $this->getEntity($field, $index)->entity();
-      return Url::fromUri($style->buildUrl($image->getFileUri()));
+      $image = $wrapper->entity();
+
+      if ($wrapper->type() === 'media') {
+        return $wrapper->getImageUrl($wrapper->metaMediaSourceField(), 0, $image_style);
+      } else {
+        /** @var ImageStyle $style */
+        $style = ImageStyle::load($image_style);
+        return Url::fromUri($style->buildUrl($image->getFileUri()));
+      }
     } else {
       return $this->getUrl($field, $index);
     }

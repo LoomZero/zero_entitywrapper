@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\zero_entitywrapper\Wrapper;
+namespace Drupal\zero_entitywrapper\Content;
 
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
@@ -8,16 +8,16 @@ use Drupal\zero_entitywrapper\Base\ItemWrapperInterface;
 
 class ContentViewWrapper {
 
-  /** @var ItemWrapperInterface */
+  /** @var ContentWrapper */
   private $wrapper;
 
-  public function __construct(ItemWrapperInterface $wrapper) {
+  public function __construct(ContentWrapper $wrapper) {
     $this->wrapper = $wrapper;
   }
 
-  public function formatter(string $field, int $index, string $formatter, array $settings = []): array {
+  private function doFormatter(ItemWrapperInterface $wrapper, string $field, int $index, string $formatter, array $settings = []): array {
     /** @var FieldItemInterface $item */
-    $item = $this->wrapper->metaItem($field, $index);
+    $item = $wrapper->metaItem($field, $index);
     if ($item === NULL) return [];
 
     return $item->view([
@@ -27,13 +27,21 @@ class ContentViewWrapper {
     ]);
   }
 
-  public function formatters(string $field, string $formatter, array $settings = []): array {
-    return $this->wrapper->metaItems($field)
+  public function doFormatters(ItemWrapperInterface $wrapper, string $field, string $formatter, array $settings = []): array {
+    return $wrapper->metaItems($field)
       ->view([
         'type' => $formatter,
         'label' => 'hidden',
         'settings' => $settings,
       ]);
+  }
+
+  public function formatter(string $field, int $index, string $formatter, array $settings = []): array {
+    return $this->doFormatter($this->wrapper, $field, $index, $formatter, $settings);
+  }
+
+  public function formatters(string $field, string $formatter, array $settings = []): array {
+    return $this->doFormatters($this->wrapper, $field, $formatter, $settings);
   }
 
   public function entity(string $field, int $index = 0, string $view_mode = 'full'): array {
@@ -99,6 +107,13 @@ class ContentViewWrapper {
   }
 
   public function image(string $field, int $index = 0, string $image_style = '', string $image_link = ''): array {
+    if ($this->wrapper->metaReferenceTargetType($field) === 'media') {
+      $media = $this->wrapper->getEntity($field, $index);
+      return $this->doFormatter($media, $media->metaMediaSourceField(), 0, 'image', [
+        'image_style' => $image_style,
+        'image_link' => $image_link,
+      ]);
+    }
     return $this->formatter($field, $index, 'image', [
       'image_style' => $image_style,
       'image_link' => $image_link,
@@ -106,6 +121,17 @@ class ContentViewWrapper {
   }
 
   public function images(string $field, string $image_style = '', string $image_link = ''): array {
+    if ($this->wrapper->metaReferenceTargetType($field) === 'media') {
+      $medias = $this->wrapper->getEntities($field);
+      $output = [];
+      foreach ($medias as $media) {
+        $output[] = $this->doFormatter($media, $media->metaMediaSourceField(), 0, 'image', [
+          'image_style' => $image_style,
+          'image_link' => $image_link,
+        ]);
+      }
+      return $output;
+    }
     return $this->formatters($field, 'image', [
       'image_style' => $image_style,
       'image_link' => $image_link,
@@ -113,6 +139,13 @@ class ContentViewWrapper {
   }
 
   public function responsiveImage(string $field, int $index = 0, string $responsive_image_style = '', string $image_link = ''): array {
+    if ($this->wrapper->metaReferenceTargetType($field) === 'media') {
+      $media = $this->wrapper->getEntity($field, $index);
+      return $this->doFormatter($media, $media->metaMediaSourceField(), 0, 'responsive_image', [
+        'responsive_image_style' => $responsive_image_style,
+        'image_link' => $image_link,
+      ]);
+    }
     return $this->formatter($field, $index, 'responsive_image', [
       'responsive_image_style' => $responsive_image_style,
       'image_link' => $image_link,
@@ -120,6 +153,17 @@ class ContentViewWrapper {
   }
 
   public function responsiveImages(string $field, string $responsive_image_style = '', string $image_link = ''): array {
+    if ($this->wrapper->metaReferenceTargetType($field) === 'media') {
+      $medias = $this->wrapper->getEntities($field);
+      $output = [];
+      foreach ($medias as $media) {
+        $output[] = $this->doFormatter($media, $media->metaMediaSourceField(), 0, 'responsive_image', [
+          'responsive_image_style' => $responsive_image_style,
+          'image_link' => $image_link,
+        ]);
+      }
+      return $output;
+    }
     return $this->formatters($field, 'responsive_image', [
       'responsive_image_style' => $responsive_image_style,
       'image_link' => $image_link,
