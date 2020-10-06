@@ -15,7 +15,7 @@ use Drupal\Core\Url;
 use Drupal\file\FileInterface;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\zero_entitywrapper\Base\ItemWrapperInterface;
-use Drupal\zero_entitywrapper\Views\ViewWrapper;
+use Drupal\zero_entitywrapper\View\ViewWrapper;
 use Drupal\zero_entitywrapper\Wrapper\BaseWrapper;
 use Drupal\zero_entitywrapper\Wrapper\ContentViewWrapper;
 
