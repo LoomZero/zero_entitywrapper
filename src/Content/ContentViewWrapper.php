@@ -112,14 +112,14 @@ class ContentViewWrapper {
     ]);
   }
 
-  public function imageResponsive(string $field, int $index = 0, string $responsive_image_style = '', string $image_link = ''): array {
+  public function responsiveImage(string $field, int $index = 0, string $responsive_image_style = '', string $image_link = ''): array {
     return $this->formatter($field, $index, 'responsive_image', [
       'responsive_image_style' => $responsive_image_style,
       'image_link' => $image_link,
     ]);
   }
 
-  public function imagesResponsive(string $field, string $responsive_image_style = '', string $image_link = ''): array {
+  public function responsiveImages(string $field, string $responsive_image_style = '', string $image_link = ''): array {
     return $this->formatters($field, 'responsive_image', [
       'responsive_image_style' => $responsive_image_style,
       'image_link' => $image_link,

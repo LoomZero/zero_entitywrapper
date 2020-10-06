@@ -3,4 +3,4 @@ type: module
 description: 'Base EntityWrapper module'
 core: 8.x
 package: zero
-version: 0.3.0
+version: 0.3.1
