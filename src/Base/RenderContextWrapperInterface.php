@@ -2,18 +2,28 @@
 
 namespace Drupal\zero_entitywrapper\Base;
 
-use Drupal\zero_entitywrapper\Wrapper\RenderContextWrapper;
+use Drupal\Core\Entity\EntityInterface;
 
-interface RenderContextWrapperInterface {
+interface RenderContextWrapperInterface extends BaseWrapperExtensionInterface {
 
-  public function setRenderContext(array &$vars);
+  public function getViewMode(): ?string;
 
-  public function renderContext(): RenderContextWrapper;
+  public function addLibrary(string $module, string $library = NULL): void;
 
-  public function setParent($parent);
+  public function addSettings(string $module, string $setting, $values): void;
 
-  public function parent();
+  ### cache methods ###
 
-  public function root();
+  public function cacheMaxAge(int $seconds = 0): void;
+
+  ### cache tag methods ###
+
+  public function cacheAddTags(array $tags = []): void;
+
+  public function cacheAddEntity(EntityInterface $entity, bool $forAllEntities = FALSE): void;
+
+  ### cache context methods ###
+
+  public function cacheAddContexts(array $contexts = []): void;
 
 }

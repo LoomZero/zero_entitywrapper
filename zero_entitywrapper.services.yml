@@ -1,3 +1,14 @@
 services:
   zero.entitywrapper.static:
     class: Drupal\zero_entitywrapper\Service\StaticWrapperService
+
+  zero.entitywrapper.extender:
+    class: Drupal\zero_entitywrapper\Service\WrapperExtenderManager
+    arguments: ['@class_resolver']
+    tags:
+      - { name: service_id_collector, tag: wrapper_extender }
+
+  zero.entitywrapper.default.extender:
+    class: Drupal\zero_entitywrapper\Extender\DefaultWrapperExtender
+    tags:
+      - { name: wrapper_extender }

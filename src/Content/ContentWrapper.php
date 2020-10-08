@@ -14,12 +14,11 @@ use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\Url;
 use Drupal\file\FileInterface;
 use Drupal\image\Entity\ImageStyle;
-use Drupal\zero_entitywrapper\Base\ItemWrapperInterface;
+use Drupal\zero_entitywrapper\Base\ContentWrapperInterface;
 use Drupal\zero_entitywrapper\View\ViewWrapper;
 use Drupal\zero_entitywrapper\Wrapper\BaseWrapper;
-use Drupal\zero_entitywrapper\Content\ContentViewWrapper;
 
-class ContentWrapper extends BaseWrapper implements ItemWrapperInterface {
+class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
 
   /**
    * @param ContentEntityBase|ContentWrapper $entity
@@ -61,9 +60,6 @@ class ContentWrapper extends BaseWrapper implements ItemWrapperInterface {
     }
     return $wrappers;
   }
-
-  /** @var ContentViewWrapper */
-  protected $view;
 
   /**
    * @param ContentEntityBase|string $entity_type
@@ -156,10 +152,9 @@ class ContentWrapper extends BaseWrapper implements ItemWrapperInterface {
   }
 
   public function view(): ContentViewWrapper {
-    if ($this->view === NULL) {
-      $this->view = new ContentViewWrapper($this);
-    }
-    return $this->view;
+    /** @var ContentViewWrapper $extension */
+    $extension = $this->getExtension('view');
+    return $extension;
   }
 
   public function getRaw(string $field, int $index = 0, string $property = NULL) {

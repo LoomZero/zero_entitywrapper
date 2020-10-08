@@ -5,19 +5,23 @@ namespace Drupal\zero_entitywrapper\Wrapper;
 
 use Drupal;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\zero_entitywrapper\Base\EntityWrapperInterface;
+use Drupal\zero_entitywrapper\Base\BaseWrapperExtensionInterface;
+use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
 use Drupal\zero_entitywrapper\Base\RenderContextWrapperInterface;
+use Drupal\zero_entitywrapper\Service\WrapperExtenderManager;
 
-abstract class BaseWrapper implements EntityWrapperInterface, RenderContextWrapperInterface {
+abstract class BaseWrapper implements BaseWrapperInterface {
 
+  /** @var WrapperExtenderManager */
+  private $extenderManager;
   /** @var EntityInterface */
   protected $entity;
   /** @var array */
   protected $vars;
-  /** @var RenderContextWrapper */
-  protected $renderContext;
   /** @var BaseWrapper */
   protected $parent;
+  /** @var BaseWrapperExtensionInterface[] */
+  protected $extenders = [];
 
   /**
    * @param EntityInterface|string $entity_type
@@ -55,25 +59,21 @@ abstract class BaseWrapper implements EntityWrapperInterface, RenderContextWrapp
     }
   }
 
-  public function renderContext(): RenderContextWrapper {
-    $root = $this->root();
-    if ($root->renderContext === NULL) {
-      $root->renderContext = new RenderContextWrapper($root->vars);
-    }
-    return $root->renderContext;
+  public function &getRenderContext(): ?array {
+    return $this->vars;
   }
 
-  /**
-   * @param BaseWrapper $parent
-   */
-  public function setParent($parent) {
+  public function renderContext(): RenderContextWrapperInterface {
+    /** @var RenderContextWrapperInterface $extension */
+    $extension = $this->getExtension('render_context');
+    return $extension;
+  }
+
+  public function setParent(BaseWrapperInterface $parent = NULL) {
     $this->parent = $parent;
   }
 
-  /**
-   * @return BaseWrapper
-   */
-  public function parent() {
+  public function parent(): ?BaseWrapperInterface {
     return $this->parent;
   }
 
@@ -97,6 +97,16 @@ abstract class BaseWrapper implements EntityWrapperInterface, RenderContextWrapp
       'entity_bundle' => $this->bundle(),
       'entity_id' => $this->id(),
     ];
+  }
+
+  public function getExtension(string $name): BaseWrapperExtensionInterface {
+    if ($this->extenderManager === NULL) {
+      $this->extenderManager = Drupal::service('zero.entitywrapper.extender');
+    }
+    if (!isset($this->extenders[$name])) {
+      $this->extenders[$name] = $this->extenderManager->getExtension($this, $name);
+    }
+    return $this->extenders[$name];
   }
 
 }

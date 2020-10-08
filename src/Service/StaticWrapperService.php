@@ -3,7 +3,7 @@
 namespace Drupal\zero_entitywrapper\Service;
 
 use Drupal\Core\Cache\Cache;
-use Drupal\zero_entitywrapper\Base\EntityWrapperInterface;
+use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
 
 class StaticWrapperService {
 
@@ -44,7 +44,7 @@ class StaticWrapperService {
     $this->cacheTags = Cache::mergeTags($this->cacheTags, $tags);
   }
 
-  public function cacheAddEntity(EntityWrapperInterface $entity, bool $forAllBundleEntities, bool $forAllTypeEntities = FALSE): void {
+  public function cacheAddEntity(BaseWrapperInterface $entity, bool $forAllBundleEntities, bool $forAllTypeEntities = FALSE): void {
     $tags = [
       $entity->type() . ':' . $entity->id(),
     ];

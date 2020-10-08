@@ -4,18 +4,24 @@ namespace Drupal\zero_entitywrapper\Content;
 
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
-use Drupal\zero_entitywrapper\Base\ItemWrapperInterface;
+use Drupal\zero_entitywrapper\Base\BaseWrapperExtensionInterface;
+use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
+use Drupal\zero_entitywrapper\Base\ContentWrapperInterface;
 
-class ContentViewWrapper {
+class ContentViewWrapper implements BaseWrapperExtensionInterface {
 
   /** @var ContentWrapper */
   private $wrapper;
 
-  public function __construct(ContentWrapper $wrapper) {
+  public function setWrapper(BaseWrapperInterface $wrapper) {
     $this->wrapper = $wrapper;
   }
 
-  private function doFormatter(ItemWrapperInterface $wrapper, string $field, int $index, string $formatter, array $settings = []): array {
+  public function getWrapper(): ?BaseWrapperInterface {
+    return $this->wrapper;
+  }
+
+  private function doFormatter(ContentWrapperInterface $wrapper, string $field, int $index, string $formatter, array $settings = []): array {
     /** @var FieldItemInterface $item */
     $item = $wrapper->metaItem($field, $index);
     if ($item === NULL) return [];
@@ -27,7 +33,7 @@ class ContentViewWrapper {
     ]);
   }
 
-  public function doFormatters(ItemWrapperInterface $wrapper, string $field, string $formatter, array $settings = []): array {
+  public function doFormatters(ContentWrapperInterface $wrapper, string $field, string $formatter, array $settings = []): array {
     return $wrapper->metaItems($field)
       ->view([
         'type' => $formatter,

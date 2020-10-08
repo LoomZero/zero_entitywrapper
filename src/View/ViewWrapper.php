@@ -5,10 +5,11 @@ namespace Drupal\zero_entitywrapper\View;
 use Drupal\views\ResultRow;
 use Drupal\views\ViewEntityInterface;
 use Drupal\views\ViewExecutable;
+use Drupal\zero_entitywrapper\Base\ViewWrapperInterface;
 use Drupal\zero_entitywrapper\Content\ContentWrapper;
 use Drupal\zero_entitywrapper\Wrapper\BaseWrapper;
 
-class ViewWrapper extends BaseWrapper {
+class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
 
   /** @var ViewExecutable */
   private $executable;

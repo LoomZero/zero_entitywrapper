@@ -5,18 +5,29 @@ namespace Drupal\zero_entitywrapper\Wrapper;
 use Drupal;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
+use Drupal\zero_entitywrapper\Base\RenderContextWrapperInterface;
 use Drupal\zero_entitywrapper\Service\StaticWrapperService;
 
-class RenderContextWrapper {
+class RenderContextWrapper implements RenderContextWrapperInterface {
 
   /** @var array */
   private $render_array;
-
   /** @var StaticWrapperService */
   private $staticPageCache;
+  /** @var BaseWrapperInterface */
+  private $wrapper;
 
   public function __construct(&$render_array = NULL) {
     $this->render_array = &$render_array;
+  }
+
+  public function getWrapper(): ?BaseWrapperInterface {
+    return $this->wrapper;
+  }
+
+  public function setWrapper(BaseWrapperInterface $wrapper) {
+    $this->wrapper = $wrapper;
   }
 
   public function getViewMode(): ?string {

@@ -5,7 +5,7 @@ namespace Drupal\zero_entitywrapper\Base;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
 
-interface ItemWrapperInterface {
+interface ContentWrapperInterface extends BaseWrapperInterface {
 
   public function metaItems(string $field): FieldItemListInterface;
 

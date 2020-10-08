@@ -18,7 +18,7 @@ class EntityWrapper extends BaseWrapper {
   }
 
   private function prepareWrapper(BaseWrapper $wrapper) {
-    $wrapper->setRenderContext($this->vars);
+    $wrapper->setRenderContext($this->getRenderContext());
   }
 
   /**
