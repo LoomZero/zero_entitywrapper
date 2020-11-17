@@ -7,6 +7,8 @@ use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 use Drupal\zero_entitywrapper\Base\BaseWrapperExtensionInterface;
 use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
 use Drupal\zero_entitywrapper\Base\ContentWrapperInterface;
+use Drupal\zero_entitywrapper\Exception\EntityWrapperException;
+use Drupal\zero_entitywrapper\Helper\WrapperHelper;
 
 class ContentViewWrapper implements BaseWrapperExtensionInterface {
 
@@ -19,6 +21,20 @@ class ContentViewWrapper implements BaseWrapperExtensionInterface {
 
   public function getWrapper(): ?BaseWrapperInterface {
     return $this->wrapper;
+  }
+
+  public function getDisplaySettings(string $view_mode = NULL, string $field = NULL): ?array {
+    $display = WrapperHelper::getViewDisplay($this->getWrapper(), $view_mode ?? $this->getWrapper()->renderContext()->getViewMode(), $view_mode === NULL);
+    if ($display === NULL) return NULL;
+    $displayFields = $display->getComponents();
+
+    if ($field !== NULL) {
+      if (isset($displayFields[$field])) {
+        return $displayFields[$field];
+      }
+      throw new EntityWrapperException('The field ' . $field . ' is unknown.');
+    }
+    return $displayFields;
   }
 
   private function doFormatter(ContentWrapperInterface $wrapper, string $field, int $index, string $formatter, array $settings = []): array {
@@ -198,6 +214,20 @@ class ContentViewWrapper implements BaseWrapperExtensionInterface {
         'format_type' => $type,
       ]);
     }
+  }
+
+  /**
+   * @param string $template
+   * @param callable|array $context
+   *
+   * @return array
+   */
+  public function template(string $template, $context) {
+    return [
+      '#type' => 'inline_template',
+      '#template' => $template,
+      '#context' => WrapperHelper::getArray($context, $this->wrapper),
+    ];
   }
 
 }

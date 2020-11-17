@@ -5,6 +5,7 @@ namespace Drupal\zero_entitywrapper\View;
 use Drupal\views\ResultRow;
 use Drupal\views\ViewEntityInterface;
 use Drupal\views\ViewExecutable;
+use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
 use Drupal\zero_entitywrapper\Base\ViewWrapperInterface;
 use Drupal\zero_entitywrapper\Content\ContentWrapper;
 use Drupal\zero_entitywrapper\Wrapper\BaseWrapper;
@@ -16,8 +17,9 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
 
   /**
    * @param string|ViewExecutable|ViewEntityInterface $entity
+   * @param string|null $display
    */
-  public function __construct($entity, string $display = NULL) {
+  public function __construct($entity, string $display = NULL, BaseWrapperInterface $parent = NULL) {
     if ($entity instanceof ViewExecutable) {
       $this->executable = $entity;
       $entity = $entity->storage;
@@ -28,6 +30,7 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
       parent::__construct($entity);
     }
     $this->setDisplay($display);
+    $this->setParent($parent);
   }
 
   /**

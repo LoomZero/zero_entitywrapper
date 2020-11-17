@@ -6,6 +6,7 @@ use DateInterval;
 use DateTime;
 use DateTimeZone;
 use Drupal\Core\Entity\ContentEntityBase;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -15,6 +16,7 @@ use Drupal\Core\Url;
 use Drupal\file\FileInterface;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\zero_entitywrapper\Base\ContentWrapperInterface;
+use Drupal\zero_entitywrapper\Helper\WrapperHelper;
 use Drupal\zero_entitywrapper\View\ViewWrapper;
 use Drupal\zero_entitywrapper\Wrapper\BaseWrapper;
 
@@ -109,6 +111,10 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return $values;
   }
 
+  public function metaEntityKey(string $key) {
+    return $this->entity()->getEntityType()->getKey($key);
+  }
+
   public function metaFieldType(string $field): string {
     return $this->metaItems($field)->getFieldDefinition()->getType();
   }
@@ -151,10 +157,41 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return $this->entity()->getSource()->getConfiguration()['source_field'];
   }
 
+  public function access($operation = 'view', EntityInterface $entity = NULL) {
+    if ($entity === NULL) $entity = $this->entity();
+    return $entity->access($operation);
+  }
+
+  protected function transformEntity(EntityInterface $entity = NULL): ?EntityInterface {
+    if ($entity === NULL) return NULL;
+    $revision = NULL;
+
+    $entity = WrapperHelper::applyLanguage($entity, $this->entity());
+    $this->renderContext()->cacheAddEntity($entity);
+
+    if ($this->access('view', $entity)) {
+      return $entity;
+    } else {
+      return NULL;
+    }
+  }
+
   public function view(): ContentViewWrapper {
     /** @var ContentViewWrapper $extension */
     $extension = $this->getExtension('view');
     return $extension;
+  }
+
+  /**
+   * @param string $field
+   * @return ContentWrapper
+   */
+  public function each(string $field) {
+    return new ContentEachWrapper($this->getEntities($field));
+  }
+
+  public function getLabel() {
+    return $this->getValue($this->metaEntityKey('label'));
   }
 
   public function getRaw(string $field, int $index = 0, string $property = NULL) {
@@ -212,7 +249,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     /** @var ContentEntityBase $entity */
     $entity = $item->get('entity')->getValue();
 
-    $this->renderContext()->cacheAddEntity($entity);
+    $entity = $this->transformEntity($entity);
 
     return ContentWrapper::create($entity, $this);
   }
@@ -333,7 +370,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   public function getView(string $field, string $explode = ':'): ?ViewWrapper {
     $value = $this->getValue($field);
     [$view, $display] = explode($explode, $value);
-    return new ViewWrapper($view, $display);
+    return new ViewWrapper($view, $display, $this);
   }
 
 }
