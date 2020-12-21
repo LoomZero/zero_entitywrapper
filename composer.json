@@ -1,5 +1,5 @@
 {
-  "name": "drupal/zero_entitywrapper",
+  "name": "loomzero/zero_entitywrapper",
   "type": "drupal-module",
   "description": "Base EntityWrapper module",
   "keywords": ["Drupal"],
