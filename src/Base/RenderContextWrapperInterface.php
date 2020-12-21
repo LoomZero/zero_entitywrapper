@@ -12,6 +12,19 @@ interface RenderContextWrapperInterface extends BaseWrapperExtensionInterface {
 
   public function addSettings(string $module, string $setting, $values): void;
 
+  /**
+   * Add settings for scripts to a element.
+   * Add data-zero-uuid="{{ uuid }}" to the twig component.
+   * Get data via Drupal.zero.Settings.get($('.selector'));
+   *
+   * @param string $name
+   * @param $settings
+   * @param null|string $uuid
+   *
+   * @return string
+   */
+  public function setElementSettings(string $name, $settings, string $uuid = NULL): string;
+
   ### cache methods ###
 
   public function cacheMaxAge(int $seconds = 0): void;

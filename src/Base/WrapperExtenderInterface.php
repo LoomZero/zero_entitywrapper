@@ -6,6 +6,6 @@ use Drupal\zero_entitywrapper\Wrapper\BaseWrapper;
 
 interface WrapperExtenderInterface {
 
-  public function getExtension(BaseWrapper $wrapper, string $name): ?BaseWrapperExtensionInterface;
+  public function getExtension(BaseWrapper $wrapper, string $name, array $args = []): ?BaseWrapperExtensionInterface;
 
 }

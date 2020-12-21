@@ -11,7 +11,7 @@ use Drupal\zero_entitywrapper\Wrapper\RenderContextWrapper;
 
 class DefaultWrapperExtender implements WrapperExtenderInterface {
 
-  public function getExtension(BaseWrapper $wrapper, string $name): ?BaseWrapperExtensionInterface {
+  public function getExtension(BaseWrapper $wrapper, string $name, array $args = []): ?BaseWrapperExtensionInterface {
     switch ($name) {
       case 'view':
         if ($wrapper instanceof ContentWrapper) {
@@ -20,7 +20,7 @@ class DefaultWrapperExtender implements WrapperExtenderInterface {
         break;
       case 'render_context':
         if ($wrapper->parent() === NULL) {
-          return new RenderContextWrapper($wrapper->root()->getRenderContext());
+          return new RenderContextWrapper();
         } else {
           return $wrapper->root()->getExtension('render_context');
         }

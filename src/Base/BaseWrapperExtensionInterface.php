@@ -8,4 +8,6 @@ interface BaseWrapperExtensionInterface {
 
   public function setWrapper(BaseWrapperInterface $wrapper);
 
+  public function cachable(): bool;
+
 }

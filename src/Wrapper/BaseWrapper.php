@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\zero_entitywrapper\Base\BaseWrapperExtensionInterface;
 use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
 use Drupal\zero_entitywrapper\Base\RenderContextWrapperInterface;
+use Drupal\zero_entitywrapper\Helper\WrapperHelper;
 use Drupal\zero_entitywrapper\Service\WrapperExtenderManager;
 
 abstract class BaseWrapper implements BaseWrapperInterface {
@@ -47,6 +48,10 @@ abstract class BaseWrapper implements BaseWrapperInterface {
     return $this->entity()->id();
   }
 
+  public function extendPreprocess(string $template) {
+    WrapperHelper::extendPreprocess($this, $template);
+  }
+
   public function render(string $view_mode = 'full'): array {
     return Drupal::entityTypeManager()
       ->getViewBuilder($this->type())
@@ -60,7 +65,11 @@ abstract class BaseWrapper implements BaseWrapperInterface {
   }
 
   public function &getRenderContext(): ?array {
-    return $this->vars;
+    if ($this->parent === NULL) {
+      return $this->vars;
+    } else {
+      return $this->root()->getRenderContext();
+    }
   }
 
   public function renderContext(): RenderContextWrapperInterface {
@@ -78,9 +87,9 @@ abstract class BaseWrapper implements BaseWrapperInterface {
   }
 
   /**
-   * @return BaseWrapper
+   * @return BaseWrapperInterface
    */
-  public function root() {
+  public function root(): BaseWrapperInterface {
     $root = $this;
     while ($root->parent !== NULL) {
       $root = $root->parent;
@@ -99,12 +108,17 @@ abstract class BaseWrapper implements BaseWrapperInterface {
     ];
   }
 
-  public function getExtension(string $name): BaseWrapperExtensionInterface {
+  public function getExtension(string $name, ...$args): BaseWrapperExtensionInterface {
     if ($this->extenderManager === NULL) {
       $this->extenderManager = Drupal::service('zero.entitywrapper.extender');
     }
     if (!isset($this->extenders[$name])) {
-      $this->extenders[$name] = $this->extenderManager->getExtension($this, $name);
+      $extension = $this->extenderManager->getExtension($this, $name, $args);
+      if ($extension->cachable()) {
+        $this->extenders[$name] = $extension;
+      } else {
+        return $extension;
+      }
     }
     return $this->extenders[$name];
   }

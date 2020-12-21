@@ -14,7 +14,7 @@ interface BaseWrapperInterface {
 
   public function parent(): ?BaseWrapperInterface;
 
-  public function root();
+  public function root(): BaseWrapperInterface;
 
   public function entity();
 
@@ -24,6 +24,8 @@ interface BaseWrapperInterface {
 
   public function id();
 
-  public function getExtension(string $name): BaseWrapperExtensionInterface;
+  public function extendPreprocess(string $template);
+
+  public function getExtension(string $name, ...$args): BaseWrapperExtensionInterface;
 
 }

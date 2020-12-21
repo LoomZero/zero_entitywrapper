@@ -1,17 +1,33 @@
 <?php
 
-use Drupal\zero_entitywrapper\Service\StaticWrapperService;
+use Drupal\zero_entitywrapper\Service\StaticMailService;
 
 function zero_entitywrapper_page_attachments(array &$attachments) {
-  /** @var StaticWrapperService $cache */
+  /** @var StaticMailService $cache */
   $cache = Drupal::service('zero.entitywrapper.static');
 
   $cache->applyAttachments($attachments);
 }
 
 function zero_entitywrapper_preprocess_page(&$variables) {
-  /** @var StaticWrapperService $cache */
+  /** @var StaticMailService $cache */
   $cache = Drupal::service('zero.entitywrapper.static');
 
   $cache->applyCache($variables, TRUE);
+}
+
+/**
+ * Implements hook_theme().
+ */
+function zero_entitywrapper_theme($existing, $type, $theme, $path) {
+  return [
+    'zero_component' => [
+      'variables' => [
+        'component_namespace' => 'components',
+        'component_vars' => [],
+        'component_path' => NULL,
+      ],
+      'pattern' => 'zero_component__',
+    ],
+  ];
 }

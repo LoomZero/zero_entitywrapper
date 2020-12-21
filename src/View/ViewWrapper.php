@@ -140,6 +140,11 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
     return $this;
   }
 
+  public function setExposedInput(array $input): ViewWrapper {
+    $this->executable()->setExposedInput($input);
+    return $this;
+  }
+
   public function render(string $display = NULL): array {
     return $this->executable()->preview($display);
   }

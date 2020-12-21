@@ -33,9 +33,9 @@ class WrapperExtenderManager {
     return $this->extender;
   }
 
-  public function getExtension(BaseWrapper $parent, string $name) {
+  public function getExtension(BaseWrapper $parent, string $name, array $args = []) {
     foreach ($this->getExtenders() as $extender) {
-      $extender = $extender->getExtension($parent, $name);
+      $extender = $extender->getExtension($parent, $name, $args);
       if ($extender !== NULL) {
         $extender->setWrapper($parent);
         return $extender;

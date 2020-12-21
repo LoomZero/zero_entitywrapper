@@ -23,6 +23,10 @@ class ContentViewWrapper implements BaseWrapperExtensionInterface {
     return $this->wrapper;
   }
 
+  public function cachable(): bool {
+    return TRUE;
+  }
+
   public function getDisplaySettings(string $view_mode = NULL, string $field = NULL): ?array {
     $display = WrapperHelper::getViewDisplay($this->getWrapper(), $view_mode ?? $this->getWrapper()->renderContext()->getViewMode(), $view_mode === NULL);
     if ($display === NULL) return NULL;
@@ -222,11 +226,33 @@ class ContentViewWrapper implements BaseWrapperExtensionInterface {
    *
    * @return array
    */
-  public function template(string $template, $context) {
+  public function template(string $template, $context = []) {
     return [
       '#type' => 'inline_template',
       '#template' => $template,
       '#context' => WrapperHelper::getArray($context, $this->wrapper),
+    ];
+  }
+
+  /**
+   * @param string $path
+   * @param callable|array $vars
+   * @param null|string $pattern
+   *
+   * @return array
+   */
+  public function component(string $path, $vars = [], string $pattern = NULL, string $namespace = 'components') {
+    $theme = [];
+    if ($pattern) {
+      $theme[] = 'zero_component__' . $pattern;
+    }
+    $theme[] = 'zero_component';
+
+    return [
+      '#theme' => $theme,
+      '#component_namespace' => $namespace,
+      '#component_vars' => WrapperHelper::getArray($vars, $this->wrapper),
+      '#component_path' => $path,
     ];
   }
 

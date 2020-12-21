@@ -8,8 +8,10 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\RevisionableStorageInterface;
 use Drupal\Core\Entity\TranslatableInterface;
+use Drupal\Core\Theme\Registry;
 use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
 use Drupal\zero_entitywrapper\Exception\EntityWrapperException;
+use Drupal\zero_preprocess\Service\PreprocessExtenderManager;
 
 class WrapperHelper {
 
@@ -82,6 +84,33 @@ class WrapperHelper {
     }
 
     return $display;
+  }
+
+  public static function getTemplateInfo(string $template) {
+    /** @var Registry $registry */
+    $registry = Drupal::service('theme.registry');
+    $template = str_replace('-', '_', $template);
+    return $registry->get()[$template];
+  }
+
+  public static function getPreprocessFile(string $template): ?string {
+    $item = WrapperHelper::getTemplateInfo($template);
+    if (!empty($item['zero']['preprocess'])) {
+      return $item['zero']['preprocess'];
+    }
+    return NULL;
+  }
+
+  public static function extendPreprocess(BaseWrapperInterface $wrapper, string $template) {
+    $info = WrapperHelper::getTemplateInfo($template);
+
+    $vars = &$wrapper->getRenderContext();
+
+    /** @var PreprocessExtenderManager $extender */
+    $extender = Drupal::service('zero.preprocess.extender');
+
+    $extender->preprocess($vars, $info['zero'], $info);
+    $extender->includePreprocess($vars, $info);
   }
 
 }

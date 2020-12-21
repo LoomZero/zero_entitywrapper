@@ -3,24 +3,19 @@
 namespace Drupal\zero_entitywrapper\Wrapper;
 
 use Drupal;
+use Drupal\Component\Uuid\Php;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
 use Drupal\zero_entitywrapper\Base\RenderContextWrapperInterface;
-use Drupal\zero_entitywrapper\Service\StaticWrapperService;
+use Drupal\zero_entitywrapper\Service\StaticMailService;
 
 class RenderContextWrapper implements RenderContextWrapperInterface {
 
-  /** @var array */
-  private $render_array;
-  /** @var StaticWrapperService */
+  /** @var StaticMailService */
   private $staticPageCache;
   /** @var BaseWrapperInterface */
   private $wrapper;
-
-  public function __construct(&$render_array = NULL) {
-    $this->render_array = &$render_array;
-  }
 
   public function getWrapper(): ?BaseWrapperInterface {
     return $this->wrapper;
@@ -30,15 +25,23 @@ class RenderContextWrapper implements RenderContextWrapperInterface {
     $this->wrapper = $wrapper;
   }
 
+  public function cachable(): bool {
+    return TRUE;
+  }
+
+  private function &renderArray() {
+    return $this->getWrapper()->getRenderContext();
+  }
+
   public function getViewMode(): ?string {
-    if (isset($this->render_array['view_mode'])) {
-      return $this->render_array['view_mode'];
+    if (isset($this->renderArray()['view_mode'])) {
+      return $this->renderArray()['view_mode'];
     } else {
       return NULL;
     }
   }
 
-  private function getStaticPageCache(): StaticWrapperService {
+  private function getStaticPageCache(): StaticMailService {
     if ($this->staticPageCache === NULL) {
       $this->staticPageCache = Drupal::service('zero.entitywrapper.static');
     }
@@ -46,33 +49,44 @@ class RenderContextWrapper implements RenderContextWrapperInterface {
   }
 
   public function addLibrary(string $module, string $library = NULL): void {
-    if ($this->render_array === NULL) {
+    if ($this->renderArray() === NULL) {
       $this->getStaticPageCache()->addLibrary($module, $library);
     } else {
       if ($library === NULL) {
-        $this->render_array['#attached']['library'][] = $module;
+        $this->renderArray()['#attached']['library'][] = $module;
       } else {
-        $this->render_array['#attached']['library'][] = $module . '/' . $library;
+        $this->renderArray()['#attached']['library'][] = $module . '/' . $library;
       }
     }
   }
 
   public function addSettings(string $module, string $setting, $values): void {
-    if ($this->render_array === NULL) {
+    if ($this->renderArray() === NULL) {
       $this->getStaticPageCache()->addSettings($module, $setting, $values);
     } else {
-      $this->render_array['#attached']['drupalSettings'][$module][$setting] = $values;
+      $this->renderArray()['#attached']['drupalSettings'][$module][$setting] = $values;
     }
+  }
+
+  public function setElementSettings(string $namespace, $settings, string $uuid = NULL): string {
+    if ($uuid === NULL) {
+      /** @var Php $uuid_generator */
+      $uuid_generator = Drupal::service('uuid');
+      $uuid = $uuid_generator->generate();
+    }
+    $this->addLibrary('zero_entitywrapper', 'settings');
+    $this->addSettings('zero_entitywrapper__' . $uuid, $namespace, $settings);
+    return $uuid;
   }
 
   ### cache methods ###
 
   public function cacheMaxAge(int $seconds = 0): void {
-    if ($this->render_array === NULL) {
+    if ($this->renderArray() === NULL) {
       $this->getStaticPageCache()->cacheMaxAge($seconds);
     } else {
-      if (empty($this->render_array['#cache']['max-age']) || $seconds < $this->render_array['#cache']['max-age']) {
-        $this->render_array['#cache']['max-age'] = $seconds;
+      if (empty($this->renderArray()['#cache']['max-age']) || $seconds < $this->renderArray()['#cache']['max-age']) {
+        $this->renderArray()['#cache']['max-age'] = $seconds;
       }
     }
   }
@@ -80,13 +94,13 @@ class RenderContextWrapper implements RenderContextWrapperInterface {
   ### cache tag methods ###
 
   public function cacheAddTags(array $tags = []): void {
-    if ($this->render_array === NULL) {
+    if ($this->renderArray() === NULL) {
       $this->getStaticPageCache()->cacheAddTags($tags);
     } else {
-      if (empty($this->render_array['#cache']['tags'])) {
-        $this->render_array['#cache']['tags'] = $tags;
+      if (empty($this->renderArray()['#cache']['tags'])) {
+        $this->renderArray()['#cache']['tags'] = $tags;
       } else {
-        $this->render_array['#cache']['tags'] = Cache::mergeTags($this->render_array['#cache']['tags'], $tags);
+        $this->renderArray()['#cache']['tags'] = Cache::mergeTags($this->renderArray()['#cache']['tags'], $tags);
       }
     }
   }
@@ -104,13 +118,13 @@ class RenderContextWrapper implements RenderContextWrapperInterface {
   ### cache context methods ###
 
   public function cacheAddContexts(array $contexts = []): void {
-    if ($this->render_array === NULL) {
+    if ($this->renderArray() === NULL) {
       $this->getStaticPageCache()->cacheAddContexts($contexts);
     } else {
-      if (empty($this->render_array['#cache']['contexts'])) {
-        $this->render_array['#cache']['contexts'] = $contexts;
+      if (empty($this->renderArray()['#cache']['contexts'])) {
+        $this->renderArray()['#cache']['contexts'] = $contexts;
       } else {
-        $this->render_array['#cache']['contexts'] = Cache::mergeContexts($this->render_array['#cache']['contexts'], $contexts);
+        $this->renderArray()['#cache']['contexts'] = Cache::mergeContexts($this->renderArray()['#cache']['contexts'], $contexts);
       }
     }
   }
