@@ -8,6 +8,7 @@ use Drupal\views\ViewExecutable;
 use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
 use Drupal\zero_entitywrapper\Base\ViewWrapperInterface;
 use Drupal\zero_entitywrapper\Content\ContentWrapper;
+use Drupal\zero_entitywrapper\Content\ContentWrapperCollection;
 use Drupal\zero_entitywrapper\Wrapper\BaseWrapper;
 
 class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
@@ -94,15 +95,15 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
   }
 
   /**
-   * @return ContentWrapper[]
+   * @return ContentWrapper|ContentWrapper[]
    * @noinspection PhpParamsInspection
    */
-  public function getContentResults(): array {
+  public function getContentResults(): ContentWrapperCollection {
     $results = [];
     foreach ($this->getResults() as $row) {
       $results[] = ContentWrapper::create($row->_entity, $this);
     }
-    return $results;
+    return new ContentWrapperCollection($results);
   }
 
   public function getTotalItems(): int {
@@ -145,7 +146,7 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
     return $this;
   }
 
-  public function render(string $display = NULL): array {
+  public function render(string $display = NULL, array $options = []): array {
     return $this->executable()->preview($display);
   }
 

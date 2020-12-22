@@ -182,14 +182,6 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return $extension;
   }
 
-  /**
-   * @param string $field
-   * @return ContentWrapper
-   */
-  public function each(string $field) {
-    return new ContentEachWrapper($this->getEntities($field));
-  }
-
   public function getLabel() {
     return $this->getValue($this->metaEntityKey('label'));
   }
@@ -257,10 +249,10 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   /**
    * @param string $field
    *
-   * @return ContentWrapper[]
+   * @return ContentWrapper|ContentWrapper[]
    */
-  public function getEntities(string $field): array {
-    return $this->metaForeach([$this, 'getEntity'], $field);
+  public function getEntities(string $field): ContentWrapperCollection {
+    return new ContentWrapperCollection($this->metaForeach([$this, 'getEntity'], $field));
   }
 
   public function getUrl(string $field, int $index = 0, array $options = []): ?Url {

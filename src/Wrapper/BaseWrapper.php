@@ -52,7 +52,7 @@ abstract class BaseWrapper implements BaseWrapperInterface {
     WrapperHelper::extendPreprocess($this, $template);
   }
 
-  public function render(string $view_mode = 'full'): array {
+  public function render(string $view_mode = 'full', array $options = []): array {
     return Drupal::entityTypeManager()
       ->getViewBuilder($this->type())
       ->view($this->entity(), $view_mode);
