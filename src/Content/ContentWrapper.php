@@ -233,6 +233,13 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return $values;
   }
 
+  public function hasListValue(string $field, ...$value): bool {
+    foreach ($value as $item) {
+      if (!in_array($item, $this->getValues($field))) return FALSE;
+    }
+    return TRUE;
+  }
+
   public function getEntity(string $field, int $index = 0): ?ContentWrapper {
     /** @var FieldItemInterface $item */
     $item = $this->metaItem($field, $index);

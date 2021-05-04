@@ -9,6 +9,7 @@ use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
 use Drupal\zero_entitywrapper\Base\ContentWrapperInterface;
 use Drupal\zero_entitywrapper\Exception\EntityWrapperException;
 use Drupal\zero_entitywrapper\Helper\WrapperHelper;
+use Drupal\zero_entitywrapper\Render\RenderWrapperCollection;
 
 class ContentViewWrapper implements BaseWrapperExtensionInterface {
 
@@ -46,55 +47,38 @@ class ContentViewWrapper implements BaseWrapperExtensionInterface {
     $item = $wrapper->metaItem($field, $index);
     if ($item === NULL) return [];
 
-    return $item->view([
-      'type' => $formatter,
-      'label' => 'hidden',
-      'settings' => $settings,
-    ]);
+    return $item->view(['type' => $formatter, 'label' => 'hidden', 'settings' => $settings,]);
   }
 
-  public function doFormatters(ContentWrapperInterface $wrapper, string $field, string $formatter, array $settings = []): array {
-    return $wrapper->metaItems($field)
-      ->view([
-        'type' => $formatter,
-        'label' => 'hidden',
-        'settings' => $settings,
-      ]);
+  private function doFormatters(ContentWrapperInterface $wrapper, string $field, string $formatter, array $settings = []): array {
+    return $wrapper->metaItems($field)->view(['type' => $formatter, 'label' => 'hidden', 'settings' => $settings,]);
   }
 
-  public function formatter(string $field, int $index, string $formatter, array $settings = []): array {
-    return $this->doFormatter($this->wrapper, $field, $index, $formatter, $settings);
+  public function formatter(string $field, int $index, string $formatter, array $settings = []): RenderWrapperCollection {
+    return new RenderWrapperCollection($this->doFormatter($this->wrapper, $field, $index, $formatter, $settings), $this->wrapper);
   }
 
-  public function formatters(string $field, string $formatter, array $settings = []): array {
-    return $this->doFormatters($this->wrapper, $field, $formatter, $settings);
+  public function formatters(string $field, string $formatter, array $settings = []): RenderWrapperCollection {
+    return new RenderWrapperCollection($this->doFormatters($this->wrapper, $field, $formatter, $settings), $this->wrapper);
   }
 
-  public function entity(string $field, int $index = 0, string $view_mode = 'full'): array {
-    return $this->formatter($field, $index, 'entity_reference_entity_view', [
-      'view_mode' => $view_mode,
-    ]);
+  public function entity(string $field, int $index = 0, string $view_mode = 'full'): RenderWrapperCollection {
+    return $this->formatter($field, $index, 'entity_reference_entity_view', ['view_mode' => $view_mode,]);
   }
 
-  public function entities(string $field, string $view_mode = 'full'): array {
-    return $this->formatters($field, 'entity_reference_entity_view', [
-      'view_mode' => $view_mode,
-    ]);
+  public function entities(string $field, string $view_mode = 'full'): RenderWrapperCollection {
+    return $this->formatters($field, 'entity_reference_entity_view', ['view_mode' => $view_mode,]);
   }
 
-  public function string(string $field, int $index = 0, bool $linkToEntity = FALSE): array {
-    return $this->formatter($field, $index, 'string', [
-      'link_to_entity' => $linkToEntity,
-    ]);
+  public function string(string $field, int $index = 0, bool $linkToEntity = FALSE): RenderWrapperCollection {
+    return $this->formatter($field, $index, 'string', ['link_to_entity' => $linkToEntity,]);
   }
 
-  public function strings(string $field, bool $linkToEntity = FALSE): array {
-    return $this->formatters($field, 'string', [
-      'link_to_entity' => $linkToEntity,
-    ]);
+  public function strings(string $field, bool $linkToEntity = FALSE): RenderWrapperCollection {
+    return $this->formatters($field, 'string', ['link_to_entity' => $linkToEntity,]);
   }
 
-  public function body(string $field, int $index = 0, int $trimmed = 0, bool $summary = FALSE): array {
+  public function body(string $field, int $index = 0, int $trimmed = 0, bool $summary = FALSE): RenderWrapperCollection {
     $formatter = 'text_default';
     $settings = [];
 
@@ -113,7 +97,7 @@ class ContentViewWrapper implements BaseWrapperExtensionInterface {
     return $this->formatter($field, $index, $formatter, $settings);
   }
 
-  public function bodies(string $field, int $trimmed = 0, bool $summary = FALSE): array {
+  public function bodies(string $field, int $trimmed = 0, bool $summary = FALSE): RenderWrapperCollection {
     $formatter = 'text_default';
     $settings = [];
 
@@ -132,91 +116,59 @@ class ContentViewWrapper implements BaseWrapperExtensionInterface {
     return $this->formatters($field, $formatter, $settings);
   }
 
-  public function image(string $field, int $index = 0, string $image_style = '', string $image_link = ''): array {
+  public function image(string $field, int $index = 0, string $image_style = '', string $image_link = ''): RenderWrapperCollection {
     if ($this->wrapper->metaReferenceTargetType($field) === 'media') {
       $media = $this->wrapper->getEntity($field, $index);
-      return $this->doFormatter($media, $media->metaMediaSourceField(), 0, 'image', [
-        'image_style' => $image_style,
-        'image_link' => $image_link,
-      ]);
+      return new RenderWrapperCollection($this->doFormatter($media, $media->metaMediaSourceField(), 0, 'image', ['image_style' => $image_style, 'image_link' => $image_link,]), $this->wrapper);
     }
-    return $this->formatter($field, $index, 'image', [
-      'image_style' => $image_style,
-      'image_link' => $image_link,
-    ]);
+    return $this->formatter($field, $index, 'image', ['image_style' => $image_style, 'image_link' => $image_link,]);
   }
 
-  public function images(string $field, string $image_style = '', string $image_link = ''): array {
+  public function images(string $field, string $image_style = '', string $image_link = ''): RenderWrapperCollection {
     if ($this->wrapper->metaReferenceTargetType($field) === 'media') {
       $medias = $this->wrapper->getEntities($field);
       $output = [];
       foreach ($medias as $media) {
-        $output[] = $this->doFormatter($media, $media->metaMediaSourceField(), 0, 'image', [
-          'image_style' => $image_style,
-          'image_link' => $image_link,
-        ]);
+        $output[] = $this->doFormatter($media, $media->metaMediaSourceField(), 0, 'image', ['image_style' => $image_style, 'image_link' => $image_link,]);
       }
-      return $output;
+      return new RenderWrapperCollection($output, $this->wrapper);
     }
-    return $this->formatters($field, 'image', [
-      'image_style' => $image_style,
-      'image_link' => $image_link,
-    ]);
+    return $this->formatters($field, 'image', ['image_style' => $image_style, 'image_link' => $image_link,]);
   }
 
-  public function responsiveImage(string $field, int $index = 0, string $responsive_image_style = '', string $image_link = ''): array {
+  public function responsiveImage(string $field, int $index = 0, string $responsive_image_style = '', string $image_link = ''): RenderWrapperCollection {
     if ($this->wrapper->metaReferenceTargetType($field) === 'media') {
       $media = $this->wrapper->getEntity($field, $index);
-      return $this->doFormatter($media, $media->metaMediaSourceField(), 0, 'responsive_image', [
-        'responsive_image_style' => $responsive_image_style,
-        'image_link' => $image_link,
-      ]);
+      return new RenderWrapperCollection($this->doFormatter($media, $media->metaMediaSourceField(), 0, 'responsive_image', ['responsive_image_style' => $responsive_image_style, 'image_link' => $image_link,]), $this->wrapper);
     }
-    return $this->formatter($field, $index, 'responsive_image', [
-      'responsive_image_style' => $responsive_image_style,
-      'image_link' => $image_link,
-    ]);
+    return $this->formatter($field, $index, 'responsive_image', ['responsive_image_style' => $responsive_image_style, 'image_link' => $image_link,]);
   }
 
-  public function responsiveImages(string $field, string $responsive_image_style = '', string $image_link = ''): array {
+  public function responsiveImages(string $field, string $responsive_image_style = '', string $image_link = ''): RenderWrapperCollection {
     if ($this->wrapper->metaReferenceTargetType($field) === 'media') {
       $medias = $this->wrapper->getEntities($field);
       $output = [];
       foreach ($medias as $media) {
-        $output[] = $this->doFormatter($media, $media->metaMediaSourceField(), 0, 'responsive_image', [
-          'responsive_image_style' => $responsive_image_style,
-          'image_link' => $image_link,
-        ]);
+        $output[] = $this->doFormatter($media, $media->metaMediaSourceField(), 0, 'responsive_image', ['responsive_image_style' => $responsive_image_style, 'image_link' => $image_link,]);
       }
-      return $output;
+      return new RenderWrapperCollection($output, $this->wrapper);
     }
-    return $this->formatters($field, 'responsive_image', [
-      'responsive_image_style' => $responsive_image_style,
-      'image_link' => $image_link,
-    ]);
+    return $this->formatters($field, 'responsive_image', ['responsive_image_style' => $responsive_image_style, 'image_link' => $image_link,]);
   }
 
-  public function date(string $field, int $index = 0, string $type = 'medium', string $format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT): array {
+  public function date(string $field, int $index = 0, string $type = 'medium', string $format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT): RenderWrapperCollection {
     if ($type === 'custom') {
-      return $this->formatter($field, $index, 'datetime_custom', [
-        'date_format' => $format,
-      ]);
+      return $this->formatter($field, $index, 'datetime_custom', ['date_format' => $format,]);
     } else {
-      return $this->formatter($field, $index, 'datetime_default', [
-        'format_type' => $type,
-      ]);
+      return $this->formatter($field, $index, 'datetime_default', ['format_type' => $type,]);
     }
   }
 
-  public function dates(string $field, string $type = 'medium', string $format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT): array {
+  public function dates(string $field, string $type = 'medium', string $format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT): RenderWrapperCollection {
     if ($type === 'custom') {
-      return $this->formatters($field, 'datetime_custom', [
-        'date_format' => $format,
-      ]);
+      return $this->formatters($field, 'datetime_custom', ['date_format' => $format,]);
     } else {
-      return $this->formatters($field, 'datetime_default', [
-        'format_type' => $type,
-      ]);
+      return $this->formatters($field, 'datetime_default', ['format_type' => $type,]);
     }
   }
 
@@ -227,11 +179,7 @@ class ContentViewWrapper implements BaseWrapperExtensionInterface {
    * @return array
    */
   public function template(string $template, $context = []) {
-    return [
-      '#type' => 'inline_template',
-      '#template' => $template,
-      '#context' => WrapperHelper::getArray($context, $this->wrapper),
-    ];
+    return ['#type' => 'inline_template', '#template' => $template, '#context' => WrapperHelper::getArray($context, $this->wrapper),];
   }
 
   /**
@@ -248,12 +196,7 @@ class ContentViewWrapper implements BaseWrapperExtensionInterface {
     }
     $theme[] = 'zero_component';
 
-    return [
-      '#theme' => $theme,
-      '#component_namespace' => $namespace,
-      '#component_vars' => WrapperHelper::getArray($vars, $this->wrapper),
-      '#component_path' => $path,
-    ];
+    return ['#theme' => $theme, '#component_namespace' => $namespace, '#component_vars' => WrapperHelper::getArray($vars, $this->wrapper), '#component_path' => $path,];
   }
 
 }
