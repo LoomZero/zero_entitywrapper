@@ -90,6 +90,14 @@ class WrapperHelper {
     /** @var Registry $registry */
     $registry = Drupal::service('theme.registry');
     $template = str_replace('-', '_', $template);
+
+    if (empty($registry->get()[$template])) {
+      if (str_ends_with($template, '.html.twig')) {
+        throw new InvalidParameterException('The parameter $template should not end with ".html.twig"');
+      } else if (str_ends_with($template, '.preprocess.php')) {
+        throw new InvalidParameterException('The parameter $template should not end with ".preprocess.php"');
+      }
+    }
     return $registry->get()[$template];
   }
 
