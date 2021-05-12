@@ -7,6 +7,7 @@ use Drupal;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\zero_entitywrapper\Content\ContentWrapper;
 use Drupal\zero_entitywrapper\View\ViewWrapper;
+use Symfony\Component\HttpFoundation\Request;
 
 class EntityWrapper extends BaseWrapper {
 
@@ -15,6 +16,15 @@ class EntityWrapper extends BaseWrapper {
     $fields[$storage->getEntityType()->getKey('bundle')] = $bundle;
     $entity = $storage->create($fields);
     return new EntityWrapper($entity);
+  }
+
+  public static function createFromRequest(string $entity_type, Request $request = NULL): ?EntityWrapper {
+    if ($request === NULL) $request = Drupal::request();
+    $entity = $request->get($entity_type);
+    if ($entity instanceof EntityInterface) {
+      return new EntityWrapper($entity);
+    }
+    return NULL;
   }
 
   private function prepareWrapper(BaseWrapper $wrapper) {
