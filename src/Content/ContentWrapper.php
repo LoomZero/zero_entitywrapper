@@ -92,6 +92,18 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return $this->entity()->toUrl($rel, $options);
   }
 
+  public function hasField(string $field): bool {
+    return $this->entity()->hasField($field);
+  }
+
+  public function isEmpty(string $field): bool {
+    return $this->entity()->get($field)->isEmpty();
+  }
+
+  public function hasValue(string $field): bool {
+    return $this->hasField($field) && !$this->isEmpty($field);
+  }
+
   public function metaItems(string $field): FieldItemListInterface {
     return $this->entity()->get($field);
   }
