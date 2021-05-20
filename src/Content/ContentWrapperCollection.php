@@ -1,24 +1,14 @@
 <?php
-/** @noinspection PhpParamsInspection */
 
 namespace Drupal\zero_entitywrapper\Content;
 
-use ArrayObject;
+use Drupal\zero_preprocess\Collection\ProxyCollection;
 
-class ContentWrapperCollection extends ArrayObject {
-
-  /**
-   * ContentWrapperCollection constructor.
-   *
-   * @param ContentWrapper[] $array
-   */
-  public function __construct(array $array = []) {
-    parent::__construct($array);
-  }
+class ContentWrapperCollection extends ProxyCollection {
 
   public function offsetSet($offset, $value) {
     if ($value instanceof ContentWrapper) {
-      throw new \InvalidArgumentException("Must be an BaseWrapper");
+      throw new \InvalidArgumentException('Added item must be an ContentWrapper');
     }
 
     parent::offsetSet($offset, $value);
@@ -26,13 +16,25 @@ class ContentWrapperCollection extends ArrayObject {
 
   public function __call($name, $arguments) {
     $results = [];
-    /** @var ContentWrapper $item */
+    $is_array = FALSE;
     foreach ($this as $item) {
       if (method_exists($item, $name)) {
-        $results[$item->id()] = $item->{$name}(...$arguments);
+        $value = $item->{$name}(...$arguments);
+        if ($value instanceof ProxyCollection) {
+          foreach ($value as $value_item) {
+            $results[] = $value_item;
+          }
+        } else {
+          if (is_array($value)) $is_array = TRUE;
+          $results[] = $value;
+        }
       }
     }
-    return $results;
+    if ($is_array) {
+      return $results;
+    } else {
+      return new self($results);
+    }
   }
 
 }
