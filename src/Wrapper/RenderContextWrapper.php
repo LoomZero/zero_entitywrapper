@@ -8,11 +8,11 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
 use Drupal\zero_entitywrapper\Base\RenderContextWrapperInterface;
-use Drupal\zero_entitywrapper\Service\StaticMailService;
+use Drupal\zero_entitywrapper\Service\StaticWrapperService;
 
 class RenderContextWrapper implements RenderContextWrapperInterface {
 
-  /** @var StaticMailService */
+  /** @var StaticWrapperService */
   private $staticPageCache;
   /** @var BaseWrapperInterface */
   private $wrapper;
@@ -41,7 +41,7 @@ class RenderContextWrapper implements RenderContextWrapperInterface {
     }
   }
 
-  private function getStaticPageCache(): StaticMailService {
+  private function getStaticPageCache(): StaticWrapperService {
     if ($this->staticPageCache === NULL) {
       $this->staticPageCache = Drupal::service('zero.entitywrapper.static');
     }

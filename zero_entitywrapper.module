@@ -1,16 +1,14 @@
 <?php
 
-use Drupal\zero_entitywrapper\Service\StaticMailService;
-
 function zero_entitywrapper_page_attachments(array &$attachments) {
-  /** @var StaticMailService $cache */
+  /** @var \Drupal\zero_entitywrapper\Service\StaticWrapperService $cache */
   $cache = Drupal::service('zero.entitywrapper.static');
 
   $cache->applyAttachments($attachments);
 }
 
 function zero_entitywrapper_preprocess_page(&$variables) {
-  /** @var StaticMailService $cache */
+  /** @var \Drupal\zero_entitywrapper\Service\StaticWrapperService $cache */
   $cache = Drupal::service('zero.entitywrapper.static');
 
   $cache->applyCache($variables, TRUE);
