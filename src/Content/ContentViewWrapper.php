@@ -186,7 +186,7 @@ class ContentViewWrapper implements BaseWrapperExtensionInterface {
    *
    * @return array
    */
-  public function template(string $template, $context = []) {
+  public function template(string $template, $context = []): array {
     return ['#type' => 'inline_template', '#template' => $template, '#context' => WrapperHelper::getArray($context, $this->wrapper)];
   }
 
