@@ -21,7 +21,6 @@ function zero_entitywrapper_theme($existing, $type, $theme, $path) {
   return [
     'zero_component' => [
       'variables' => [
-        'component_namespace' => 'components',
         'component_vars' => [],
         'component_path' => NULL,
       ],

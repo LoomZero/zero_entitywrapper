@@ -5,6 +5,7 @@ namespace Drupal\zero_entitywrapper\Content;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
+use Drupal;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
@@ -13,6 +14,8 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Link;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\Url;
+use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
+use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\file\FileInterface;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\zero_entitywrapper\Base\ContentWrapperInterface;
@@ -359,6 +362,26 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return $this->metaForeach([$this, 'getNumber'], $field, $decimals, $dec_point, $thousands_sep);
   }
 
+  /**
+   * @param string $field
+   * @param int $index
+   * @param string|null $property ('value', 'end_value')
+   * @return DrupalDateTime
+   */
+  public function getDateTime(string $field, int $index = 0, string $property = NULL): DrupalDateTime {
+    if ($property === NULL) $property = $this->metaMainProperty($field);
+    return $this->metaItem($field, $index)->get($property)->getDateTime();
+  }
+
+  /**
+   * @param string $field
+   * @param string|null $property ('value', 'end_value')
+   * @return DrupalDateTime[]
+   */
+  public function getDateTimes(string $field, string $property = NULL): array {
+    return $this->metaForeach([$this, 'getDateTime'], $field, $property);
+  }
+
   public function getUTCDate(string $field, int $index = 0, string $property = 'value'): ?DateTime {
     $date = $this->getRaw($field, $index, $property);
     if ($date === NULL) return NULL;
@@ -376,6 +399,40 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
 
   public function getUTCDates(string $field, string $property = 'value'): array {
     return $this->metaForeach([$this, 'getUTCDate'], $field, $property);
+  }
+
+  public function getDateRange(string $field, int $index = 0, string $type = 'medium', string $start_format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT, string $end_format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT): array {
+    /** @var Drupal\Core\Datetime\DateFormatterInterface $formatter */
+    $formatter = Drupal::service('date.formatter');
+
+    $start_time = $this->getDateTime($field, $index)->getTimestamp();
+    $end_time = $this->getDateTime($field, $index, 'end_value')->getTimestamp();
+
+    if ($type === 'custom') {
+      $start = $formatter->format($start_time, 'custom', $start_format);
+      $end = $formatter->format($end_time, 'custom', $end_format);
+    } else {
+      $start = $formatter->format($start_time, $type);
+      $end = $formatter->format($end_time, $type);
+    }
+
+    return [
+      'start' => $start,
+      'end' => $end,
+    ];
+  }
+
+  public function getDateRanges(string $field, int $index = 0, string $type = 'medium', string $start_format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT, string $end_format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT): array {
+    return $this->metaForeach([$this, 'getDateRange'], $field, $type, $start_format, $end_format);
+  }
+
+  public function getDateRangeFormatted(string $field, int $index = 0, string $type = 'medium', string $start_format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT, string $end_format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT, string $seperator = ' - '): string {
+    $data = $this->getDateRange($field, $index, $type, $start_format, $end_format);
+    return $data['start'] . $seperator . $data['end'];
+  }
+
+  public function getDateRangesFormatted(string $field, string $type = 'medium', string $start_format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT, string $end_format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT, string $seperator = ' - '): array {
+    return $this->metaForeach([$this, 'getDateRangeFormatted'], $field, $type, $start_format, $end_format);
   }
 
   public function getView(string $field, string $explode = ':'): ?ViewWrapper {
