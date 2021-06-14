@@ -4,6 +4,7 @@
 namespace Drupal\zero_entitywrapper\Wrapper;
 
 use Drupal;
+use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\zero_entitywrapper\Base\BaseWrapperExtensionInterface;
 use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
@@ -42,6 +43,13 @@ abstract class BaseWrapper implements BaseWrapperInterface {
 
   public function bundle(): string {
     return $this->entity()->bundle();
+  }
+
+  public function getBundle(): ConfigEntityBundleBase {
+    /** @noinspection PhpIncompatibleReturnTypeInspection */
+    return Drupal::entityTypeManager()
+      ->getStorage($this->entity()->getEntityType()->get('bundle_entity_type'))
+      ->load($this->bundle());
   }
 
   public function id() {

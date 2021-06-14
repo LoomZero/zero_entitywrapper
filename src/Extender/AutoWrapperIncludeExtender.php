@@ -22,26 +22,42 @@ class AutoWrapperIncludeExtender implements PreprocessExtenderInterface {
   public function registry(array &$zero, array $item, $name, array $theme_registry) {
     if (empty($zero['preprocess'])) return;
 
+    $zero['wrapper']['entity'] = [];
     if (!empty($item['base hook'])) {
-      $zero['wrapper']['entity'] = $item['base hook'];
+      $zero['wrapper']['entity']['wrapper'] = $item['base hook'];
+    }
+
+    // add menu_link_content support
+    if (strpos($item['template'], 'menu-link-content') === 0) {
+      $zero['wrapper']['entity']['wrapper'] = 'menu_link_content';
+    }
+
+    // add comment support
+    if (strpos($item['template'], 'comment') === 0) {
+      $zero['wrapper']['entity']['wrapper'] = 'comment';
+      $zero['wrapper']['entity']['commented'] = 'commented_entity';
     }
   }
 
   public function preprocess(array &$vars, array $zero, array $template) {
-    if (empty($zero['wrapper']['entity'])) return;
+    if (empty($zero['wrapper']['entity']) || !count($zero['wrapper']['entity'])) return;
 
-    $entity = NULL;
-    if (isset($vars[$zero['wrapper']['entity']])) {
+    foreach ($zero['wrapper']['entity'] as $name => $type) {
       $entity = NULL;
-    }
-    if ($entity === NULL && isset($vars['elements']['#' . $zero['wrapper']['entity']])) {
-      $entity = $vars['elements']['#' . $zero['wrapper']['entity']];
-    }
 
-    if ($entity !== NULL) {
-      if ($entity instanceof ContentEntityBase) {
-        $vars['zero']['local']['wrapper'] = ContentWrapper::create($entity);
-        $vars['zero']['local']['wrapper']->setRenderContext($vars);
+      if (isset($vars[$type])) {
+        $entity = $vars[$type];
+      }
+
+      if ($entity === NULL && isset($vars['elements']['#' . $type])) {
+        $entity = $vars['elements']['#' . $type];
+      }
+
+      if ($entity !== NULL) {
+        if ($entity instanceof ContentEntityBase) {
+          $vars['zero']['local'][$name] = ContentWrapper::create($entity);
+          $vars['zero']['local'][$name]->setRenderContext($vars);
+        }
       }
     }
   }
