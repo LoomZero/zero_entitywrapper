@@ -22,6 +22,7 @@ use Drupal\zero_entitywrapper\Base\ContentWrapperInterface;
 use Drupal\zero_entitywrapper\Helper\WrapperHelper;
 use Drupal\zero_entitywrapper\View\ViewWrapper;
 use Drupal\zero_entitywrapper\Wrapper\BaseWrapper;
+use Drupal\zero_preprocess\Collection\ProxyCollection;
 
 class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
 
@@ -399,6 +400,14 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
 
   public function getUTCDates(string $field, string $property = 'value'): array {
     return $this->metaForeach([$this, 'getUTCDate'], $field, $property);
+  }
+
+  public function getDateDiff(string $field, int $index = 0): DateInterval {
+    return $this->getDateTime($field)->diff($this->getDateTime($field, $index, 'ent_value'));
+  }
+
+  public function getDateDiffs(string $field): array {
+    return $this->metaForeach([$this, 'getDateDiff'], $field);
   }
 
   public function getDateRange(string $field, int $index = 0, string $type = 'medium', string $start_format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT, string $end_format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT): array {
