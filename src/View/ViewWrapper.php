@@ -16,6 +16,11 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
   /** @var ViewExecutable */
   private $executable;
 
+  public static function create(string $value, BaseWrapperInterface $parent = NULL): ViewWrapper {
+    [ $view, $display ] = explode(':', $value);
+    return new ViewWrapper($view, $display, $parent);
+  }
+
   /**
    * @param string|ViewExecutable|ViewEntityInterface $entity
    * @param string|null $display
@@ -47,6 +52,13 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
       $this->executable = $this->entity()->getExecutable();
     }
     return $this->executable;
+  }
+
+  public function setConfig(array $config): ViewWrapper {
+    if (isset($config['page'])) $this->executable()->setCurrentPage($config['page']);
+    if (isset($config['items'])) $this->executable()->setItemsPerPage($config['items']);
+    if (isset($config['offset'])) $this->executable()->setOffset($config['offset']);
+    return $this;
   }
 
   public function setDisplay(string $display = NULL): ViewWrapper {
@@ -123,7 +135,14 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
   }
 
   /**
-   * @return array<string, int>
+   * @return array = [
+   *     'offset' => 0,
+   *     'items' => 0,
+   *     'total' => 0,
+   *     'current' => 0,
+   *     'total_pages' => 0,
+   *     'remain' => 0,
+   * ]
    */
   public function getResultMeta(): array {
     $meta = [
@@ -131,8 +150,10 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
       'items' => $this->getItemsPerPage(),
       'total' => $this->getTotalItems(),
       'current' => $this->getCurrentPage(),
+      'page' => $this->getCurrentPage(),
     ];
-    $meta['remain'] = $meta['total'] - $meta['items'] * $meta['current'];
+    $meta['total_pages'] = ceil($meta['total'] / $meta['items']);
+    $meta['remain'] = $meta['total'] - $meta['items'] * ($meta['current'] + 1);
     return $meta;
   }
 
