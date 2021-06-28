@@ -22,27 +22,27 @@ class AutoWrapperIncludeExtender implements PreprocessExtenderInterface {
   public function registry(array &$zero, array $item, $name, array $theme_registry) {
     if (empty($zero['preprocess'])) return;
 
-    $zero['wrapper']['entity'] = [];
+    $zero['wrapper']['content'] = [];
     if (!empty($item['base hook'])) {
-      $zero['wrapper']['entity']['wrapper'] = $item['base hook'];
+      $zero['wrapper']['content']['wrapper'] = $item['base hook'];
     }
 
     // add menu_link_content support
     if (strpos($item['template'], 'menu-link-content') === 0) {
-      $zero['wrapper']['entity']['wrapper'] = 'menu_link_content';
+      $zero['wrapper']['content']['wrapper'] = 'menu_link_content';
     }
 
     // add comment support
     if (strpos($item['template'], 'comment') === 0) {
-      $zero['wrapper']['entity']['wrapper'] = 'comment';
-      $zero['wrapper']['entity']['commented'] = 'commented_entity';
+      $zero['wrapper']['content']['wrapper'] = 'comment';
+      $zero['wrapper']['content']['commented'] = 'commented_entity';
     }
   }
 
   public function preprocess(array &$vars, array $zero, array $template) {
-    if (empty($zero['wrapper']['entity']) || !count($zero['wrapper']['entity'])) return;
+    if (empty($zero['wrapper']['content']) || !count($zero['wrapper']['content'])) return;
 
-    foreach ($zero['wrapper']['entity'] as $name => $type) {
+    foreach ($zero['wrapper']['content'] as $name => $type) {
       $entity = NULL;
 
       if (isset($vars[$type])) {
