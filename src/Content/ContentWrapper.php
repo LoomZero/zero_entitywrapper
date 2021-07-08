@@ -278,6 +278,17 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return new ContentWrapperCollection($this->metaForeach([$this, 'getEntity'], $field));
   }
 
+  /**
+   * Try to create a Url object of the value. 
+   * Supported field types: link, string, file, entity_reference(media)
+   * 
+   * @param string $field The machine-readable field name
+   * @param int $index The delta value of the value
+   * @param array $options = [
+   *   'query' => [],
+   * ]
+   * @return Url|NULL The generated Url object or NULL if error
+   */
   public function getUrl(string $field, int $index = 0, array $options = []): ?Url {
     $items = $this->metaItems($field);
 
