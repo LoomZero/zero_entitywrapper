@@ -264,6 +264,8 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     /** @var ContentEntityBase $entity */
     $entity = $item->get('entity')->getValue();
 
+    if ($entity === NULL) return NULL;
+
     $entity = $this->transformEntity($entity);
 
     return ContentWrapper::create($entity, $this);
