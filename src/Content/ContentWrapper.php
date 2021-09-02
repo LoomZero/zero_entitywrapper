@@ -118,7 +118,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
 
   public function metaAcceptItem(FieldItemBase $item): bool {
     if ($item->isEmpty()) return FALSE;
-    if ($item->getFieldDefinition()->getType() === 'entity_reference' && $item->get('entity')->getValue() === NULL) return FALSE;
+    if (in_array($item->getFieldDefinition()->getType(), ['entity_reference', 'entity_reference_revisions']) && $item->get('entity')->getValue() === NULL) return FALSE;
     return TRUE;
   }
 
@@ -142,6 +142,8 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
         $value = $callable($field, $index, ...$params);
         if ($value === NULL) continue;
         $values[] = $value;
+      } else {
+        Drupal::logger('zero_entitywrapper')->warning('<details><summary>Deleted entity found in field ' . $field . ' [' . $this->type() . ' - ' . $this->bundle() . ' - ' . $this->id() . ']</summary><p>More Data: <pre>' . json_encode($item->getValue(), JSON_PRETTY_PRINT) . '</pre></p></details>');
       }
       $index++;
     }
