@@ -131,7 +131,13 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   }
 
   public function metaItem(string $field, int $index): ?TypedDataInterface {
-    return $this->entity()->get($field)->get($index);
+    $count = 0;
+    foreach ($this->metaItems($field) as $item) {
+      if ($this->metaAcceptItem($item) && $index === $count++) {
+        return $item;
+      }
+    }
+    return NULL;
   }
 
   protected function metaForeach(callable $callable, string $field, ...$params) {
@@ -139,13 +145,12 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     $index = 0;
     foreach ($this->metaItems($field) as $item) {
       if ($this->metaAcceptItem($item)) {
-        $value = $callable($field, $index, ...$params);
+        $value = $callable($field, $index++, ...$params);
         if ($value === NULL) continue;
         $values[] = $value;
       } else {
         Drupal::logger('zero_entitywrapper')->warning('<details><summary>Deleted entity found in field ' . $field . ' [' . $this->type() . ' - ' . $this->bundle() . ' - ' . $this->id() . ']</summary><p>More Data: <pre>' . json_encode($item->getValue(), JSON_PRETTY_PRINT) . '</pre></p></details>');
       }
-      $index++;
     }
     return $values;
   }
@@ -327,7 +332,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     }
 
     /** @var FieldItemInterface */
-    $item = $items->get($index);
+    $item = $this->metaItem($field, $index);
 
     if ($this->metaFieldType($field) === 'string') {
       return Url::fromUri($item->getValue()['value'], $options);
