@@ -9,6 +9,7 @@ use Drupal;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
+use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Link;
@@ -22,7 +23,6 @@ use Drupal\zero_entitywrapper\Base\ContentWrapperInterface;
 use Drupal\zero_entitywrapper\Helper\WrapperHelper;
 use Drupal\zero_entitywrapper\View\ViewWrapper;
 use Drupal\zero_entitywrapper\Wrapper\BaseWrapper;
-use Drupal\zero_preprocess\Collection\ProxyCollection;
 
 class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
 
@@ -101,7 +101,25 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   }
 
   public function isEmpty(string $field): bool {
-    return $this->entity()->get($field)->isEmpty();
+    return $this->count($field) === 0;
+  }
+
+  public function count(string $field): int {
+    $count = 0;
+    foreach ($this->metaItems($field) as $item) {
+      if ($this->metaAcceptItem($item)) {
+        $count++;
+      } else {
+        Drupal::logger('zero_entitywrapper')->warning('<details><summary>Deleted entity found in field ' . $field . ' [' . $this->type() . ' - ' . $this->bundle() . ' - ' . $this->id() . ']</summary><p>More Data: <pre>' . json_encode($item->getValue(), JSON_PRETTY_PRINT) . '</pre></p></details>');
+      }
+    }
+    return $count;
+  }
+
+  public function metaAcceptItem(FieldItemBase $item): bool {
+    if ($item->isEmpty()) return FALSE;
+    if ($item->getFieldDefinition()->getType() === 'entity_reference' && $item->get('entity')->getValue() === NULL) return FALSE;
+    return TRUE;
   }
 
   public function hasValue(string $field): bool {
@@ -118,11 +136,14 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
 
   protected function metaForeach(callable $callable, string $field, ...$params) {
     $values = [];
-    $count = count($this->metaItems($field));
-    for ($index = 0; $index < $count; $index++) {
-      $value = $callable($field, $index, ...$params);
-      if ($value === NULL) continue;
-      $values[] = $value;
+    $index = 0;
+    foreach ($this->metaItems($field) as $item) {
+      if ($this->metaAcceptItem($item)) {
+        $value = $callable($field, $index, ...$params);
+        if ($value === NULL) continue;
+        $values[] = $value;
+      }
+      $index++;
     }
     return $values;
   }
@@ -280,17 +301,6 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return new ContentWrapperCollection($this->metaForeach([$this, 'getEntity'], $field));
   }
 
-  /**
-   * Try to create a Url object of the value. 
-   * Supported field types: link, string, file, entity_reference(media)
-   * 
-   * @param string $field The machine-readable field name
-   * @param int $index The delta value of the value
-   * @param array $options = [
-   *   'query' => [],
-   * ]
-   * @return Url|NULL The generated Url object or NULL if error
-   */
   public function getUrl(string $field, int $index = 0, array $options = []): ?Url {
     $items = $this->metaItems($field);
 
