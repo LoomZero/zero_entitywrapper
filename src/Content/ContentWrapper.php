@@ -334,6 +334,8 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     /** @var FieldItemInterface */
     $item = $this->metaItem($field, $index);
 
+    if ($item === NULL) return NULL;
+
     if ($this->metaFieldType($field) === 'string') {
       return Url::fromUri($item->getValue()['value'], $options);
     } else {
