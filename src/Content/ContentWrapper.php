@@ -110,7 +110,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
       if ($this->metaAcceptItem($item)) {
         $count++;
       } else {
-        Drupal::logger('zero_entitywrapper')->warning('<details><summary>Deleted entity found in field ' . $field . ' [' . $this->type() . ' - ' . $this->bundle() . ' - ' . $this->id() . ']</summary><p>More Data: <pre>' . json_encode($item->getValue(), JSON_PRETTY_PRINT) . '</pre></p></details>');
+        $this->metaLogItem($field, $item);
       }
     }
     return $count;
@@ -118,8 +118,23 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
 
   public function metaAcceptItem(FieldItemBase $item): bool {
     if ($item->isEmpty()) return FALSE;
-    if (in_array($item->getFieldDefinition()->getType(), ['entity_reference', 'entity_reference_revisions']) && $item->get('entity')->getValue() === NULL) return FALSE;
+    if (in_array($item->getFieldDefinition()->getType(), ['entity_reference', 'entity_reference_revisions'])) {
+      if ($item->get('entity')->getValue() === NULL) {
+        return FALSE;
+      } else if (!$item->get('entity')->getValue()->access('view')) {
+        return FALSE;
+      }
+    }
     return TRUE;
+  }
+
+  public function metaLogItem(string $field, FieldItemBase $item) {
+    if ($item->isEmpty()) return;
+    if (in_array($item->getFieldDefinition()->getType(), ['entity_reference', 'entity_reference_revisions'])) {
+      if ($item->get('entity')->getValue() === NULL) {
+        Drupal::logger('zero_entitywrapper')->warning('<details><summary>Deleted entity found in field ' . $field . ' [' . $this->type() . ' - ' . $this->bundle() . ' - ' . $this->id() . ']</summary><p>More Data: <pre>' . json_encode($item->getValue(), JSON_PRETTY_PRINT) . '</pre></p></details>');
+      }
+    }
   }
 
   public function hasValue(string $field): bool {
@@ -149,7 +164,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
         if ($value === NULL) continue;
         $values[] = $value;
       } else {
-        Drupal::logger('zero_entitywrapper')->warning('<details><summary>Deleted entity found in field ' . $field . ' [' . $this->type() . ' - ' . $this->bundle() . ' - ' . $this->id() . ']</summary><p>More Data: <pre>' . json_encode($item->getValue(), JSON_PRETTY_PRINT) . '</pre></p></details>');
+        $this->metaLogItem($field, $item);
       }
     }
     return $values;
