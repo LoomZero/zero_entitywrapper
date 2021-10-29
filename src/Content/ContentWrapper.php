@@ -328,6 +328,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
 
     if ($items instanceof EntityReferenceFieldItemListInterface) {
       $wrapper = $this->getEntity($field, $index);
+      if ($wrapper === NULL) return NULL;
       $entity = $wrapper->entity();
 
       if ($entity instanceof FileInterface) {
@@ -385,6 +386,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   public function getImageUrl(string $field, int $index = 0, string $image_style = ''): ?Url {
     if ($image_style) {
       $wrapper = $this->getEntity($field, $index);
+      if ($wrapper === NULL) return NULL;
       /** @var FileInterface $image */
       $image = $wrapper->entity();
 
