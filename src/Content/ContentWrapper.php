@@ -13,6 +13,8 @@ use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Link;
+use Drupal\Component\Render\MarkupInterface;
+use Drupal\Core\Render\Markup;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\Url;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
@@ -23,8 +25,6 @@ use Drupal\zero_entitywrapper\Base\ContentWrapperInterface;
 use Drupal\zero_entitywrapper\Helper\WrapperHelper;
 use Drupal\zero_entitywrapper\View\ViewWrapper;
 use Drupal\zero_entitywrapper\Wrapper\BaseWrapper;
-use Drupal\Component\Render\MarkupInterface;
-use Drupal\Core\Render\Markup;
 
 class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
 
@@ -237,9 +237,29 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     }
   }
 
+  /**
+   * @deprecated Will be removed at version 1.0.0, use instead "$wrapper->display()"
+   *   Use "$wrapper->displayCollection()" if you used the collection feature of the "ContentViewWrapper".
+   *   Example:
+   *   <code>$wrapper->view()->responsiveImage('field_placeholder', 0, 'video_placeholder')->addItemClass('idle--fit');</code>
+   *
+   * @return ContentViewWrapper
+   */
   public function view(): ContentViewWrapper {
     /** @var ContentViewWrapper $extension */
     $extension = $this->getExtension('view');
+    return $extension;
+  }
+
+  public function display(): ContentDisplayWrapper {
+    /** @var ContentDisplayWrapper $extension */
+    $extension = $this->getExtension('display');
+    return $extension;
+  }
+
+  public function displayCollection(): ContentDisplayCollectionWrapper {
+    /** @var ContentDisplayCollectionWrapper $extension */
+    $extension = $this->getExtension('display.collection');
     return $extension;
   }
 
@@ -342,11 +362,21 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   }
 
   /**
+   * Please use the method "getEntitiesCollection()" to get the ContentWrapperCollection.
    * @param string $field
    *
-   * @return ContentWrapper|ContentWrapper[]
+   * @return ContentWrapper[]
    */
   public function getEntities(string $field): ContentWrapperCollection {
+    return new ContentWrapperCollection($this->metaForeach([$this, 'getEntity'], $field));
+  }
+
+  /**
+   * @param string $field
+   *
+   * @return ContentWrapper|ContentWrapper[]|ContentWrapperCollection
+   */
+  public function getEntitiesCollection(string $field): ContentWrapperCollection {
     return new ContentWrapperCollection($this->metaForeach([$this, 'getEntity'], $field));
   }
 

@@ -11,10 +11,7 @@ use Drupal\zero_entitywrapper\Exception\EntityWrapperException;
 use Drupal\zero_entitywrapper\Helper\WrapperHelper;
 use Drupal\zero_entitywrapper\Render\RenderWrapperCollection;
 
-/**
- * @deprecated Will be removed at version 1.0.0, use instead "$wrapper->display()"
- */
-class ContentViewWrapper implements BaseWrapperExtensionInterface {
+class ContentDisplayCollectionWrapper implements BaseWrapperExtensionInterface {
 
   /** @var ContentWrapper */
   private $wrapper;
