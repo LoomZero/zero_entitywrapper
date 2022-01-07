@@ -23,6 +23,8 @@ use Drupal\zero_entitywrapper\Base\ContentWrapperInterface;
 use Drupal\zero_entitywrapper\Helper\WrapperHelper;
 use Drupal\zero_entitywrapper\View\ViewWrapper;
 use Drupal\zero_entitywrapper\Wrapper\BaseWrapper;
+use Drupal\Component\Render\MarkupInterface;
+use Drupal\Core\Render\Markup;
 
 class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
 
@@ -297,6 +299,31 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
       if (!in_array($item, $this->getValues($field))) return FALSE;
     }
     return TRUE;
+  }
+
+  /**
+   * @param string $field
+   * @param int $index
+   * @param string|NULL $property
+   * @return MarkupInterface|string
+   */
+  public function getMarkup(string $field, int $index = 0, string $property = NULL) {
+    if ($property === NULL) $property = $this->metaMainProperty($field);
+    return Markup::create($this->getRaw($field, $index, $property));
+  }
+
+  /**
+   * @param string $field
+   * @param string|NULL $property
+   * @return MarkupInterface[]|string[]
+   */
+  public function getMarkups(string $field, string $property = NULL): array {
+    if ($property === NULL) $property = $this->metaMainProperty($field);
+    $markups = [];
+    foreach ($this->getRaws($field, $property) as $value) {
+      $markups[] = Markup::create($value);
+    }
+    return $markups;
   }
 
   public function getEntity(string $field, int $index = 0): ?ContentWrapper {
