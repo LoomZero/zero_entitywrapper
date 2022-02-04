@@ -524,6 +524,18 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return $this->metaForeach([$this, 'getDateRangeFormatted'], $field, $type, $start_format, $end_format);
   }
 
+  public function getDateRangeMerged(string $field, int $index = 0, string $type = 'medium', string $format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $seperator = ' - '): string {
+    $data = $this->getDateRange($field, $index, $type, $format, $format);
+    for ($i = 0; $i < strlen($data['start']); $i++) {
+      if (substr($data['start'], $i) === substr($data['end'], $i)) break;
+    }
+    return substr($data['start'], 0, $i) . $seperator . $data['end'];
+  }
+
+  public function getDateRangesMerged(string $field, string $type = 'medium', string $format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $seperator = ' - '): array {
+    return $this->metaForeach([$this, 'getDateRangeMerged'], $field, $type, $format, $seperator);
+  }
+
   public function getView(string $field, string $explode = ':'): ?ViewWrapper {
     $value = $this->getValue($field);
     [$view, $display] = explode($explode, $value);
