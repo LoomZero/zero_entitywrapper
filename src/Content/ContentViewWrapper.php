@@ -124,7 +124,8 @@ class ContentViewWrapper implements BaseWrapperExtensionInterface {
     return $this->formatters($field, $formatter, $settings);
   }
 
-  public function image(string $field, int $index = 0, string $image_style = '', string $image_link = ''): RenderWrapperCollection {
+  public function image(string $field = NULL, int $index = 0, string $image_style = '', string $image_link = ''): RenderWrapperCollection {
+    $field = WrapperHelper::getDefaultField($this->wrapper, $field);
     if ($this->wrapper->metaReferenceTargetType($field) === 'media') {
       $media = $this->wrapper->getEntity($field, $index);
       return new RenderWrapperCollection($this->doFormatter($media, $media->metaMediaSourceField(), 0, 'image', ['image_style' => $image_style, 'image_link' => $image_link]), $this->wrapper);
@@ -132,7 +133,8 @@ class ContentViewWrapper implements BaseWrapperExtensionInterface {
     return $this->formatter($field, $index, 'image', ['image_style' => $image_style, 'image_link' => $image_link]);
   }
 
-  public function images(string $field, string $image_style = '', string $image_link = ''): RenderWrapperCollection {
+  public function images(string $field = NULL, string $image_style = '', string $image_link = ''): RenderWrapperCollection {
+    $field = WrapperHelper::getDefaultField($this->wrapper, $field);
     if ($this->wrapper->metaReferenceTargetType($field) === 'media') {
       $medias = $this->wrapper->getEntities($field);
       $output = [];
@@ -144,7 +146,8 @@ class ContentViewWrapper implements BaseWrapperExtensionInterface {
     return $this->formatters($field, 'image', ['image_style' => $image_style, 'image_link' => $image_link]);
   }
 
-  public function responsiveImage(string $field, int $index = 0, string $responsive_image_style = '', string $image_link = ''): RenderWrapperCollection {
+  public function responsiveImage(string $field = NULL, int $index = 0, string $responsive_image_style = '', string $image_link = ''): RenderWrapperCollection {
+    $field = WrapperHelper::getDefaultField($this->wrapper, $field);
     if ($this->wrapper->metaReferenceTargetType($field) === 'media') {
       $media = $this->wrapper->getEntity($field, $index);
       return new RenderWrapperCollection($this->doFormatter($media, $media->metaMediaSourceField(), 0, 'responsive_image', ['responsive_image_style' => $responsive_image_style, 'image_link' => $image_link]), $this->wrapper);
@@ -152,7 +155,8 @@ class ContentViewWrapper implements BaseWrapperExtensionInterface {
     return $this->formatter($field, $index, 'responsive_image', ['responsive_image_style' => $responsive_image_style, 'image_link' => $image_link]);
   }
 
-  public function responsiveImages(string $field, string $responsive_image_style = '', string $image_link = ''): RenderWrapperCollection {
+  public function responsiveImages(string $field = NULL, string $responsive_image_style = '', string $image_link = ''): RenderWrapperCollection {
+    $field = WrapperHelper::getDefaultField($this->wrapper, $field);
     if ($this->wrapper->metaReferenceTargetType($field) === 'media') {
       $medias = $this->wrapper->getEntities($field);
       $output = [];

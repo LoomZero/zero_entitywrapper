@@ -10,6 +10,7 @@ use Drupal\Core\Entity\RevisionableStorageInterface;
 use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Theme\Registry;
 use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
+use Drupal\zero_entitywrapper\Content\ContentWrapper;
 use Drupal\zero_entitywrapper\Exception\EntityWrapperException;
 use Drupal\zero_preprocess\Service\PreprocessExtenderManager;
 
@@ -119,6 +120,17 @@ class WrapperHelper {
 
     $extender->preprocess($vars, $info['zero'], $info);
     $extender->includePreprocess($vars, $info);
+  }
+
+  public static function getDefaultField(ContentWrapper $wrapper, string $field = NULL): string {
+    if ($field === NULL) {
+      if ($wrapper->type() === 'media') {
+        $field = $wrapper->metaMediaSourceField();
+      } else {
+        throw new EntityWrapperException('Undefined $field is currently only allowed on entity type "Media".');
+      }
+    }
+    return $field;
   }
 
 }

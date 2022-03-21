@@ -13,6 +13,7 @@ use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Link;
+use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\Url;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
@@ -350,7 +351,8 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return new ContentWrapperCollection($this->metaForeach([$this, 'getEntity'], $field));
   }
 
-  public function getUrl(string $field, int $index = 0, array $options = []): ?Url {
+  public function getUrl(string $field = NULL, int $index = 0, array $options = []): ?Url {
+    $field = WrapperHelper::getDefaultField($this, $field);
     $items = $this->metaItems($field);
 
     if ($items instanceof EntityReferenceFieldItemListInterface) {
@@ -387,7 +389,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     }
   }
 
-  public function getUrls(string $field, array $options = []): array {
+  public function getUrls(string $field = NULL, array $options = []): array {
     return $this->metaForeach([$this, 'getUrl'], $field, $options);
   }
 
@@ -410,7 +412,8 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return $this->metaForeach([$this, 'getLink'], $field, $options, $title_overwrite);
   }
 
-  public function getImageUrl(string $field, int $index = 0, string $image_style = ''): ?Url {
+  public function getImageUrl(string $field = NULL, int $index = 0, string $image_style = ''): ?Url {
+    $field = WrapperHelper::getDefaultField($this, $field);
     if ($image_style) {
       $wrapper = $this->getEntity($field, $index);
       if ($wrapper === NULL) return NULL;
@@ -429,7 +432,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     }
   }
 
-  public function getImageUrls(string $field, string $image_style = ''): array {
+  public function getImageUrls(string $field = NULL, string $image_style = ''): array {
     return $this->metaForeach([$this, 'getImageUrl'], $field, $image_style);
   }
 
@@ -540,6 +543,38 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     $value = $this->getValue($field);
     [$view, $display] = explode($explode, $value);
     return new ViewWrapper($view, $display, $this);
+  }
+
+  public function getFileContent(string $field = NULL, int $index = 0): string {
+    return file_get_contents($this->getFilePath($field, $index));
+  }
+
+  public function getFileContents(string $field = NULL): array {
+    return $this->metaForeach([$this, 'getFileContent'], $field);
+  }
+
+  public function getFilePath(string $field = NULL, int $index = 0): string {
+    return $this->getStreamWrapper($field, $index)->realpath();
+  }
+
+  public function getFilePaths(string $field = NULL): array {
+    return $this->metaForeach([$this, 'getFilePath'], $field);
+  }
+
+  public function getStreamWrapper(string $field = NULL, int $index = 0): StreamWrapperInterface {
+    $field = WrapperHelper::getDefaultField($this, $field);
+    $wrapper = $this->getEntity($field, $index);
+    /** @var FileInterface $file */
+    if ($wrapper->type() === 'media') {
+      $file = $wrapper->getEntity($wrapper->metaMediaSourceField())->entity();
+    } else {
+      $file = $wrapper->entity();
+    }
+    return \Drupal::service('stream_wrapper_manager')->getViaUri($file->getFileUri());
+  }
+
+  public function getStreamWrappers(string $field = NULL): array {
+    return $this->metaForeach([$this, 'getStreamWrapper'], $field);
   }
 
 }
