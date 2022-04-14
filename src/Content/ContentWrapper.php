@@ -224,14 +224,14 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return $entity->access($operation);
   }
 
-  protected function transformEntity(EntityInterface $entity = NULL): ?EntityInterface {
+  protected function transformEntity(EntityInterface $entity = NULL, bool $ignoreAccess = FALSE): ?EntityInterface {
     if ($entity === NULL) return NULL;
     $revision = NULL;
 
     $entity = WrapperHelper::applyLanguage($entity, $this->entity());
     $this->renderContext()->cacheAddEntity($entity);
 
-    if ($this->access('view', $entity)) {
+    if ($ignoreAccess || $this->access('view', $entity)) {
       return $entity;
     } else {
       return NULL;
@@ -327,7 +327,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return $markups;
   }
 
-  public function getEntity(string $field, int $index = 0): ?ContentWrapper {
+  public function getEntity(string $field, int $index = 0, bool $ignoreAccess = FALSE): ?ContentWrapper {
     /** @var FieldItemInterface $item */
     $item = $this->metaItem($field, $index);
 
@@ -337,7 +337,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
 
     if ($entity === NULL) return NULL;
 
-    $entity = $this->transformEntity($entity);
+    $entity = $this->transformEntity($entity, $ignoreAccess);
 
     return ContentWrapper::create($entity, $this);
   }
@@ -347,8 +347,12 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
    *
    * @return ContentWrapper|ContentWrapper[]
    */
-  public function getEntities(string $field): ContentWrapperCollection {
-    return new ContentWrapperCollection($this->metaForeach([$this, 'getEntity'], $field));
+  public function getEntities(string $field, bool $ignoreAccess = FALSE): ContentWrapperCollection {
+    return new ContentWrapperCollection($this->metaForeach([$this, 'getEntity'], $field, $ignoreAccess));
+  }
+
+  public function getAuthor(bool $ignoreAccess = FALSE): ?ContentWrapper {
+    return $this->getEntity('uid', 0, $ignoreAccess);
   }
 
   public function getUrl(string $field = NULL, int $index = 0, array $options = []): ?Url {
