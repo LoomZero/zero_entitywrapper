@@ -13,6 +13,7 @@ use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Link;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\Url;
@@ -28,6 +29,9 @@ use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Render\Markup;
 
 class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
+
+  public const CONTENT_BYPASS_ACCESS = 'content_bypass_access';
+  public const CONTENT_ACCESS_FOR_ACCOUNT = 'content_access_for_account';
 
   /**
    * @param ContentEntityBase|ContentWrapper $entity
@@ -83,6 +87,10 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     }
   }
 
+  protected function getConfigAccessAccount(): ?AccountInterface {
+    return $this->getConfig(ContentWrapper::CONTENT_ACCESS_FOR_ACCOUNT);
+  }
+
   /**
    * @return ContentEntityBase
    * @noinspection PhpIncompatibleReturnTypeInspection
@@ -124,7 +132,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     if (in_array($item->getFieldDefinition()->getType(), ['entity_reference', 'entity_reference_revisions'])) {
       if ($item->get('entity')->getValue() === NULL) {
         return FALSE;
-      } else if (!$item->get('entity')->getValue()->access('view')) {
+      } else if (!$this->access('view', $item->get('entity')->getValue())) {
         return FALSE;
       }
     }
@@ -219,9 +227,11 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return $this->entity()->getSource()->getConfiguration()['source_field'];
   }
 
-  public function access($operation = 'view', EntityInterface $entity = NULL) {
+  public function access($operation = 'view', EntityInterface $entity = NULL, AccountInterface $account = NULL): bool {
+    if ($this->getConfig(ContentWrapper::CONTENT_BYPASS_ACCESS)) return TRUE;
     if ($entity === NULL) $entity = $this->entity();
-    return $entity->access($operation);
+    if ($account === NULL) $account = $this->getConfigAccessAccount();
+    return $entity->access($operation, $account);
   }
 
   protected function transformEntity(EntityInterface $entity = NULL, bool $ignoreAccess = FALSE): ?EntityInterface {

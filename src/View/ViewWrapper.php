@@ -54,7 +54,7 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
     return $this->executable;
   }
 
-  public function setConfig(array $config): ViewWrapper {
+  public function setPagerConfig(array $config): ViewWrapper {
     if (isset($config['page'])) $this->executable()->setCurrentPage($config['page']);
     if (isset($config['items'])) $this->executable()->setItemsPerPage($config['items']);
     if (isset($config['offset'])) $this->executable()->setOffset($config['offset']);
