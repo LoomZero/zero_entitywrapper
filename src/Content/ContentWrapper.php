@@ -252,7 +252,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
    * @deprecated Will be removed at version 1.0.0, use instead "$wrapper->display()"
    *   Use "$wrapper->displayCollection()" if you used the collection feature of the "ContentViewWrapper".
    *   Example:
-   *   <code>$wrapper->view()->responsiveImage('field_placeholder', 0, 'video_placeholder')->addItemClass('idle--fit');</code>
+   *   <code>$wrapper->displayCollection()->responsiveImage('field_placeholder', 0, 'video_placeholder')->addItemClass('idle--fit');</code>
    *
    * @return ContentViewWrapper
    */
