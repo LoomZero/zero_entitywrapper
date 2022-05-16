@@ -15,6 +15,8 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Link;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Render\Markup;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\Url;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
@@ -27,6 +29,9 @@ use Drupal\zero_entitywrapper\View\ViewWrapper;
 use Drupal\zero_entitywrapper\Wrapper\BaseWrapper;
 
 class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
+
+  public const CONTENT_BYPASS_ACCESS = 'content_bypass_access';
+  public const CONTENT_ACCESS_FOR_ACCOUNT = 'content_access_for_account';
 
   /**
    * @param ContentEntityBase|ContentWrapper $entity
@@ -82,6 +87,10 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     }
   }
 
+  protected function getConfigAccessAccount(): ?AccountInterface {
+    return $this->getConfig(ContentWrapper::CONTENT_ACCESS_FOR_ACCOUNT);
+  }
+
   /**
    * @return ContentEntityBase
    * @noinspection PhpIncompatibleReturnTypeInspection
@@ -123,7 +132,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     if (in_array($item->getFieldDefinition()->getType(), ['entity_reference', 'entity_reference_revisions'])) {
       if ($item->get('entity')->getValue() === NULL) {
         return FALSE;
-      } else if (!$item->get('entity')->getValue()->access('view')) {
+      } else if (!$this->access('view', $item->get('entity')->getValue())) {
         return FALSE;
       }
     }
@@ -218,19 +227,21 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return $this->entity()->getSource()->getConfiguration()['source_field'];
   }
 
-  public function access($operation = 'view', EntityInterface $entity = NULL) {
+  public function access($operation = 'view', EntityInterface $entity = NULL, AccountInterface $account = NULL): bool {
+    if ($this->getConfig(ContentWrapper::CONTENT_BYPASS_ACCESS)) return TRUE;
     if ($entity === NULL) $entity = $this->entity();
-    return $entity->access($operation);
+    if ($account === NULL) $account = $this->getConfigAccessAccount();
+    return $entity->access($operation, $account);
   }
 
-  protected function transformEntity(EntityInterface $entity = NULL): ?EntityInterface {
+  protected function transformEntity(EntityInterface $entity = NULL, bool $ignoreAccess = FALSE): ?EntityInterface {
     if ($entity === NULL) return NULL;
     $revision = NULL;
 
     $entity = WrapperHelper::applyLanguage($entity, $this->entity());
     $this->renderContext()->cacheAddEntity($entity);
 
-    if ($this->access('view', $entity)) {
+    if ($ignoreAccess || $this->access('view', $entity)) {
       return $entity;
     } else {
       return NULL;
@@ -346,7 +357,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return $markups;
   }
 
-  public function getEntity(string $field, int $index = 0): ?ContentWrapper {
+  public function getEntity(string $field, int $index = 0, bool $ignoreAccess = FALSE): ?ContentWrapper {
     /** @var FieldItemInterface $item */
     $item = $this->metaItem($field, $index);
 
@@ -356,7 +367,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
 
     if ($entity === NULL) return NULL;
 
-    $entity = $this->transformEntity($entity);
+    $entity = $this->transformEntity($entity, $ignoreAccess);
 
     return ContentWrapper::create($entity, $this);
   }
@@ -367,10 +378,10 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
    *
    * @return ContentWrapper[]
    */
-  public function getEntities(string $field): ContentWrapperCollection {
-    return new ContentWrapperCollection($this->metaForeach([$this, 'getEntity'], $field));
+  public function getEntities(string $field, bool $ignoreAccess = FALSE): ContentWrapperCollection {
+    return new ContentWrapperCollection($this->metaForeach([$this, 'getEntity'], $field, $ignoreAccess));
   }
-
+  
   /**
    * @param string $field
    *
@@ -380,7 +391,12 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return new ContentWrapperCollection($this->metaForeach([$this, 'getEntity'], $field));
   }
 
-  public function getUrl(string $field, int $index = 0, array $options = []): ?Url {
+  public function getAuthor(bool $ignoreAccess = FALSE): ?ContentWrapper {
+    return $this->getEntity('uid', 0, $ignoreAccess);
+  }
+
+  public function getUrl(string $field = NULL, int $index = 0, array $options = []): ?Url {
+    $field = WrapperHelper::getDefaultField($this, $field);
     $items = $this->metaItems($field);
 
     if ($items instanceof EntityReferenceFieldItemListInterface) {
@@ -417,7 +433,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     }
   }
 
-  public function getUrls(string $field, array $options = []): array {
+  public function getUrls(string $field = NULL, array $options = []): array {
     return $this->metaForeach([$this, 'getUrl'], $field, $options);
   }
 
@@ -440,7 +456,8 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return $this->metaForeach([$this, 'getLink'], $field, $options, $title_overwrite);
   }
 
-  public function getImageUrl(string $field, int $index = 0, string $image_style = ''): ?Url {
+  public function getImageUrl(string $field = NULL, int $index = 0, string $image_style = ''): ?Url {
+    $field = WrapperHelper::getDefaultField($this, $field);
     if ($image_style) {
       $wrapper = $this->getEntity($field, $index);
       if ($wrapper === NULL) return NULL;
@@ -459,7 +476,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     }
   }
 
-  public function getImageUrls(string $field, string $image_style = ''): array {
+  public function getImageUrls(string $field = NULL, string $image_style = ''): array {
     return $this->metaForeach([$this, 'getImageUrl'], $field, $image_style);
   }
 
@@ -554,10 +571,54 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return $this->metaForeach([$this, 'getDateRangeFormatted'], $field, $type, $start_format, $end_format);
   }
 
+  public function getDateRangeMerged(string $field, int $index = 0, string $type = 'medium', string $format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $seperator = ' - '): string {
+    $data = $this->getDateRange($field, $index, $type, $format, $format);
+    for ($i = 0; $i < strlen($data['start']); $i++) {
+      if (substr($data['start'], $i) === substr($data['end'], $i)) break;
+    }
+    return substr($data['start'], 0, $i) . $seperator . $data['end'];
+  }
+
+  public function getDateRangesMerged(string $field, string $type = 'medium', string $format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $seperator = ' - '): array {
+    return $this->metaForeach([$this, 'getDateRangeMerged'], $field, $type, $format, $seperator);
+  }
+
   public function getView(string $field, string $explode = ':'): ?ViewWrapper {
     $value = $this->getValue($field);
     [$view, $display] = explode($explode, $value);
     return new ViewWrapper($view, $display, $this);
+  }
+
+  public function getFileContent(string $field = NULL, int $index = 0): string {
+    return file_get_contents($this->getFilePath($field, $index));
+  }
+
+  public function getFileContents(string $field = NULL): array {
+    return $this->metaForeach([$this, 'getFileContent'], $field);
+  }
+
+  public function getFilePath(string $field = NULL, int $index = 0): string {
+    return $this->getStreamWrapper($field, $index)->realpath();
+  }
+
+  public function getFilePaths(string $field = NULL): array {
+    return $this->metaForeach([$this, 'getFilePath'], $field);
+  }
+
+  public function getStreamWrapper(string $field = NULL, int $index = 0): StreamWrapperInterface {
+    $field = WrapperHelper::getDefaultField($this, $field);
+    $wrapper = $this->getEntity($field, $index);
+    /** @var FileInterface $file */
+    if ($wrapper->type() === 'media') {
+      $file = $wrapper->getEntity($wrapper->metaMediaSourceField())->entity();
+    } else {
+      $file = $wrapper->entity();
+    }
+    return \Drupal::service('stream_wrapper_manager')->getViaUri($file->getFileUri());
+  }
+
+  public function getStreamWrappers(string $field = NULL): array {
+    return $this->metaForeach([$this, 'getStreamWrapper'], $field);
   }
 
 }

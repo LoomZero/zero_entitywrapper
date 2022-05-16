@@ -24,6 +24,8 @@ abstract class BaseWrapper implements BaseWrapperInterface {
   protected $parent;
   /** @var BaseWrapperExtensionInterface[] */
   protected $extenders = [];
+  /** @var array */
+  protected $configs = [];
 
   /**
    * @param EntityInterface|string $entity_type
@@ -35,6 +37,29 @@ abstract class BaseWrapper implements BaseWrapperInterface {
     } else {
       $this->entity = Drupal::entityTypeManager()->getStorage($entity_type)->load($entity_id);
     }
+  }
+
+  public function getConfig(string $config) {
+    return $this->configs[$config] ?? NULL;
+  }
+
+  public function getConfigs(): array {
+    return $this->configs;
+  }
+
+  /**
+   * @param string $config
+   * @param $value
+   * @return $this
+   */
+  public function setConfig(string $config, $value = TRUE) {
+    $this->configs[$config] = $value;
+    return $this;
+  }
+
+  public function setConfigs(array $configs) {
+    $this->configs = $configs;
+    return $this;
   }
 
   public function type(): string {
@@ -88,6 +113,9 @@ abstract class BaseWrapper implements BaseWrapperInterface {
 
   public function setParent(BaseWrapperInterface $parent = NULL) {
     $this->parent = $parent;
+    if ($parent !== NULL) {
+      $this->setConfigs($parent->getConfigs());
+    }
   }
 
   public function parent(): ?BaseWrapperInterface {
