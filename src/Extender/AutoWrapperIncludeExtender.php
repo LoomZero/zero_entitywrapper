@@ -53,11 +53,9 @@ class AutoWrapperIncludeExtender implements PreprocessExtenderInterface {
         $entity = $vars['elements']['#' . $type];
       }
 
-      if ($entity !== NULL) {
-        if ($entity instanceof ContentEntityBase) {
-          $vars['zero']['local'][$name] = ContentWrapper::create($entity);
-          $vars['zero']['local'][$name]->setRenderContext($vars);
-        }
+      if ($entity instanceof ContentEntityBase) {
+        $vars['zero']['local'][$name] = ContentWrapper::create($entity);
+        $vars['zero']['local'][$name]->setRenderContext($vars);
       }
     }
   }

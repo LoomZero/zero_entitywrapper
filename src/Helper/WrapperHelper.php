@@ -13,6 +13,7 @@ use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
 use Drupal\zero_entitywrapper\Content\ContentWrapper;
 use Drupal\zero_entitywrapper\Exception\EntityWrapperException;
 use Drupal\zero_preprocess\Service\PreprocessExtenderManager;
+use Symfony\Component\Routing\Exception\InvalidParameterException;
 
 class WrapperHelper {
 

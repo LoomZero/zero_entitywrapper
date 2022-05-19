@@ -2,10 +2,14 @@
 
 namespace Drupal\zero_entitywrapper\Service;
 
+use Drupal;
 use Drupal\Core\Cache\Cache;
 use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
 
 class StaticWrapperService {
+
+  /** @var EntitywrapperService */
+  private $service;
 
   private $libraries;
   private $settings;
@@ -15,6 +19,13 @@ class StaticWrapperService {
   private $cacheContext;
 
   private $pageAttached = FALSE;
+
+  private function getService(): EntitywrapperService {
+    if ($this->service === NULL) {
+      $this->service = Drupal::service('zero_entitywrapper.service');
+    }
+    return $this->service;
+  }
 
   public function addLibrary(string $module, string $library = NULL): void {
     if ($this->libraries === NULL) $this->libraries = [];
@@ -41,6 +52,7 @@ class StaticWrapperService {
 
   public function cacheAddTags(array $tags = []): void {
     if ($this->cacheTags === NULL) $this->cacheTags = [];
+    $this->getService()->log('cache_tag', 'Merge cache tags (static) <code>[' . implode(', ', $tags) . ']</code> and <code>[' . implode(', ', $this->cacheTags) . ']</code>');
     $this->cacheTags = Cache::mergeTags($this->cacheTags, $tags);
   }
 
@@ -60,6 +72,7 @@ class StaticWrapperService {
 
   public function cacheAddContexts(array $contexts = []): void {
     if ($this->cacheContext === NULL) $this->cacheContext = [];
+    $this->getService()->log('cache_context', 'Merge cache contexts (static) <code>[' . implode(', ', $contexts) . ']</code> and <code>[' . implode(', ', $this->cacheContext) . ']</code>');
     $this->cacheContext = Cache::mergeContexts($this->cacheContext, $contexts);
   }
 

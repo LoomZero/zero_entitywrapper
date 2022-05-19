@@ -80,15 +80,9 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
   }
 
   public function setRange(int $itemsPerPage = NULL, int $page = NULL, int $offset = NULL): ViewWrapper {
-    if ($itemsPerPage !== NULL) {
-      $this->executable()->setItemsPerPage($itemsPerPage);
-    }
-    if ($page !== NULL) {
-      $this->executable()->setCurrentPage($page);
-    }
-    if ($offset !== NULL) {
-      $this->executable()->setOffset($offset);
-    }
+    if ($itemsPerPage !== NULL) $this->executable()->setItemsPerPage($itemsPerPage);
+    if ($page !== NULL) $this->executable()->setCurrentPage($page);
+    if ($offset !== NULL) $this->executable()->setOffset($offset);
     return $this;
   }
 
@@ -111,6 +105,14 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
    * @noinspection PhpParamsInspection
    */
   public function getContentResults(): ContentWrapperCollection {
+    $results = [];
+    foreach ($this->getResults() as $row) {
+      $results[] = ContentWrapper::create($row->_entity, $this);
+    }
+    return new ContentWrapperCollection($results, ['message' => 'Please use method <code>getContentResultsCollection()</code> instead of <code>getContentResults()</code> to use collection features.', 'lines' => ['Collection support will be removed at version 1.0.0']]);
+  }
+
+  public function getContentResultsCollection(): ContentWrapperCollection {
     $results = [];
     foreach ($this->getResults() as $row) {
       $results[] = ContentWrapper::create($row->_entity, $this);

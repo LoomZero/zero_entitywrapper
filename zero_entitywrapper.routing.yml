@@ -1,0 +1,9 @@
+zero_entitywrapper.config.form:
+  path: '/admin/config/zero/entitywrapper'
+  defaults:
+    _form: '\Drupal\zero_entitywrapper\Form\ZeroEntitywrapperForm'
+    _title: 'Zero Entitywrapper Config'
+  requirements:
+    _permission: 'administer zero_entitywrapper'
+  options:
+    _admin_route: TRUE

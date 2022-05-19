@@ -11,6 +11,7 @@ use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
 use Drupal\zero_entitywrapper\Base\RenderContextWrapperInterface;
 use Drupal\zero_entitywrapper\Helper\WrapperHelper;
 use Drupal\zero_entitywrapper\Service\WrapperExtenderManager;
+use Drupal\zero_entitywrapper\Service\EntitywrapperService;
 
 abstract class BaseWrapper implements BaseWrapperInterface {
 
@@ -20,12 +21,14 @@ abstract class BaseWrapper implements BaseWrapperInterface {
   protected $entity;
   /** @var array */
   protected $vars;
-  /** @var BaseWrapper */
+  /** @var BaseWrapperInterface */
   protected $parent;
   /** @var BaseWrapperExtensionInterface[] */
   protected $extenders = [];
   /** @var array */
   protected $configs = [];
+  /** @var EntitywrapperService */
+  protected $service = NULL;
 
   /**
    * @param EntityInterface|string $entity_type
@@ -39,6 +42,13 @@ abstract class BaseWrapper implements BaseWrapperInterface {
     }
   }
 
+  public function getService(): EntitywrapperService {
+    if ($this->service === NULL) {
+      $this->service = Drupal::service('zero_entitywrapper.service');
+    }
+    return $this->service;
+  }
+
   public function getConfig(string $config) {
     return $this->configs[$config] ?? NULL;
   }
@@ -47,11 +57,6 @@ abstract class BaseWrapper implements BaseWrapperInterface {
     return $this->configs;
   }
 
-  /**
-   * @param string $config
-   * @param $value
-   * @return $this
-   */
   public function setConfig(string $config, $value = TRUE) {
     $this->configs[$config] = $value;
     return $this;
@@ -133,9 +138,6 @@ abstract class BaseWrapper implements BaseWrapperInterface {
     return $root;
   }
 
-  /**
-   * @return array<string, int>
-   */
   public function getEntityMeta(): array {
     return [
       'entity_type' => $this->type(),

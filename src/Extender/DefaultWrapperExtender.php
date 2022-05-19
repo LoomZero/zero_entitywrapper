@@ -3,6 +3,7 @@
 namespace Drupal\zero_entitywrapper\Extender;
 
 use Drupal\zero_entitywrapper\Base\BaseWrapperExtensionInterface;
+use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
 use Drupal\zero_entitywrapper\Base\WrapperExtenderInterface;
 use Drupal\zero_entitywrapper\Content\ContentDisplayCollectionWrapper;
 use Drupal\zero_entitywrapper\Content\ContentDisplayWrapper;
@@ -13,7 +14,7 @@ use Drupal\zero_entitywrapper\Wrapper\RenderContextWrapper;
 
 class DefaultWrapperExtender implements WrapperExtenderInterface {
 
-  public function getExtension(BaseWrapper $wrapper, string $name, array $args = []): ?BaseWrapperExtensionInterface {
+  public function getExtension(BaseWrapperInterface $wrapper, string $name, array $args = []): ?BaseWrapperExtensionInterface {
     switch ($name) {
       case 'view':
         if ($wrapper instanceof ContentWrapper) {
@@ -36,6 +37,7 @@ class DefaultWrapperExtender implements WrapperExtenderInterface {
         } else {
           return $wrapper->root()->getExtension('render_context');
         }
+        break;
     }
     return NULL;
   }

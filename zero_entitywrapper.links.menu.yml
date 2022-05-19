@@ -1,0 +1,6 @@
+zero_entitywrapper.config.form:
+  title: 'Zero Entitywrapper Config'
+  route_name: zero_entitywrapper.config.form
+  description: 'Manage Zero Entitywrapper Config'
+  parent: system.admin_config_development
+  weight: 99
