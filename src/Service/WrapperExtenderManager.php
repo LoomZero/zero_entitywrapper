@@ -3,6 +3,7 @@
 namespace Drupal\zero_entitywrapper\Service;
 
 use Drupal\Core\DependencyInjection\ClassResolverInterface;
+use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
 use Drupal\zero_entitywrapper\Base\WrapperExtenderInterface;
 use Drupal\zero_entitywrapper\Wrapper\BaseWrapper;
 
@@ -33,7 +34,7 @@ class WrapperExtenderManager {
     return $this->extender;
   }
 
-  public function getExtension(BaseWrapper $parent, string $name, array $args = []) {
+  public function getExtension(BaseWrapperInterface $parent, string $name, array $args = []) {
     foreach ($this->getExtenders() as $extender) {
       $extender = $extender->getExtension($parent, $name, $args);
       if ($extender !== NULL) {

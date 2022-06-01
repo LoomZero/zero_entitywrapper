@@ -5,13 +5,15 @@ namespace Drupal\zero_entitywrapper\Wrapper;
 
 use Drupal;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
+use Drupal\zero_entitywrapper\Base\ContentWrapperInterface;
 use Drupal\zero_entitywrapper\Content\ContentWrapper;
 use Drupal\zero_entitywrapper\View\ViewWrapper;
 use Symfony\Component\HttpFoundation\Request;
 
 class EntityWrapper extends BaseWrapper {
 
-  public static function createNew(string $entity_type, string $bundle, array $fields = []) {
+  public static function createNew(string $entity_type, string $bundle, array $fields = []): EntityWrapper {
     $storage = Drupal::entityTypeManager()->getStorage($entity_type);
     $fields[$storage->getEntityType()->getKey('bundle')] = $bundle;
     $entity = $storage->create($fields);
@@ -27,7 +29,7 @@ class EntityWrapper extends BaseWrapper {
     return NULL;
   }
 
-  private function prepareWrapper(BaseWrapper $wrapper) {
+  private function prepareWrapper(BaseWrapperInterface $wrapper) {
     $wrapper->setRenderContext($this->getRenderContext());
     $wrapper->setConfigs($this->configs);
   }
@@ -39,7 +41,7 @@ class EntityWrapper extends BaseWrapper {
     return $this->entity;
   }
 
-  public function wrapContent(): ContentWrapper {
+  public function wrapContent(): ContentWrapperInterface {
     $wrapper = ContentWrapper::create($this->entity);
     $this->prepareWrapper($wrapper);
     return $wrapper;

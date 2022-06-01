@@ -51,14 +51,3 @@
   };
 
 })(jQuery);
-
-(function ($) {
-
-  var item = $('.item');
-  var slider = Drupal.zero.Settings.get(item, 'slider');
-  slider.page = 5;
-  for (var uuid of Drupal.zero.Settings.list()) {
-    console.log(Drupal.zero.Settings.element(uuid));
-  }
-
-})(jQuery);

@@ -8,11 +8,11 @@ use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\RenderableInterface;
 use Drupal\Core\Render\RendererInterface;
-use Drupal\zero_entitywrapper\Wrapper\BaseWrapper;
+use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
 
 class RenderWrapperCollection extends ArrayObject implements RenderableInterface {
 
-  /** @var BaseWrapper|null */
+  /** @var BaseWrapperInterface|null */
   private $wrapper;
   /** @var RendererInterface */
   private $renderer;
@@ -21,9 +21,9 @@ class RenderWrapperCollection extends ArrayObject implements RenderableInterface
    * ContentWrapperCollection constructor.
    *
    * @param array $array
-   * @param BaseWrapper $wrapper
+   * @param BaseWrapperInterface $wrapper
    */
-  public function __construct(array $array = [], BaseWrapper $wrapper = NULL) {
+  public function __construct(array $array = [], BaseWrapperInterface $wrapper = NULL) {
     parent::__construct($array);
     $this->wrapper = $wrapper;
   }
@@ -35,7 +35,7 @@ class RenderWrapperCollection extends ArrayObject implements RenderableInterface
     return $this->renderer;
   }
 
-  public function getWrapper(): ?BaseWrapper {
+  public function getWrapper(): ?BaseWrapperInterface {
     return $this->wrapper;
   }
 

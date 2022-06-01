@@ -13,6 +13,7 @@ use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Link;
+use Drupal\Core\Render\Markup;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
@@ -21,12 +22,13 @@ use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\file\FileInterface;
 use Drupal\image\Entity\ImageStyle;
+use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
+use Drupal\zero_entitywrapper\Base\ContentDisplayCollectionWrapperInterface;
+use Drupal\zero_entitywrapper\Base\ContentDisplayWrapperInterface;
 use Drupal\zero_entitywrapper\Base\ContentWrapperInterface;
 use Drupal\zero_entitywrapper\Helper\WrapperHelper;
 use Drupal\zero_entitywrapper\View\ViewWrapper;
 use Drupal\zero_entitywrapper\Wrapper\BaseWrapper;
-use Drupal\Component\Render\MarkupInterface;
-use Drupal\Core\Render\Markup;
 
 class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
 
@@ -34,34 +36,34 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   public const CONTENT_ACCESS_FOR_ACCOUNT = 'content_access_for_account';
 
   /**
-   * @param ContentEntityBase|ContentWrapper $entity
-   * @param BaseWrapper|null $parent
+   * @param ContentEntityBase|ContentWrapperInterface $entity
+   * @param BaseWrapperInterface|null $parent
    *
-   * @return ContentWrapper
+   * @return ContentWrapperInterface
    */
-  public static function create($entity, BaseWrapper $parent = NULL): ContentWrapper {
-    if ($entity instanceof ContentWrapper) return $entity;
+  public static function create($entity, BaseWrapperInterface $parent = NULL): ContentWrapperInterface {
+    if ($entity instanceof ContentWrapperInterface) return $entity;
     return new ContentWrapper($entity, NULL, $parent);
   }
 
   /**
    * @param string $entity_type
    * @param int|string $entity_id
-   * @param BaseWrapper|null $parent
+   * @param BaseWrapperInterface|null $parent
    *
-   * @return ContentWrapper
+   * @return ContentWrapperInterface
    */
-  public static function load(string $entity_type, $entity_id, BaseWrapper $parent = NULL): ContentWrapper {
+  public static function load(string $entity_type, $entity_id, BaseWrapperInterface $parent = NULL): ContentWrapperInterface {
     return new ContentWrapper($entity_type, $entity_id, $parent);
   }
 
   /**
    * @param string[]|ContentEntityBase[] $entities Item can by either a string <strong>[entity_type]:[entity_id]</strong> or a <strong>ContentEntityBase</strong>
-   * @param BaseWrapper|null $parent
+   * @param BaseWrapperInterface|null $parent
    *
-   * @return ContentWrapper[]
+   * @return ContentWrapperInterface[]
    */
-  public static function multi(array $entities, BaseWrapper $parent = NULL): array {
+  public static function multi(array $entities, BaseWrapperInterface $parent = NULL): array {
     $wrappers = [];
     foreach ($entities as $delta => $entity) {
       if (is_string($entity)) {
@@ -75,11 +77,25 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   }
 
   /**
+   * @param string $entity_type
+   * @param array $conditions
+   * @param BaseWrapperInterface|null $parent
+   * @return ContentWrapperInterface[]
+   */
+  public static function loadByProperties(string $entity_type, array $conditions = [], BaseWrapperInterface $parent = NULL): array {
+    $entities = Drupal::entityTypeManager()->getStorage($entity_type)->loadByProperties($conditions);
+    foreach ($entities as $index => $entity) {
+      $entities[$index] = new ContentWrapper($entity, NULL, $parent);
+    }
+    return $entities;
+  }
+
+  /**
    * @param ContentEntityBase|string $entity_type
    * @param int|string|null $entity_id
-   * @param BaseWrapper|null $parent
+   * @param BaseWrapperInterface|null $parent
    */
-  private function __construct($entity_type, $entity_id = NULL, $parent = NULL) {
+  private function __construct($entity_type, $entity_id = NULL, BaseWrapperInterface $parent = NULL) {
     parent::__construct($entity_type, $entity_id);
     if ($parent !== NULL) {
       $this->setParent($parent);
@@ -139,10 +155,11 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return TRUE;
   }
 
-  public function metaLogItem(string $field, FieldItemBase $item) {
+  public function metaLogItem(string $field, FieldItemBase $item): void {
     if ($item->isEmpty()) return;
     if (in_array($item->getFieldDefinition()->getType(), ['entity_reference', 'entity_reference_revisions'])) {
       if ($item->get('entity')->getValue() === NULL) {
+        $this->getService()->log('reference_invalid', 'Reference invalid - deleted entity found in field <code>' . $field . '</code>', ['Entity: <code>' . $this->type() . ' - ' . $this->bundle() . ' - ' . $this->id() . '</code>']);
         Drupal::logger('zero_entitywrapper')->warning('<details><summary>Deleted entity found in field ' . $field . ' [' . $this->type() . ' - ' . $this->bundle() . ' - ' . $this->id() . ']</summary><p>More Data: <pre>' . json_encode($item->getValue(), JSON_PRETTY_PRINT) . '</pre></p></details>');
       }
     }
@@ -248,9 +265,31 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     }
   }
 
+  /**
+   * @deprecated Will be removed at version 1.0.0, use instead <code>$wrapper->display()</code>
+   *   <i>More Info:</i>
+   *   Use <code>$wrapper->displayCollection()</code> if you used the collection feature of the <code>ContentViewWrapper</code>.
+   *   <i>Example:</i>
+   *   <code>$wrapper->displayCollection()->responsiveImage('field_placeholder', 0, 'video_placeholder')->addItemClass('idle--fit');</code>
+   * @return ContentViewWrapper
+   */
   public function view(): ContentViewWrapper {
+    $this->getService()->logDeprecation();
+
     /** @var ContentViewWrapper $extension */
     $extension = $this->getExtension('view');
+    return $extension;
+  }
+
+  public function display(): ContentDisplayWrapperInterface {
+    /** @var ContentDisplayWrapperInterface $extension */
+    $extension = $this->getExtension('display');
+    return $extension;
+  }
+
+  public function displayCollection(): ContentDisplayCollectionWrapperInterface {
+    /** @var ContentDisplayCollectionWrapperInterface $extension */
+    $extension = $this->getExtension('display.collection');
     return $extension;
   }
 
@@ -312,22 +351,11 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return TRUE;
   }
 
-  /**
-   * @param string $field
-   * @param int $index
-   * @param string|NULL $property
-   * @return MarkupInterface|string
-   */
   public function getMarkup(string $field, int $index = 0, string $property = NULL) {
     if ($property === NULL) $property = $this->metaMainProperty($field);
     return Markup::create($this->getRaw($field, $index, $property));
   }
 
-  /**
-   * @param string $field
-   * @param string|NULL $property
-   * @return MarkupInterface[]|string[]
-   */
   public function getMarkups(string $field, string $property = NULL): array {
     if ($property === NULL) $property = $this->metaMainProperty($field);
     $markups = [];
@@ -352,13 +380,12 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return ContentWrapper::create($entity, $this);
   }
 
-  /**
-   * @param string $field
-   *
-   * @return ContentWrapper|ContentWrapper[]
-   */
   public function getEntities(string $field, bool $ignoreAccess = FALSE): ContentWrapperCollection {
-    return new ContentWrapperCollection($this->metaForeach([$this, 'getEntity'], $field, $ignoreAccess));
+    return new ContentWrapperCollection($this->metaForeach([$this, 'getEntity'], $field, $ignoreAccess), ['message' => 'Please use method <code>getEntitiesCollection()</code> instead of <code>getEntities()</code> to use collection features.', 'lines' => ['Collection support will be removed at version 1.0.0']]);
+  }
+
+  public function getEntitiesCollection(string $field): ContentWrapperCollection {
+    return new ContentWrapperCollection($this->metaForeach([$this, 'getEntity'], $field));
   }
 
   public function getAuthor(bool $ignoreAccess = FALSE): ?ContentWrapper {
@@ -424,6 +451,19 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
 
   public function getLinks(string $field, array $options = [], string $title_overwrite = NULL): array {
     return $this->metaForeach([$this, 'getLink'], $field, $options, $title_overwrite);
+  }
+
+  public function getLinkData(string $field, int $index = 0, array $options = [], string $title_overwrite = NULL): array {
+    $link = $this->getLink($field, $index, $options, $title_overwrite);
+
+    return [
+      'text' => $link->getText(),
+      'url' => $link->getUrl()->toString(),
+    ];
+  }
+
+  public function getLinksData(string $field, array $options = [], string $title_overwrite = NULL): array {
+    return $this->metaForeach([$this, 'getLinkData'], $field, $options, $title_overwrite);
   }
 
   public function getImageUrl(string $field = NULL, int $index = 0, string $image_style = ''): ?Url {

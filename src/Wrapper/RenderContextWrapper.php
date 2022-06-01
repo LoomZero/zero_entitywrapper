@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
 use Drupal\zero_entitywrapper\Base\RenderContextWrapperInterface;
 use Drupal\zero_entitywrapper\Service\StaticWrapperService;
+use Drupal\zero_entitywrapper\Service\EntitywrapperService;
 
 class RenderContextWrapper implements RenderContextWrapperInterface {
 
@@ -16,6 +17,8 @@ class RenderContextWrapper implements RenderContextWrapperInterface {
   private $staticPageCache;
   /** @var BaseWrapperInterface */
   private $wrapper;
+  /** @var EntitywrapperService */
+  private $service;
 
   public function getWrapper(): ?BaseWrapperInterface {
     return $this->wrapper;
@@ -39,6 +42,13 @@ class RenderContextWrapper implements RenderContextWrapperInterface {
     } else {
       return NULL;
     }
+  }
+
+  private function getService(): EntitywrapperService {
+    if ($this->service === NULL) {
+      $this->service = Drupal::service('zero_entitywrapper.service');
+    }
+    return $this->service;
   }
 
   private function getStaticPageCache(): StaticWrapperService {
@@ -98,8 +108,10 @@ class RenderContextWrapper implements RenderContextWrapperInterface {
       $this->getStaticPageCache()->cacheAddTags($tags);
     } else {
       if (empty($this->renderArray()['#cache']['tags'])) {
+        $this->getService()->log('cache_tag', 'Add cache tags <code>[' . implode(', ', $tags) . ']</code>');
         $this->renderArray()['#cache']['tags'] = $tags;
       } else {
+        $this->getService()->log('cache_tag', 'Merge cache tags <code>[' . implode(', ', $tags) . ']</code> and <code>[' . implode(', ', $this->renderArray()['#cache']['tags']) . ']</code>');
         $this->renderArray()['#cache']['tags'] = Cache::mergeTags($this->renderArray()['#cache']['tags'], $tags);
       }
     }
@@ -122,8 +134,10 @@ class RenderContextWrapper implements RenderContextWrapperInterface {
       $this->getStaticPageCache()->cacheAddContexts($contexts);
     } else {
       if (empty($this->renderArray()['#cache']['contexts'])) {
+        $this->getService()->log('cache_context', 'Add cache tags <code>[' . implode(', ', $contexts) . ']</code>');
         $this->renderArray()['#cache']['contexts'] = $contexts;
       } else {
+        $this->getService()->log('cache_context', 'Merge cache tags <code>[' . implode(', ', $contexts) . ']</code> and <code>[' . implode(', ', $this->renderArray()['#cache']['contexts']) . ']</code>');
         $this->renderArray()['#cache']['contexts'] = Cache::mergeContexts($this->renderArray()['#cache']['contexts'], $contexts);
       }
     }
