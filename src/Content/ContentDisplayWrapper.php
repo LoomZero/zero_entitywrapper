@@ -49,6 +49,8 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
    * @inheritDoc
    */
   public function getDisplaySettings(string $view_mode = NULL, string $field = NULL): ?array {
+    WrapperHelper::checkViewMode($view_mode);
+
     $display = WrapperHelper::getViewDisplay($this->getWrapper(), $view_mode ?? $this->getWrapper()->renderContext()->getViewMode(), $view_mode === NULL);
     if ($display === NULL) return NULL;
     $displayFields = $display->getComponents();
@@ -66,7 +68,7 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
    * @inheritDoc
    */
   public function as(string $field, string $view_mode = NULL) {
-    $view = $this->getDisplaySettings($view_mode, $field);
+    $view = $this->getDisplaySettings(WrapperHelper::checkViewMode($view_mode), $field);
     return $this->process($this->getWrapper()->entity()->get($field)->view($view));
   }
 
@@ -108,14 +110,14 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
    * @inheritDoc
    */
   public function entity(string $field, int $index = 0, string $view_mode = 'full') {
-    return $this->formatter($field, $index, 'entity_reference_entity_view', ['view_mode' => $view_mode]);
+    return $this->formatter($field, $index, 'entity_reference_entity_view', ['view_mode' => WrapperHelper::checkViewMode($view_mode)]);
   }
 
   /**
    * @inheritDoc
    */
   public function entities(string $field, string $view_mode = 'full') {
-    return $this->formatters($field, 'entity_reference_entity_view', ['view_mode' => $view_mode]);
+    return $this->formatters($field, 'entity_reference_entity_view', ['view_mode' => WrapperHelper::checkViewMode($view_mode)]);
   }
 
   /**

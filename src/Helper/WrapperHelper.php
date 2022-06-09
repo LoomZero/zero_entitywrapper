@@ -74,6 +74,8 @@ class WrapperHelper {
    * @return EntityViewDisplayInterface
    */
   public static function getViewDisplay(BaseWrapperInterface $entity, string $view_mode = 'default', $fallback = TRUE): ?EntityViewDisplayInterface {
+    WrapperHelper::checkViewMode($view_mode);
+    
     /** @var EntityViewDisplayInterface $display */
     $display = Drupal::entityTypeManager()
       ->getStorage('entity_view_display')
@@ -132,6 +134,11 @@ class WrapperHelper {
       }
     }
     return $field;
+  }
+
+  public static function checkViewMode(string $view_mode): string {
+    if (str_contains($view_mode, '-')) throw new EntityWrapperException('The view mode is a maschine key, don`t use "-".');
+    return $view_mode;
   }
 
 }

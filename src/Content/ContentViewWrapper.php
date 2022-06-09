@@ -32,6 +32,8 @@ class ContentViewWrapper implements BaseWrapperExtensionInterface {
   }
 
   public function getDisplaySettings(string $view_mode = NULL, string $field = NULL): ?array {
+    WrapperHelper::checkViewMode($view_mode);
+    
     $display = WrapperHelper::getViewDisplay($this->getWrapper(), $view_mode ?? $this->getWrapper()->renderContext()->getViewMode(), $view_mode === NULL);
     if ($display === NULL) return NULL;
     $displayFields = $display->getComponents();
