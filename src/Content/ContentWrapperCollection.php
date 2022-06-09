@@ -27,7 +27,7 @@ class ContentWrapperCollection extends ProxyCollection {
     return $this->service;
   }
 
-  public function offsetSet($offset, $value) {
+  public function offsetSet($offset, $value): void {
     if ($value instanceof ContentWrapper) {
       throw new \InvalidArgumentException('Added item must be an ContentWrapper');
     }

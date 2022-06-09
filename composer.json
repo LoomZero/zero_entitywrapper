@@ -12,6 +12,7 @@
   },
   "require": { 
     "composer/installers": "~1.0",
-    "loomzero/zero_preprocess": "~0.3"
+    "loomzero/zero_preprocess": "~0.3",
+    "php": ">=7.4"
   }
 }

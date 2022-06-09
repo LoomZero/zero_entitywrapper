@@ -100,8 +100,21 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    */
   public function hasValue(string $field): bool;
 
+  /**
+   * Get the specific drupal items of a field
+   * 
+   * @param string $field
+   * @return FieldItemListInterface
+   */
   public function metaItems(string $field): FieldItemListInterface;
 
+  /**
+   * Get a specific drupal item of a field
+   * 
+   * @param string $field
+   * @param int $index
+   * @return TypedDataInterface|null
+   */
   public function metaItem(string $field, int $index): ?TypedDataInterface;
 
   /**
@@ -602,9 +615,9 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    *
    * @param string $field
    * @param string $explode
-   * @return ViewWrapper|null
+   * @return ViewWrapperInterface|null
    */
-  public function getView(string $field, string $explode = ':'): ?ViewWrapper;
+  public function getView(string $field, string $explode = ':'): ?ViewWrapperInterface;
 
   /**
    * Get the file content of a file reference field

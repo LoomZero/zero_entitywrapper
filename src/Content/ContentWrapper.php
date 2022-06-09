@@ -26,6 +26,7 @@ use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
 use Drupal\zero_entitywrapper\Base\ContentDisplayCollectionWrapperInterface;
 use Drupal\zero_entitywrapper\Base\ContentDisplayWrapperInterface;
 use Drupal\zero_entitywrapper\Base\ContentWrapperInterface;
+use Drupal\zero_entitywrapper\Base\ViewWrapperInterface;
 use Drupal\zero_entitywrapper\Helper\WrapperHelper;
 use Drupal\zero_entitywrapper\View\ViewWrapper;
 use Drupal\zero_entitywrapper\Wrapper\BaseWrapper;
@@ -115,22 +116,37 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return $this->entity;
   }
 
+  /**
+   * @inheritDoc
+   */
   public function langcode(): ?string {
     return $this->entity->get('langcode')->getString();
   }
 
+  /**
+   * @inheritDoc
+   */
   public function url(array $options = [], string $rel = 'canonical'): ?Url {
     return $this->entity()->toUrl($rel, $options);
   }
 
+  /**
+   * @inheritDoc
+   */
   public function hasField(string $field): bool {
     return $this->entity()->hasField($field);
   }
 
+  /**
+   * @inheritDoc
+   */
   public function isEmpty(string $field): bool {
     return $this->count($field) === 0;
   }
 
+  /**
+   * @inheritDoc
+   */
   public function count(string $field): int {
     $count = 0;
     foreach ($this->metaItems($field) as $item) {
@@ -143,6 +159,9 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return $count;
   }
 
+  /**
+   * @inheritDoc
+   */
   public function metaAcceptItem(FieldItemBase $item): bool {
     if ($item->isEmpty()) return FALSE;
     if (in_array($item->getFieldDefinition()->getType(), ['entity_reference', 'entity_reference_revisions'])) {
@@ -155,6 +174,9 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return TRUE;
   }
 
+  /**
+   * @inheritDoc
+   */
   public function metaLogItem(string $field, FieldItemBase $item): void {
     if ($item->isEmpty()) return;
     if (in_array($item->getFieldDefinition()->getType(), ['entity_reference', 'entity_reference_revisions'])) {
@@ -165,14 +187,23 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     }
   }
 
+  /**
+   * @inheritDoc
+   */
   public function hasValue(string $field): bool {
     return $this->hasField($field) && !$this->isEmpty($field);
   }
 
+  /**
+   * @inheritDoc
+   */
   public function metaItems(string $field): FieldItemListInterface {
     return $this->entity()->get($field);
   }
 
+  /**
+   * @inheritDoc
+   */
   public function metaItem(string $field, int $index): ?TypedDataInterface {
     $count = 0;
     foreach ($this->metaItems($field) as $item) {
@@ -183,6 +214,9 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return NULL;
   }
 
+  /**
+   * @inheritDoc
+   */
   protected function metaForeach(callable $callable, string $field, ...$params) {
     $values = [];
     $index = 0;
@@ -198,14 +232,23 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return $values;
   }
 
+  /**
+   * @inheritDoc
+   */
   public function metaEntityKey(string $key) {
     return $this->entity()->getEntityType()->getKey($key);
   }
 
+  /**
+   * @inheritDoc
+   */
   public function metaFieldType(string $field): string {
     return $this->metaItems($field)->getFieldDefinition()->getType();
   }
 
+  /**
+   * @inheritDoc
+   */
   public function metaFieldSettings(string $field, string $property = NULL) {
     if ($property === NULL) {
       $settings = $this->metaItems($field)->getFieldDefinition()->getSettings();
@@ -220,6 +263,9 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     }
   }
 
+  /**
+   * @inheritDoc
+   */
   public function metaMainProperty(string $field): string {
     return $this
       ->metaItems($field)
@@ -228,22 +274,37 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
       ->getMainPropertyName();
   }
 
+  /**
+   * @inheritDoc
+   */
   public function metaListOptions(string $field): ?array {
     return $this->metaFieldSettings($field, 'allowed_values');
   }
 
+  /**
+   * @inheritDoc
+   */
   public function metaReferenceTargetType(string $field): ?string {
     return $this->metaFieldSettings($field, 'target_type');
   }
 
+  /**
+   * @inheritDoc
+   */
   public function metaReferenceTargetBundles(string $field): ?array {
     return $this->metaFieldSettings($field, 'handler_settings')['target_bundles'];
   }
 
+  /**
+   * @inheritDoc
+   */
   public function metaMediaSourceField(): ?string {
     return $this->entity()->getSource()->getConfiguration()['source_field'];
   }
 
+  /**
+   * @inheritDoc
+   */
   public function access($operation = 'view', EntityInterface $entity = NULL, AccountInterface $account = NULL): bool {
     if ($this->getConfig(ContentWrapper::CONTENT_BYPASS_ACCESS)) return TRUE;
     if ($entity === NULL) $entity = $this->entity();
@@ -266,12 +327,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   }
 
   /**
-   * @deprecated Will be removed at version 1.0.0, use instead <code>$wrapper->display()</code>
-   *   <i>More Info:</i>
-   *   Use <code>$wrapper->displayCollection()</code> if you used the collection feature of the <code>ContentViewWrapper</code>.
-   *   <i>Example:</i>
-   *   <code>$wrapper->displayCollection()->responsiveImage('field_placeholder', 0, 'video_placeholder')->addItemClass('idle--fit');</code>
-   * @return ContentViewWrapper
+   * @inheritDoc
    */
   public function view(): ContentViewWrapper {
     $this->getService()->logDeprecation();
@@ -281,22 +337,34 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return $extension;
   }
 
+  /**
+   * @inheritDoc
+   */
   public function display(): ContentDisplayWrapperInterface {
     /** @var ContentDisplayWrapperInterface $extension */
     $extension = $this->getExtension('display');
     return $extension;
   }
 
+  /**
+   * @inheritDoc
+   */
   public function displayCollection(): ContentDisplayCollectionWrapperInterface {
     /** @var ContentDisplayCollectionWrapperInterface $extension */
     $extension = $this->getExtension('display.collection');
     return $extension;
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getLabel() {
     return $this->getValue($this->metaEntityKey('label'));
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getRaw(string $field, int $index = 0, string $property = NULL) {
     $item = $this->metaItem($field, $index);
     if ($item === NULL) return NULL;
@@ -307,22 +375,34 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return $item->getValue()[$property];
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getRaws(string $field, string $property = NULL): array {
     return $this->metaForeach([$this, 'getRaw'], $field, $property);
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getValue(string $field, int $index = 0) {
     $main = $this->metaMainProperty($field);
 
     return $this->getRaw($field, $index, $main);
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getValues(string $field): array {
     $main = $this->metaMainProperty($field);
 
     return $this->getRaws($field, $main);
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getListValue(string $field, int $index = 0) {
     $allowed_values = $this->metaListOptions($field);
     $value = $this->getValue($field, $index);
@@ -332,6 +412,9 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return $allowed_values[$value];
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getListValues(string $field): array {
     $allowed_values = $this->metaListOptions($field);
     $original = $this->getValues($field);
@@ -344,6 +427,9 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return $values;
   }
 
+  /**
+   * @inheritDoc
+   */
   public function hasListValue(string $field, ...$value): bool {
     foreach ($value as $item) {
       if (!in_array($item, $this->getValues($field))) return FALSE;
@@ -351,11 +437,17 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return TRUE;
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getMarkup(string $field, int $index = 0, string $property = NULL) {
     if ($property === NULL) $property = $this->metaMainProperty($field);
     return Markup::create($this->getRaw($field, $index, $property));
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getMarkups(string $field, string $property = NULL): array {
     if ($property === NULL) $property = $this->metaMainProperty($field);
     $markups = [];
@@ -365,7 +457,10 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return $markups;
   }
 
-  public function getEntity(string $field, int $index = 0, bool $ignoreAccess = FALSE): ?ContentWrapper {
+  /**
+   * @inheritDoc
+   */
+  public function getEntity(string $field, int $index = 0, bool $ignoreAccess = FALSE): ?ContentWrapperInterface {
     /** @var FieldItemInterface $item */
     $item = $this->metaItem($field, $index);
 
@@ -380,18 +475,30 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return ContentWrapper::create($entity, $this);
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getEntities(string $field, bool $ignoreAccess = FALSE): ContentWrapperCollection {
     return new ContentWrapperCollection($this->metaForeach([$this, 'getEntity'], $field, $ignoreAccess), ['message' => 'Please use method <code>getEntitiesCollection()</code> instead of <code>getEntities()</code> to use collection features.', 'lines' => ['Collection support will be removed at version 1.0.0']]);
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getEntitiesCollection(string $field): ContentWrapperCollection {
     return new ContentWrapperCollection($this->metaForeach([$this, 'getEntity'], $field));
   }
 
-  public function getAuthor(bool $ignoreAccess = FALSE): ?ContentWrapper {
+  /**
+   * @inheritDoc
+   */
+  public function getAuthor(bool $ignoreAccess = FALSE): ?ContentWrapperInterface {
     return $this->getEntity('uid', 0, $ignoreAccess);
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getUrl(string $field = NULL, int $index = 0, array $options = []): ?Url {
     $field = WrapperHelper::getDefaultField($this, $field);
     $items = $this->metaItems($field);
@@ -430,15 +537,24 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     }
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getUrls(string $field = NULL, array $options = []): array {
     return $this->metaForeach([$this, 'getUrl'], $field, $options);
   }
 
+  /**
+   * @inheritDoc
+   */
   public function setUrl(string $field, Url $url): ContentWrapper {
     $this->entity()->set($field, [$url]);
     return $this;
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getLink(string $field, int $index = 0, array $options = [], string $title_overwrite = NULL): ?Link {
     /** @var FieldItemInterface */
     $item = $this->metaItem($field, $index);
@@ -449,10 +565,16 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return Link::fromTextAndUrl($title_overwrite ?? $values['title'] ?? $url->toString(), $url);
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getLinks(string $field, array $options = [], string $title_overwrite = NULL): array {
     return $this->metaForeach([$this, 'getLink'], $field, $options, $title_overwrite);
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getLinkData(string $field, int $index = 0, array $options = [], string $title_overwrite = NULL): array {
     $link = $this->getLink($field, $index, $options, $title_overwrite);
 
@@ -462,10 +584,16 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     ];
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getLinksData(string $field, array $options = [], string $title_overwrite = NULL): array {
     return $this->metaForeach([$this, 'getLinkData'], $field, $options, $title_overwrite);
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getImageUrl(string $field = NULL, int $index = 0, string $image_style = ''): ?Url {
     $field = WrapperHelper::getDefaultField($this, $field);
     if ($image_style) {
@@ -486,25 +614,31 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     }
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getImageUrls(string $field = NULL, string $image_style = ''): array {
     return $this->metaForeach([$this, 'getImageUrl'], $field, $image_style);
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getNumber(string $field, int $index = 0, int $decimals = 2, string $dec_point = '.', string $thousands_sep = ','): ?string {
     $value = $this->getValue($field, $index);
     if ($value === NULL) return NULL;
     return number_format($value, $decimals, $dec_point, $thousands_sep);
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getNumbers(string $field, int $decimals = 2, string $dec_point = '.', string $thousands_sep = ','): array {
     return $this->metaForeach([$this, 'getNumber'], $field, $decimals, $dec_point, $thousands_sep);
   }
 
   /**
-   * @param string $field
-   * @param int $index
-   * @param string|null $property ('value', 'end_value')
-   * @return DrupalDateTime
+   * @inheritDoc
    */
   public function getDateTime(string $field, int $index = 0, string $property = NULL): DrupalDateTime {
     if ($property === NULL) $property = $this->metaMainProperty($field);
@@ -512,14 +646,15 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   }
 
   /**
-   * @param string $field
-   * @param string|null $property ('value', 'end_value')
-   * @return DrupalDateTime[]
+   * @inheritDoc
    */
   public function getDateTimes(string $field, string $property = NULL): array {
     return $this->metaForeach([$this, 'getDateTime'], $field, $property);
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getUTCDate(string $field, int $index = 0, string $property = 'value'): ?DateTime {
     $date = $this->getRaw($field, $index, $property);
     if ($date === NULL) return NULL;
@@ -535,18 +670,30 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return $gmtDateTime;
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getUTCDates(string $field, string $property = 'value'): array {
     return $this->metaForeach([$this, 'getUTCDate'], $field, $property);
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getDateDiff(string $field, int $index = 0): DateInterval {
     return $this->getDateTime($field)->diff($this->getDateTime($field, $index, 'ent_value'));
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getDateDiffs(string $field): array {
     return $this->metaForeach([$this, 'getDateDiff'], $field);
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getDateRange(string $field, int $index = 0, string $type = 'medium', string $start_format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT, string $end_format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT): array {
     /** @var Drupal\Core\Datetime\DateFormatterInterface $formatter */
     $formatter = Drupal::service('date.formatter');
@@ -568,19 +715,31 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     ];
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getDateRanges(string $field, int $index = 0, string $type = 'medium', string $start_format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT, string $end_format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT): array {
     return $this->metaForeach([$this, 'getDateRange'], $field, $type, $start_format, $end_format);
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getDateRangeFormatted(string $field, int $index = 0, string $type = 'medium', string $start_format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT, string $end_format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT, string $seperator = ' - '): string {
     $data = $this->getDateRange($field, $index, $type, $start_format, $end_format);
     return $data['start'] . $seperator . $data['end'];
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getDateRangesFormatted(string $field, string $type = 'medium', string $start_format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT, string $end_format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT, string $seperator = ' - '): array {
     return $this->metaForeach([$this, 'getDateRangeFormatted'], $field, $type, $start_format, $end_format);
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getDateRangeMerged(string $field, int $index = 0, string $type = 'medium', string $format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $seperator = ' - '): string {
     $data = $this->getDateRange($field, $index, $type, $format, $format);
     for ($i = 0; $i < strlen($data['start']); $i++) {
@@ -589,32 +748,53 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return substr($data['start'], 0, $i) . $seperator . $data['end'];
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getDateRangesMerged(string $field, string $type = 'medium', string $format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $seperator = ' - '): array {
     return $this->metaForeach([$this, 'getDateRangeMerged'], $field, $type, $format, $seperator);
   }
 
-  public function getView(string $field, string $explode = ':'): ?ViewWrapper {
+  /**
+   * @inheritDoc
+   */
+  public function getView(string $field, string $explode = ':'): ?ViewWrapperInterface {
     $value = $this->getValue($field);
     [$view, $display] = explode($explode, $value);
     return new ViewWrapper($view, $display, $this);
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getFileContent(string $field = NULL, int $index = 0): string {
     return file_get_contents($this->getFilePath($field, $index));
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getFileContents(string $field = NULL): array {
     return $this->metaForeach([$this, 'getFileContent'], $field);
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getFilePath(string $field = NULL, int $index = 0): string {
     return $this->getStreamWrapper($field, $index)->realpath();
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getFilePaths(string $field = NULL): array {
     return $this->metaForeach([$this, 'getFilePath'], $field);
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getStreamWrapper(string $field = NULL, int $index = 0): StreamWrapperInterface {
     $field = WrapperHelper::getDefaultField($this, $field);
     $wrapper = $this->getEntity($field, $index);
@@ -627,6 +807,9 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return \Drupal::service('stream_wrapper_manager')->getViaUri($file->getFileUri());
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getStreamWrappers(string $field = NULL): array {
     return $this->metaForeach([$this, 'getStreamWrapper'], $field);
   }
