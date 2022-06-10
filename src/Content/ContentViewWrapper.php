@@ -33,7 +33,7 @@ class ContentViewWrapper implements BaseWrapperExtensionInterface {
 
   public function getDisplaySettings(string $view_mode = NULL, string $field = NULL): ?array {
     WrapperHelper::checkViewMode($view_mode);
-    
+
     $display = WrapperHelper::getViewDisplay($this->getWrapper(), $view_mode ?? $this->getWrapper()->renderContext()->getViewMode(), $view_mode === NULL);
     if ($display === NULL) return NULL;
     $displayFields = $display->getComponents();
@@ -76,11 +76,11 @@ class ContentViewWrapper implements BaseWrapperExtensionInterface {
   }
 
   public function entity(string $field, int $index = 0, string $view_mode = 'full'): RenderWrapperCollection {
-    return $this->formatter($field, $index, 'entity_reference_entity_view', ['view_mode' => $view_mode]);
+    return $this->formatter($field, $index, 'entity_reference_entity_view', ['view_mode' => WrapperHelper::checkViewMode($view_mode)]);
   }
 
   public function entities(string $field, string $view_mode = 'full'): RenderWrapperCollection {
-    return $this->formatters($field, 'entity_reference_entity_view', ['view_mode' => $view_mode]);
+    return $this->formatters($field, 'entity_reference_entity_view', ['view_mode' => WrapperHelper::checkViewMode($view_mode)]);
   }
 
   public function string(string $field, int $index = 0, bool $linkToEntity = FALSE): RenderWrapperCollection {
