@@ -93,7 +93,7 @@ abstract class BaseWrapper implements BaseWrapperInterface {
   public function render(string $view_mode = 'full', array $options = []): array {
     return Drupal::entityTypeManager()
       ->getViewBuilder($this->type())
-      ->view($this->entity(), $view_mode);
+      ->view($this->entity(), WrapperHelper::checkViewMode($view_mode));
   }
 
   public function setRenderContext(array &$vars = NULL) {
