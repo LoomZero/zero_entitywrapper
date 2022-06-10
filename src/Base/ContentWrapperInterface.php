@@ -102,7 +102,7 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
 
   /**
    * Get the specific drupal items of a field
-   * 
+   *
    * @param string $field
    * @return FieldItemListInterface
    */
@@ -110,7 +110,7 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
 
   /**
    * Get a specific drupal item of a field
-   * 
+   *
    * @param string $field
    * @param int $index
    * @return TypedDataInterface|null
@@ -376,7 +376,14 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    *
    * @param string|NULL $field
    * @param int $index
-   * @param array $options
+   * @param array $options = [
+   *     'attributes' => ['name' => 'value'],
+   *     'query' => ['name' => 'value'],
+   *     'fragment' => 'jumpmark',
+   *     'absolute' => FALSE,
+   *     'language' => LanguageInterface::TYPE_URL,
+   *     'https' => NULL,
+   * ]
    * @return Url|null
    */
   public function getUrl(string $field = NULL, int $index = 0, array $options = []): ?Url;
@@ -385,7 +392,14 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    * Get all urls of entity field or media field or url field or link field
    *
    * @param string|NULL $field
-   * @param array $options
+   * @param array $options = [
+   *     'attributes' => ['name' => 'value'],
+   *     'query' => ['name' => 'value'],
+   *     'fragment' => 'jumpmark',
+   *     'absolute' => FALSE,
+   *     'language' => LanguageInterface::TYPE_URL,
+   *     'https' => NULL,
+   * ]
    * @return array
    */
   public function getUrls(string $field = NULL, array $options = []): array;
@@ -395,7 +409,14 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    *
    * @param string $field
    * @param int $index
-   * @param array $options
+   * @param array $options = [
+   *     'attributes' => ['name' => 'value'],
+   *     'query' => ['name' => 'value'],
+   *     'fragment' => 'jumpmark',
+   *     'absolute' => FALSE,
+   *     'language' => LanguageInterface::TYPE_URL,
+   *     'https' => NULL,
+   * ]
    * @param string|NULL $title_overwrite
    * @return Link|null
    */
@@ -405,7 +426,14 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    * Get all links of a link field
    *
    * @param string $field
-   * @param array $options
+   * @param array $options = [
+   *     'attributes' => ['name' => 'value'],
+   *     'query' => ['name' => 'value'],
+   *     'fragment' => 'jumpmark',
+   *     'absolute' => FALSE,
+   *     'language' => LanguageInterface::TYPE_URL,
+   *     'https' => NULL,
+   * ]
    * @param string|NULL $title_overwrite
    * @return array
    */
@@ -416,11 +444,21 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    *
    * @param string $field
    * @param int $index
-   * @param array $options
+   * @param array $options = [
+   *     'attributes' => [':name' => 'value'],
+   *     'query' => [':name' => 'value'],
+   *     'fragment' => 'jumpmark',
+   *     'absolute' => FALSE,
+   *     'language' => LanguageInterface::TYPE_URL,
+   *     'https' => NULL,
+   * ]
    * @param string|NULL $title_overwrite
    * @return array = [
    *     'text' => $link->getText(),
    *     'url' => $link->getUrl()->toString(),
+   *     'options' => [
+   *        'attributes' => [':name' => 'value'],
+   *     ],
    * ]
    */
   public function getLinkData(string $field, int $index = 0, array $options = [], string $title_overwrite = NULL): array;
@@ -431,7 +469,14 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    * @see ContentWrapperInterface::getLinkData()
    *
    * @param string $field
-   * @param array $options
+   * @param array $options = [
+   *     'attributes' => ['name' => 'value'],
+   *     'query' => ['name' => 'value'],
+   *     'fragment' => 'jumpmark',
+   *     'absolute' => FALSE,
+   *     'language' => LanguageInterface::TYPE_URL,
+   *     'https' => NULL,
+   * ]
    * @param string|NULL $title_overwrite
    * @return array
    */

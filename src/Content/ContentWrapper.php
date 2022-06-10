@@ -533,7 +533,11 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
       return Url::fromUri($item->getValue()['value'], $options);
     } else {
       // Assume we have a link field
-      return Url::fromUri($item->getValue()['uri'], $options);
+      $value = $item->getValue();
+      if (isset($value['options'])) {
+        $options = array_merge($value['options'], $options);
+      }
+      return Url::fromUri($value['uri'], $options);
     }
   }
 
@@ -581,6 +585,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return [
       'text' => $link->getText(),
       'url' => $link->getUrl()->toString(),
+      'options' => $link->getUrl()->getOptions(),
     ];
   }
 
