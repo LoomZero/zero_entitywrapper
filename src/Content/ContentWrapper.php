@@ -119,13 +119,6 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   /**
    * @inheritDoc
    */
-  public function langcode(): ?string {
-    return $this->entity->get('langcode')->getString();
-  }
-
-  /**
-   * @inheritDoc
-   */
   public function url(array $options = [], string $rel = 'canonical'): ?Url {
     return $this->entity()->toUrl($rel, $options);
   }

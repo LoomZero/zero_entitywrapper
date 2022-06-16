@@ -19,22 +19,11 @@ use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\Url;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
-use Drupal\zero_entitywrapper\Content\ContentDisplayCollectionWrapper;
-use Drupal\zero_entitywrapper\Content\ContentDisplayWrapper;
 use Drupal\zero_entitywrapper\Content\ContentViewWrapper;
-use Drupal\zero_entitywrapper\Content\ContentWrapper;
 use Drupal\zero_entitywrapper\Content\ContentWrapperCollection;
 use Drupal\zero_entitywrapper\Helper\WrapperHelper;
-use Drupal\zero_entitywrapper\View\ViewWrapper;
 
 interface ContentWrapperInterface extends BaseWrapperInterface {
-
-  /**
-   * Get the langcode as string
-   *
-   * @return string|null
-   */
-  public function langcode(): ?string;
 
   /**
    * Get the url from this entity

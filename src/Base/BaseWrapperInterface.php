@@ -112,7 +112,9 @@ interface BaseWrapperInterface {
    * Render the entity in a givin view mode
    *
    * @param string $view_mode
-   * @param array $options
+   * @param array $options = [
+   *     'langcode' => 'en',
+   * ]
    * @return array
    */
   public function render(string $view_mode = 'full', array $options = []): array;
@@ -166,6 +168,13 @@ interface BaseWrapperInterface {
    * ]
    */
   public function getEntityMeta(): array;
+
+  /**
+   * Get the langcode as string
+   *
+   * @return string|null
+   */
+  public function langcode(): ?string;
 
   /**
    * Set language of the entity

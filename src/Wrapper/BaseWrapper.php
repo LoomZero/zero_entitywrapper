@@ -124,9 +124,12 @@ abstract class BaseWrapper implements BaseWrapperInterface {
    * @inheritDoc
    */
   public function render(string $view_mode = 'full', array $options = []): array {
+    $langcode = $this->langcode();
+    if (isset($options['langcode'])) $langcode = $options['langcode'];
+
     return Drupal::entityTypeManager()
       ->getViewBuilder($this->type())
-      ->view($this->entity(), WrapperHelper::checkViewMode($view_mode));
+      ->view($this->entity(), WrapperHelper::checkViewMode($view_mode), $langcode);
   }
 
   /**
@@ -213,6 +216,13 @@ abstract class BaseWrapper implements BaseWrapperInterface {
       }
     }
     return $this->extenders[$name];
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function langcode(): ?string {
+    return $this->entity->get('langcode')->getString();
   }
 
   /**
