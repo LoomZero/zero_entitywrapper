@@ -167,4 +167,24 @@ interface BaseWrapperInterface {
    */
   public function getEntityMeta(): array;
 
+  /**
+   * Set language of the entity
+   *
+   * @see TranslatableInterface::getTranslation()
+   *
+   * @param string $langcode
+   * @return BaseWrapperInterface
+   */
+  public function setLanguage(string $langcode): BaseWrapperInterface;
+
+  /**
+   * Set the current language
+   *
+   * @see BaseWrapperInterface::setLanguage()
+   * @see \Drupal::languageManager()->getCurrentLanguage()
+   *
+   * @return BaseWrapperInterface
+   */
+  public function setCurrentLanguage(): BaseWrapperInterface;
+
 }

@@ -42,6 +42,9 @@ abstract class BaseWrapper implements BaseWrapperInterface {
     }
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getService(): EntitywrapperService {
     if ($this->service === NULL) {
       $this->service = Drupal::service('zero_entitywrapper.service');
@@ -49,32 +52,53 @@ abstract class BaseWrapper implements BaseWrapperInterface {
     return $this->service;
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getConfig(string $config) {
     return $this->configs[$config] ?? NULL;
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getConfigs(): array {
     return $this->configs;
   }
 
+  /**
+   * @inheritDoc
+   */
   public function setConfig(string $config, $value = TRUE) {
     $this->configs[$config] = $value;
     return $this;
   }
 
+  /**
+   * @inheritDoc
+   */
   public function setConfigs(array $configs) {
     $this->configs = $configs;
     return $this;
   }
 
+  /**
+   * @inheritDoc
+   */
   public function type(): string {
     return $this->entity()->getEntityTypeId();
   }
 
+  /**
+   * @inheritDoc
+   */
   public function bundle(): string {
     return $this->entity()->bundle();
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getBundle(): ConfigEntityBundleBase {
     /** @noinspection PhpIncompatibleReturnTypeInspection */
     return Drupal::entityTypeManager()
@@ -82,26 +106,41 @@ abstract class BaseWrapper implements BaseWrapperInterface {
       ->load($this->bundle());
   }
 
+  /**
+   * @inheritDoc
+   */
   public function id() {
     return $this->entity()->id();
   }
 
+  /**
+   * @inheritDoc
+   */
   public function extendPreprocess(string $template) {
     WrapperHelper::extendPreprocess($this, $template);
   }
 
+  /**
+   * @inheritDoc
+   */
   public function render(string $view_mode = 'full', array $options = []): array {
     return Drupal::entityTypeManager()
       ->getViewBuilder($this->type())
       ->view($this->entity(), WrapperHelper::checkViewMode($view_mode));
   }
 
+  /**
+   * @inheritDoc
+   */
   public function setRenderContext(array &$vars = NULL) {
     if ($vars !== NULL) {
       $this->vars = &$vars;
     }
   }
 
+  /**
+   * @inheritDoc
+   */
   public function &getRenderContext(): ?array {
     if ($this->parent === NULL) {
       return $this->vars;
@@ -110,12 +149,18 @@ abstract class BaseWrapper implements BaseWrapperInterface {
     }
   }
 
+  /**
+   * @inheritDoc
+   */
   public function renderContext(): RenderContextWrapperInterface {
     /** @var RenderContextWrapperInterface $extension */
     $extension = $this->getExtension('render_context');
     return $extension;
   }
 
+  /**
+   * @inheritDoc
+   */
   public function setParent(BaseWrapperInterface $parent = NULL) {
     $this->parent = $parent;
     if ($parent !== NULL) {
@@ -123,12 +168,15 @@ abstract class BaseWrapper implements BaseWrapperInterface {
     }
   }
 
+  /**
+   * @inheritDoc
+   */
   public function parent(): ?BaseWrapperInterface {
     return $this->parent;
   }
 
   /**
-   * @return BaseWrapperInterface
+   * @inheritDoc
    */
   public function root(): BaseWrapperInterface {
     $root = $this;
@@ -138,6 +186,9 @@ abstract class BaseWrapper implements BaseWrapperInterface {
     return $root;
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getEntityMeta(): array {
     return [
       'entity_type' => $this->type(),
@@ -146,6 +197,9 @@ abstract class BaseWrapper implements BaseWrapperInterface {
     ];
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getExtension(string $name, ...$args): BaseWrapperExtensionInterface {
     if ($this->extenderManager === NULL) {
       $this->extenderManager = Drupal::service('zero.entitywrapper.extender');
@@ -159,6 +213,21 @@ abstract class BaseWrapper implements BaseWrapperInterface {
       }
     }
     return $this->extenders[$name];
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function setLanguage(string $langcode): BaseWrapperInterface {
+    $this->entity = $this->entity->getTranslation($langcode);
+    return $this;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function setCurrentLanguage(): BaseWrapperInterface {
+    return $this->setLanguage(Drupal::languageManager()->getCurrentLanguage()->getId());
   }
 
 }
