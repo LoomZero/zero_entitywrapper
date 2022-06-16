@@ -2,6 +2,7 @@
 
 namespace Drupal\zero_entitywrapper\Base;
 
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\views\ResultRow;
 use Drupal\views\ViewExecutable;
 use Drupal\zero_entitywrapper\Content\ContentWrapperCollection;
@@ -91,7 +92,7 @@ interface ViewWrapperInterface extends BaseWrapperInterface {
    * @see ViewWrapperInterface::getContentResults()
    * @see ViewWrapperInterface::getContentResultsCollection()
    *
-   * @param $language
+   * @param LanguageInterface|string $language
    * @return self
    */
   public function setResultLanguage($language = NULL): self;
