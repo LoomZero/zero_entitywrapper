@@ -6,6 +6,8 @@ namespace Drupal\zero_entitywrapper\Wrapper;
 use Drupal;
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\TranslatableInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\zero_entitywrapper\Base\BaseWrapperExtensionInterface;
 use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
 use Drupal\zero_entitywrapper\Base\RenderContextWrapperInterface;
@@ -221,15 +223,27 @@ abstract class BaseWrapper implements BaseWrapperInterface {
   /**
    * @inheritDoc
    */
-  public function langcode(): ?string {
-    return $this->entity->get('langcode')->getString();
+  public function language(): LanguageInterface {
+    return $this->entity->language();
   }
 
   /**
    * @inheritDoc
    */
-  public function setLanguage(string $langcode): BaseWrapperInterface {
-    $this->entity = $this->entity->getTranslation($langcode);
+  public function langcode(): ?string {
+    return $this->language()->getId();
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function setLanguage($language): BaseWrapperInterface {
+    if ($this->entity instanceof TranslatableInterface && $this->entity->isTranslatable()) {
+      if ($language instanceof LanguageInterface) $language = $language->getId();
+      if ($this->entity->hasTranslation($language)) {
+        $this->entity = $this->entity->getTranslation($language);
+      }
+    }
     return $this;
   }
 
@@ -237,7 +251,7 @@ abstract class BaseWrapper implements BaseWrapperInterface {
    * @inheritDoc
    */
   public function setCurrentLanguage(): BaseWrapperInterface {
-    return $this->setLanguage(Drupal::languageManager()->getCurrentLanguage()->getId());
+    return $this->setLanguage(Drupal::languageManager()->getCurrentLanguage());
   }
 
 }

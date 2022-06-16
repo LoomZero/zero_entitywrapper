@@ -4,6 +4,7 @@ namespace Drupal\zero_entitywrapper\Base;
 
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\zero_entitywrapper\Service\EntitywrapperService;
 
 interface BaseWrapperInterface {
@@ -170,7 +171,16 @@ interface BaseWrapperInterface {
   public function getEntityMeta(): array;
 
   /**
+   * Get the language object of the entity
+   *
+   * @return LanguageInterface
+   */
+  public function language(): LanguageInterface;
+
+  /**
    * Get the langcode as string
+   *
+   * @see BaseWrapperInterface::language()
    *
    * @return string|null
    */
@@ -180,11 +190,12 @@ interface BaseWrapperInterface {
    * Set language of the entity
    *
    * @see TranslatableInterface::getTranslation()
+   * @see LanguageInterface::getId()
    *
-   * @param string $langcode
+   * @param LanguageInterface|string $language
    * @return BaseWrapperInterface
    */
-  public function setLanguage(string $langcode): BaseWrapperInterface;
+  public function setLanguage($language): BaseWrapperInterface;
 
   /**
    * Set the current language
