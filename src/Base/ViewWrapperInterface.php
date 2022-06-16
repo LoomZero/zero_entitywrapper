@@ -7,7 +7,6 @@ use Drupal\views\ViewExecutable;
 use Drupal\zero_entitywrapper\Content\ContentWrapperCollection;
 use Drupal\zero_entitywrapper\View\ViewFilterWrapper;
 use Drupal\zero_entitywrapper\View\ViewSortWrapper;
-use Drupal\zero_entitywrapper\View\ViewWrapper;
 
 interface ViewWrapperInterface extends BaseWrapperInterface {
 
@@ -26,17 +25,17 @@ interface ViewWrapperInterface extends BaseWrapperInterface {
    *     'items' => 20,
    *     'offset' => 0,
    * ]
-   * @return ViewWrapper
+   * @return self
    */
-  public function setPagerConfig(array $config): ViewWrapperInterface;
+  public function setPagerConfig(array $config): self;
 
   /**
    * Set the display
    *
    * @param string|NULL $display
-   * @return $this
+   * @return self
    */
-  public function setDisplay(string $display = NULL): ViewWrapperInterface;
+  public function setDisplay(string $display = NULL): self;
 
   /**
    * Get the name of the current display
@@ -51,9 +50,9 @@ interface ViewWrapperInterface extends BaseWrapperInterface {
    * @param int|NULL $itemsPerPage
    * @param int|NULL $page
    * @param int|NULL $offset
-   * @return $this
+   * @return self
    */
-  public function setFullPager(int $itemsPerPage = NULL, int $page = NULL, int $offset = NULL): ViewWrapperInterface;
+  public function setFullPager(int $itemsPerPage = NULL, int $page = NULL, int $offset = NULL): self;
 
   /**
    * Set the pager range
@@ -61,9 +60,9 @@ interface ViewWrapperInterface extends BaseWrapperInterface {
    * @param int|NULL $itemsPerPage
    * @param int|NULL $page
    * @param int|NULL $offset
-   * @return $this
+   * @return self
    */
-  public function setRange(int $itemsPerPage = NULL, int $page = NULL, int $offset = NULL): ViewWrapperInterface;
+  public function setRange(int $itemsPerPage = NULL, int $page = NULL, int $offset = NULL): self;
 
   /**
    * Get the result of the view
@@ -76,16 +75,36 @@ interface ViewWrapperInterface extends BaseWrapperInterface {
    * Get the result of the view as ContentWrapperInterface
    *
    * @return ContentWrapperInterface|ContentWrapperInterface[]|ContentWrapperCollection
-   * @noinspection PhpParamsInspection
    */
   public function getContentResults(): ContentWrapperCollection;
 
   /**
    * Get the result of the view as ContentWrapperCollection
    *
-   * @return ContentWrapperCollection
+   * @return ContentWrapperInterface|ContentWrapperInterface[]|ContentWrapperCollection
    */
   public function getContentResultsCollection(): ContentWrapperCollection;
+
+  /**
+   * Set the language code for the results array used by getContentResults()
+   *
+   * @see ViewWrapperInterface::getContentResults()
+   * @see ViewWrapperInterface::getContentResultsCollection()
+   *
+   * @param $language
+   * @return self
+   */
+  public function setResultLanguage($language = NULL): self;
+
+  /**
+   * Get the language code for the results array used by getContentResults()
+   *
+   * @see ViewWrapperInterface::getContentResults()
+   * @see ViewWrapperInterface::getContentResultsCollection()
+   *
+   * @return string|null
+   */
+  public function getResultLanguage(): ?string;
 
   /**
    * Get the total number of items this view will have
@@ -133,17 +152,17 @@ interface ViewWrapperInterface extends BaseWrapperInterface {
    * Set the view arguments
    *
    * @param array $args
-   * @return $this
+   * @return self
    */
-  public function setArgs(array $args): ViewWrapperInterface;
+  public function setArgs(array $args): self;
 
   /**
    * Set the exposed input
    *
    * @param array $input
-   * @return $this
+   * @return self
    */
-  public function setExposedInput(array $input): ViewWrapperInterface;
+  public function setExposedInput(array $input): self;
 
   /**
    * Render the view with display
@@ -163,9 +182,9 @@ interface ViewWrapperInterface extends BaseWrapperInterface {
    * @param string|callable|null $table
    * @param string|null $field
    *
-   * @return $this
+   * @return self
    */
-  public function removeHandler(string $type, $table = NULL, string $field = NULL): ViewWrapperInterface;
+  public function removeHandler(string $type, $table = NULL, string $field = NULL): self;
 
   /**
    * Remove a filter for the execution
@@ -173,9 +192,9 @@ interface ViewWrapperInterface extends BaseWrapperInterface {
    * @param string|callable|null $table
    * @param string|null $field
    *
-   * @return $this
+   * @return self
    */
-  public function removeFilter($table = NULL, string $field = NULL): ViewWrapperInterface;
+  public function removeFilter($table = NULL, string $field = NULL): self;
 
   /**
    * Add a filter for the execution
@@ -192,9 +211,9 @@ interface ViewWrapperInterface extends BaseWrapperInterface {
    * @param string|callable|null $table
    * @param string|null $field
    *
-   * @return $this
+   * @return self
    */
-  public function removeSort($table = NULL, string $field = NULL): ViewWrapperInterface;
+  public function removeSort($table = NULL, string $field = NULL): self;
 
   /**
    * Add a sort operation

@@ -98,22 +98,17 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
    */
   private function __construct($entity_type, $entity_id = NULL, BaseWrapperInterface $parent = NULL) {
     parent::__construct($entity_type, $entity_id);
-    if ($parent !== NULL) {
+    if ($parent === NULL) {
+      $this->setCurrentLanguage();
+    } else {
       $this->setParent($parent);
       $this->renderContext()->cacheAddEntity($this->entity());
+      $this->setLanguage($parent->language());
     }
   }
 
   protected function getConfigAccessAccount(): ?AccountInterface {
     return $this->getConfig(ContentWrapper::CONTENT_ACCESS_FOR_ACCOUNT);
-  }
-
-  /**
-   * @return ContentEntityBase
-   * @noinspection PhpIncompatibleReturnTypeInspection
-   */
-  public function entity() {
-    return $this->entity;
   }
 
   /**
@@ -802,7 +797,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     } else {
       $file = $wrapper->entity();
     }
-    return \Drupal::service('stream_wrapper_manager')->getViaUri($file->getFileUri());
+    return Drupal::service('stream_wrapper_manager')->getViaUri($file->getFileUri());
   }
 
   /**

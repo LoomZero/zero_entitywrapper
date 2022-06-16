@@ -34,13 +34,6 @@ class EntityWrapper extends BaseWrapper {
     $wrapper->setConfigs($this->configs);
   }
 
-  /**
-   * @return EntityInterface
-   */
-  public function entity() {
-    return $this->entity;
-  }
-
   public function wrapContent(): ContentWrapperInterface {
     $wrapper = ContentWrapper::create($this->entity);
     $this->prepareWrapper($wrapper);

@@ -47,6 +47,13 @@ abstract class BaseWrapper implements BaseWrapperInterface {
   /**
    * @inheritDoc
    */
+  public function entity(): EntityInterface {
+    return $this->entity;
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function getService(): EntitywrapperService {
     if ($this->service === NULL) {
       $this->service = Drupal::service('zero_entitywrapper.service');
@@ -71,7 +78,7 @@ abstract class BaseWrapper implements BaseWrapperInterface {
   /**
    * @inheritDoc
    */
-  public function setConfig(string $config, $value = TRUE) {
+  public function setConfig(string $config, $value = TRUE): self {
     $this->configs[$config] = $value;
     return $this;
   }
@@ -79,7 +86,7 @@ abstract class BaseWrapper implements BaseWrapperInterface {
   /**
    * @inheritDoc
    */
-  public function setConfigs(array $configs) {
+  public function setConfigs(array $configs): self {
     $this->configs = $configs;
     return $this;
   }
@@ -118,8 +125,9 @@ abstract class BaseWrapper implements BaseWrapperInterface {
   /**
    * @inheritDoc
    */
-  public function extendPreprocess(string $template) {
+  public function extendPreprocess(string $template): self {
     WrapperHelper::extendPreprocess($this, $template);
+    return $this;
   }
 
   /**
@@ -137,10 +145,11 @@ abstract class BaseWrapper implements BaseWrapperInterface {
   /**
    * @inheritDoc
    */
-  public function setRenderContext(array &$vars = NULL) {
+  public function setRenderContext(array &$vars = NULL): self {
     if ($vars !== NULL) {
       $this->vars = &$vars;
     }
+    return $this;
   }
 
   /**
@@ -166,11 +175,12 @@ abstract class BaseWrapper implements BaseWrapperInterface {
   /**
    * @inheritDoc
    */
-  public function setParent(BaseWrapperInterface $parent = NULL) {
+  public function setParent(BaseWrapperInterface $parent = NULL): self {
     $this->parent = $parent;
     if ($parent !== NULL) {
       $this->setConfigs($parent->getConfigs());
     }
+    return $this;
   }
 
   /**
@@ -237,7 +247,7 @@ abstract class BaseWrapper implements BaseWrapperInterface {
   /**
    * @inheritDoc
    */
-  public function setLanguage($language): BaseWrapperInterface {
+  public function setLanguage($language): self {
     if ($this->entity instanceof TranslatableInterface && $this->entity->isTranslatable()) {
       if ($language instanceof LanguageInterface) $language = $language->getId();
       if ($this->entity->hasTranslation($language)) {
@@ -250,7 +260,7 @@ abstract class BaseWrapper implements BaseWrapperInterface {
   /**
    * @inheritDoc
    */
-  public function setCurrentLanguage(): BaseWrapperInterface {
+  public function setCurrentLanguage(): self {
     return $this->setLanguage(Drupal::languageManager()->getCurrentLanguage());
   }
 

@@ -2,7 +2,8 @@
 
 namespace Drupal\zero_entitywrapper\View;
 
-use Drupal\views\ResultRow;
+use Drupal;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\views\ViewEntityInterface;
 use Drupal\views\ViewExecutable;
 use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
@@ -15,6 +16,8 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
 
   /** @var ViewExecutable */
   private $executable;
+  /** @var string */
+  private $resultLangcode = NULL;
 
   public static function create(string $value, BaseWrapperInterface $parent = NULL): ViewWrapper {
     [ $view, $display ] = explode(':', $value);
@@ -37,16 +40,16 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
     }
     $this->setDisplay($display);
     $this->setParent($parent);
+    if ($parent === NULL) {
+      $this->setResultLanguage();
+    } else {
+      $this->setResultLanguage($parent->language());
+    }
   }
 
   /**
-   * @return ViewEntityInterface
-   * @noinspection PhpIncompatibleReturnTypeInspection
+   * @inheritDoc
    */
-  public function entity() {
-    return $this->entity;
-  }
-
   public function executable(): ViewExecutable {
     if ($this->executable === NULL) {
       $this->executable = $this->entity()->getExecutable();
@@ -54,32 +57,47 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
     return $this->executable;
   }
 
-  public function setPagerConfig(array $config): ViewWrapper {
+  /**
+   * @inheritDoc
+   */
+  public function setPagerConfig(array $config): self {
     if (isset($config['page'])) $this->executable()->setCurrentPage($config['page']);
     if (isset($config['items'])) $this->executable()->setItemsPerPage($config['items']);
     if (isset($config['offset'])) $this->executable()->setOffset($config['offset']);
     return $this;
   }
 
-  public function setDisplay(string $display = NULL): ViewWrapper {
+  /**
+   * @inheritDoc
+   */
+  public function setDisplay(string $display = NULL): self {
     if ($display !== NULL) {
       $this->executable()->setDisplay($display);
     }
     return $this;
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getDisplay(): string {
     return $this->executable()->current_display;
   }
 
-  public function setFullPager(int $itemsPerPage = NULL, int $page = NULL, int $offset = NULL): ViewWrapper {
+  /**
+   * @inheritDoc
+   */
+  public function setFullPager(int $itemsPerPage = NULL, int $page = NULL, int $offset = NULL): self {
     $pager = $this->executable()->getDisplay()->getOption('pager');
     $pager['type'] = 'full';
     $this->executable()->getDisplay()->setOption('pager', $pager);
     return $this->setRange($itemsPerPage, $page, $offset);
   }
 
-  public function setRange(int $itemsPerPage = NULL, int $page = NULL, int $offset = NULL): ViewWrapper {
+  /**
+   * @inheritDoc
+   */
+  public function setRange(int $itemsPerPage = NULL, int $page = NULL, int $offset = NULL): self {
     if ($itemsPerPage !== NULL) $this->executable()->setItemsPerPage($itemsPerPage);
     if ($page !== NULL) $this->executable()->setCurrentPage($page);
     if ($offset !== NULL) $this->executable()->setOffset($offset);
@@ -94,57 +112,88 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
   }
 
   /**
-   * @return ResultRow[]
+   * @inheritDoc
    */
   public function getResults(): array {
     return $this->executed()->result;
   }
 
   /**
-   * @return ContentWrapper|ContentWrapper[]
+   * @inheritDoc
    * @noinspection PhpParamsInspection
    */
   public function getContentResults(): ContentWrapperCollection {
     $results = [];
     foreach ($this->getResults() as $row) {
-      $results[] = ContentWrapper::create($row->_entity, $this);
+      $results[] = ContentWrapper::create($row->_entity, $this)
+        ->setLanguage($this->getResultLanguage());
     }
     return new ContentWrapperCollection($results, ['message' => 'Please use method <code>getContentResultsCollection()</code> instead of <code>getContentResults()</code> to use collection features.', 'lines' => ['Collection support will be removed at version 1.0.0']]);
   }
 
+  /**
+   * @inheritDoc
+   * @noinspection PhpParamsInspection
+   */
   public function getContentResultsCollection(): ContentWrapperCollection {
     $results = [];
     foreach ($this->getResults() as $row) {
-      $results[] = ContentWrapper::create($row->_entity, $this);
+      $results[] = ContentWrapper::create($row->_entity, $this)
+        ->setLanguage($this->getResultLanguage());
     }
     return new ContentWrapperCollection($results);
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function setResultLanguage($language = NULL): self {
+    if ($language === NULL) $language = Drupal::languageManager()->getCurrentLanguage()->getId();
+    if ($language instanceof LanguageInterface) {
+      $this->resultLangcode = $language->getId();
+    } else {
+      $this->resultLangcode = $language;
+    }
+    return $this;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getResultLanguage(): ?string {
+    return $this->resultLangcode;
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function getTotalItems(): int {
     return (int)$this->executed()->getPager()->getTotalItems();
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getOffset(): int {
     return (int)$this->executable()->getOffset();
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getItemsPerPage(): int {
     return (int)$this->executable()->getItemsPerPage();
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getCurrentPage(): int {
     return (int)$this->executable()->getCurrentPage();
   }
 
   /**
-   * @return array = [
-   *     'offset' => 0,
-   *     'items' => 0,
-   *     'total' => 0,
-   *     'current' => 0,
-   *     'total_pages' => 0,
-   *     'remain' => 0,
-   * ]
+   * @inheritDoc
    */
   public function getResultMeta(): array {
     $meta = [
@@ -154,31 +203,34 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
       'current' => $this->getCurrentPage(),
       'page' => $this->getCurrentPage(),
     ];
-    $meta['total_pages'] = ceil($meta['total'] / $meta['items']);
+    $meta['total_pages'] = (int)ceil($meta['total'] / $meta['items']);
     $meta['remain'] = $meta['total'] - $meta['items'] * ($meta['current'] + 1);
     return $meta;
   }
 
-  public function setArgs(array $args): ViewWrapper {
+  /**
+   * @inheritDoc
+   */
+  public function setArgs(array $args): self {
     $this->executable()->setArguments($args);
     return $this;
   }
 
-  public function setExposedInput(array $input): ViewWrapper {
+  /**
+   * @inheritDoc
+   */
+  public function setExposedInput(array $input): self {
     $this->executable()->setExposedInput($input);
     return $this;
   }
 
+  /**
+   * @inheritDoc
+   */
   public function render(string $display = NULL, array $options = []): array {
     return $this->executable()->preview($display);
   }
 
-  /**
-   * @param string|callable|null $table
-   * @param string|null $field
-   *
-   * @return callable
-   */
   private function ensureTableFieldFilter($table = NULL, $field = NULL): callable {
     if (is_callable($table)) return $table;
     return function($handler) use ($table, $field) {
@@ -189,13 +241,9 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
   }
 
   /**
-   * @param string $type
-   * @param string|callable|null $table
-   * @param string|null $field
-   *
-   * @return $this
+   * @inheritDoc
    */
-  public function removeHandler(string $type, $table = NULL, string $field = NULL): ViewWrapper {
+  public function removeHandler(string $type, $table = NULL, string $field = NULL): self {
     $function = $this->ensureTableFieldFilter($table, $field);
 
     $handlers = $this->executable()->getHandlers($type);
@@ -208,29 +256,29 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
   }
 
   /**
-   * @param string|callable|null $table
-   * @param string|null $field
-   *
-   * @return $this
+   * @inheritDoc
    */
-  public function removeFilter($table = NULL, string $field = NULL): ViewWrapper {
+  public function removeFilter($table = NULL, string $field = NULL): self {
     return $this->removeHandler('filter', $table, $field);
   }
 
+  /**
+   * @inheritDoc
+   */
   public function addFilter(string $table, string $field): ViewFilterWrapper {
     return new ViewFilterWrapper($this, $table, $field);
   }
 
   /**
-   * @param string|callable|null $table
-   * @param string|null $field
-   *
-   * @return $this
+   * @inheritDoc
    */
-  public function removeSort($table = NULL, string $field = NULL): ViewWrapper {
+  public function removeSort($table = NULL, string $field = NULL): self {
     return $this->removeHandler('sort', $table, $field);
   }
 
+  /**
+   * @inheritDoc
+   */
   public function addSort(string $table, string $field): ViewSortWrapper {
     return new ViewSortWrapper($this, $table, $field);
   }

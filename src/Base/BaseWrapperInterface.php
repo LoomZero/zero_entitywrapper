@@ -13,9 +13,9 @@ interface BaseWrapperInterface {
    * Set the render context array for cache control
    *
    * @param array $vars
-   * @return void
+   * @return self
    */
-  public function setRenderContext(array &$vars);
+  public function setRenderContext(array &$vars): self;
 
   /**
    * Get the render context of this wrapper
@@ -39,9 +39,9 @@ interface BaseWrapperInterface {
    * @see BaseWrapperInterface::getConfig()
    *
    * @param BaseWrapperInterface|NULL $parent
-   * @return void
+   * @return self
    */
-  public function setParent(BaseWrapperInterface $parent = NULL);
+  public function setParent(BaseWrapperInterface $parent = NULL): self;
 
   /**
    * Get the parent wrapper
@@ -62,7 +62,7 @@ interface BaseWrapperInterface {
    *
    * @return EntityInterface
    */
-  public function entity();
+  public function entity(): EntityInterface;
 
   /**
    * Get the type of the entity
@@ -96,9 +96,9 @@ interface BaseWrapperInterface {
    * Call a preprocess file of another template
    *
    * @param string $template
-   * @return mixed
+   * @return self
    */
-  public function extendPreprocess(string $template);
+  public function extendPreprocess(string $template): self;
 
   /**
    * Get the extension wrapper for a givin function
@@ -147,17 +147,17 @@ interface BaseWrapperInterface {
    *
    * @param string $config
    * @param mixed $value
-   * @return mixed
+   * @return self
    */
-  public function setConfig(string $config, $value = TRUE);
+  public function setConfig(string $config, $value = TRUE): self;
 
   /**
    * Set all configs
    *
    * @param array $configs
-   * @return mixed
+   * @return self
    */
-  public function setConfigs(array $configs);
+  public function setConfigs(array $configs): self;
 
   /**
    * Get entity meta data to rebuild state
@@ -193,9 +193,9 @@ interface BaseWrapperInterface {
    * @see LanguageInterface::getId()
    *
    * @param LanguageInterface|string $language
-   * @return BaseWrapperInterface
+   * @return self
    */
-  public function setLanguage($language): BaseWrapperInterface;
+  public function setLanguage($language): self;
 
   /**
    * Set the current language
@@ -203,8 +203,8 @@ interface BaseWrapperInterface {
    * @see BaseWrapperInterface::setLanguage()
    * @see \Drupal::languageManager()->getCurrentLanguage()
    *
-   * @return BaseWrapperInterface
+   * @return self
    */
-  public function setCurrentLanguage(): BaseWrapperInterface;
+  public function setCurrentLanguage(): self;
 
 }
