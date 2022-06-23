@@ -25,6 +25,9 @@ use Drupal\zero_entitywrapper\Helper\WrapperHelper;
 
 interface ContentWrapperInterface extends BaseWrapperInterface {
 
+  public const CONTENT_BYPASS_ACCESS = 'content_bypass_access';
+  public const CONTENT_ACCESS_FOR_ACCOUNT = 'content_access_for_account';
+
   /**
    * Get the url from this entity
    *
@@ -321,6 +324,8 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
   /**
    * Get the entity of the reference field
    *
+   * Please don't use the parameter $ignoreAccess, instead use `$wrapper->setConfig(ContentWrapperInterface::CONTENT_BYPASS_ACCESS)`
+   *
    * @param string $field
    * @param int $index
    * @param bool $ignoreAccess
@@ -331,6 +336,8 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
   /**
    * Get all entities of the reference field
    * Please use the method "getEntitiesCollection()" to get the ContentWrapperCollection.
+   *
+   * Please don't use the parameter $ignoreAccess, instead use `$wrapper->setConfig(ContentWrapperInterface::CONTENT_BYPASS_ACCESS)`
    *
    * @see ContentWrapperInterface::getEntity()
    * @see ContentWrapperInterface::getEntitiesCollection()
@@ -352,6 +359,8 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
 
   /**
    * Get the author of this entity
+   *
+   * Please don't use the parameter $ignoreAccess, instead use `$wrapper->setConfig(ContentWrapperInterface::CONTENT_BYPASS_ACCESS)`
    *
    * @param bool $ignoreAccess
    * @return ContentWrapperInterface|null

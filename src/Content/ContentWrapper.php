@@ -33,9 +33,6 @@ use Drupal\zero_entitywrapper\Wrapper\BaseWrapper;
 
 class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
 
-  public const CONTENT_BYPASS_ACCESS = 'content_bypass_access';
-  public const CONTENT_ACCESS_FOR_ACCOUNT = 'content_access_for_account';
-
   /**
    * @param ContentEntityBase|ContentWrapperInterface $entity
    * @param BaseWrapperInterface|null $parent
@@ -106,7 +103,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   }
 
   protected function getConfigAccessAccount(): ?AccountInterface {
-    return $this->getConfig(ContentWrapper::CONTENT_ACCESS_FOR_ACCOUNT);
+    return $this->getConfig(ContentWrapperInterface::CONTENT_ACCESS_FOR_ACCOUNT);
   }
 
   /**
@@ -292,7 +289,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
    * @inheritDoc
    */
   public function access($operation = 'view', EntityInterface $entity = NULL, AccountInterface $account = NULL): bool {
-    if ($this->getConfig(ContentWrapper::CONTENT_BYPASS_ACCESS)) return TRUE;
+    if ($this->getConfig(ContentWrapperInterface::CONTENT_BYPASS_ACCESS)) return TRUE;
     if ($entity === NULL) $entity = $this->entity();
     if ($account === NULL) $account = $this->getConfigAccessAccount();
     return $entity->access($operation, $account);
@@ -457,6 +454,8 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     if ($entity === NULL) return NULL;
 
     $entity = $this->transformEntity($entity, $ignoreAccess);
+
+    if ($entity === NULL) return NULL;
 
     return ContentWrapper::create($entity, $this);
   }
