@@ -10,6 +10,7 @@ use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
 use Drupal\zero_entitywrapper\Base\ViewWrapperInterface;
 use Drupal\zero_entitywrapper\Content\ContentWrapper;
 use Drupal\zero_entitywrapper\Content\ContentWrapperCollection;
+use Drupal\zero_entitywrapper\Exception\EntityWrapperException;
 use Drupal\zero_entitywrapper\Wrapper\BaseWrapper;
 
 class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
@@ -18,20 +19,28 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
   private $executable;
   /** @var string */
   private $resultLangcode = NULL;
+  /** @var bool */
+  private $fixed = FALSE;
 
-  public static function create(string $value, BaseWrapperInterface $parent = NULL): ViewWrapper {
-    [ $view, $display ] = explode(':', $value);
-    return new ViewWrapper($view, $display, $parent);
+  /**
+   * @param string|ViewExecutable|ViewEntityInterface $value
+   * @param BaseWrapperInterface|null $parent
+   */
+  public static function create($value, BaseWrapperInterface $parent = NULL): ViewWrapper {
+    return new ViewWrapper($value, NULL, $parent);
   }
 
   /**
    * @param string|ViewExecutable|ViewEntityInterface $entity
    * @param string|null $display
+   * @param BaseWrapperInterface|null $parent
    */
   public function __construct($entity, string $display = NULL, BaseWrapperInterface $parent = NULL) {
     if ($entity instanceof ViewExecutable) {
       $this->executable = $entity;
       $entity = $entity->storage;
+    } else if (is_string($entity)) {
+      [ $entity, $display ] = explode(':', $entity);
     }
     if (is_string($entity)) {
       parent::__construct('view', $entity);
@@ -45,6 +54,25 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
     } else {
       $this->setResultLanguage($parent->language());
     }
+  }
+
+  private function checkFixed(string $method) {
+    if ($this->getFixed()) throw new EntityWrapperException('The ViewWrapper is in fixed state. The result will not be modified by <code>' . $method . '</code>.');
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function setFixed(bool $fixed): self {
+    $this->fixed = $fixed;
+    return $this;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getFixed(): bool {
+    return $this->fixed;
   }
 
   /**
@@ -61,6 +89,7 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
    * @inheritDoc
    */
   public function setPagerConfig(array $config): self {
+    $this->checkFixed('setPagerConfig($config)');
     if (isset($config['page'])) $this->executable()->setCurrentPage($config['page']);
     if (isset($config['items'])) $this->executable()->setItemsPerPage($config['items']);
     if (isset($config['offset'])) $this->executable()->setOffset($config['offset']);
@@ -71,6 +100,7 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
    * @inheritDoc
    */
   public function setDisplay(string $display = NULL): self {
+    $this->checkFixed('setDisplay($display)');
     if ($display !== NULL) {
       $this->executable()->setDisplay($display);
     }
@@ -88,6 +118,7 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
    * @inheritDoc
    */
   public function setFullPager(int $itemsPerPage = NULL, int $page = NULL, int $offset = NULL): self {
+    $this->checkFixed('setFullPager($itemsPerPage, $page, $offset)');
     $pager = $this->executable()->getDisplay()->getOption('pager');
     $pager['type'] = 'full';
     $this->executable()->getDisplay()->setOption('pager', $pager);
@@ -98,6 +129,7 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
    * @inheritDoc
    */
   public function setRange(int $itemsPerPage = NULL, int $page = NULL, int $offset = NULL): self {
+    $this->checkFixed('setRange($itemsPerPage, $page, $offset)');
     if ($itemsPerPage !== NULL) $this->executable()->setItemsPerPage($itemsPerPage);
     if ($page !== NULL) $this->executable()->setCurrentPage($page);
     if ($offset !== NULL) $this->executable()->setOffset($offset);
@@ -107,6 +139,7 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
   private function executed(): ViewExecutable {
     if (!$this->executable()->executed) {
       $this->executable()->execute();
+      $this->setFixed(TRUE);
     }
     return $this->executable();
   }
@@ -212,6 +245,7 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
    * @inheritDoc
    */
   public function setArgs(array $args): self {
+    $this->checkFixed('getArgs($args)');
     $this->executable()->setArguments($args);
     return $this;
   }
@@ -220,6 +254,7 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
    * @inheritDoc
    */
   public function setExposedInput(array $input): self {
+    $this->checkFixed('setExposedInput($input)');
     $this->executable()->setExposedInput($input);
     return $this;
   }
@@ -259,6 +294,7 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
    * @inheritDoc
    */
   public function removeFilter($table = NULL, string $field = NULL): self {
+    $this->checkFixed('removeFilter($table, $field)');
     return $this->removeHandler('filter', $table, $field);
   }
 
@@ -266,6 +302,7 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
    * @inheritDoc
    */
   public function addFilter(string $table, string $field): ViewFilterWrapper {
+    $this->checkFixed('addFilter($table, $field)');
     return new ViewFilterWrapper($this, $table, $field);
   }
 
@@ -273,6 +310,7 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
    * @inheritDoc
    */
   public function removeSort($table = NULL, string $field = NULL): self {
+    $this->checkFixed('removeSort($table, $field)');
     return $this->removeHandler('sort', $table, $field);
   }
 
@@ -280,6 +318,7 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
    * @inheritDoc
    */
   public function addSort(string $table, string $field): ViewSortWrapper {
+    $this->checkFixed('addSort($table, $field)');
     return new ViewSortWrapper($this, $table, $field);
   }
 

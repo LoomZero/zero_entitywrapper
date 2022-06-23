@@ -12,6 +12,21 @@ use Drupal\zero_entitywrapper\View\ViewSortWrapper;
 interface ViewWrapperInterface extends BaseWrapperInterface {
 
   /**
+   * Set the fixed state, the wrapper will throw an exception when a "set" method will be called in fixed state.
+   *
+   * @param bool $fixed
+   * @returns self
+   */
+  public function setFixed(bool $fixed): self;
+
+  /**
+   * get the fixed state
+   *
+   * @returns bool
+   */
+  public function getFixed(): bool;
+
+  /**
    * Get view executable
    *
    * @return ViewExecutable

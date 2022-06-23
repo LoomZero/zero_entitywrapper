@@ -4,6 +4,7 @@ namespace Drupal\zero_entitywrapper\Extender;
 
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\zero_entitywrapper\Content\ContentWrapper;
+use Drupal\zero_entitywrapper\View\ViewWrapper;
 use Drupal\zero_preprocess\Base\PreprocessExtenderInterface;
 
 class AutoWrapperIncludeExtender implements PreprocessExtenderInterface {
@@ -42,20 +43,25 @@ class AutoWrapperIncludeExtender implements PreprocessExtenderInterface {
   public function preprocess(array &$vars, array $zero, array $template) {
     if (empty($zero['wrapper']['content']) || !count($zero['wrapper']['content'])) return;
 
-    foreach ($zero['wrapper']['content'] as $name => $type) {
-      $entity = NULL;
+    if ($zero['wrapper']['content']['wrapper'] === 'views_view') {
+      $vars['zero']['local']['wrapper'] = ViewWrapper::create($vars['view']);
+      $vars['zero']['local']['wrapper']->setFixed(TRUE);
+    } else {
+      foreach ($zero['wrapper']['content'] as $name => $type) {
+        $entity = NULL;
 
-      if (isset($vars[$type])) {
-        $entity = $vars[$type];
-      }
+        if (isset($vars[$type])) {
+          $entity = $vars[$type];
+        }
 
-      if ($entity === NULL && isset($vars['elements']['#' . $type])) {
-        $entity = $vars['elements']['#' . $type];
-      }
+        if ($entity === NULL && isset($vars['elements']['#' . $type])) {
+          $entity = $vars['elements']['#' . $type];
+        }
 
-      if ($entity instanceof ContentEntityBase) {
-        $vars['zero']['local'][$name] = ContentWrapper::create($entity);
-        $vars['zero']['local'][$name]->setRenderContext($vars);
+        if ($entity instanceof ContentEntityBase) {
+          $vars['zero']['local'][$name] = ContentWrapper::create($entity);
+          $vars['zero']['local'][$name]->setRenderContext($vars);
+        }
       }
     }
   }
