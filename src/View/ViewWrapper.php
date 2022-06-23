@@ -39,7 +39,7 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
     if ($entity instanceof ViewExecutable) {
       $this->executable = $entity;
       $entity = $entity->storage;
-    } else if (is_string($entity)) {
+    } else if (is_string($entity) && $display === NULL) {
       [ $entity, $display ] = explode(':', $entity);
     }
     if (is_string($entity)) {
