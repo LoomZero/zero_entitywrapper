@@ -3,6 +3,7 @@
 namespace Drupal\zero_entitywrapper\Extender;
 
 use Drupal\Core\Entity\ContentEntityBase;
+use Drupal\views\ViewExecutable;
 use Drupal\zero_entitywrapper\Content\ContentWrapper;
 use Drupal\zero_entitywrapper\View\ViewWrapper;
 use Drupal\zero_preprocess\Base\PreprocessExtenderInterface;
@@ -41,7 +42,14 @@ class AutoWrapperIncludeExtender implements PreprocessExtenderInterface {
   }
 
   public function preprocess(array &$vars, array $zero, array $template) {
-    if (empty($zero['wrapper']['content']) || !count($zero['wrapper']['content'])) return;
+    if (empty($zero['wrapper']['content']) || !count($zero['wrapper']['content'])) {
+      if (!empty($vars['view']) && $vars['view'] instanceof ViewExecutable && !empty($vars['row'])) {
+        $vars['zero']['local']['wrapper'] = ViewWrapper::create($vars['view']);
+        $vars['zero']['local']['wrapper']->setFixed(TRUE);
+      } else {
+        return;
+      }
+    }
 
     if ($zero['wrapper']['content']['wrapper'] === 'views_view') {
       $vars['zero']['local']['wrapper'] = ViewWrapper::create($vars['view']);
