@@ -16,7 +16,7 @@ use Drupal\zero_entitywrapper\Wrapper\BaseWrapper;
 class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
 
   /** @var ViewExecutable */
-  private $executable;
+  private $executable = NULL;
   /** @var string */
   private $resultLangcode = NULL;
   /** @var bool */
@@ -54,6 +54,7 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
     } else {
       $this->setResultLanguage($parent->language());
     }
+    if ($this->executable !== NULL && $this->executable->executed) $this->setFixed(TRUE); // lock the wrapper if view is already executed
   }
 
   private function checkFixed(string $method) {
