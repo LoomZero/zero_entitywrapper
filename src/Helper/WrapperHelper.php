@@ -121,8 +121,10 @@ class WrapperHelper {
     /** @var PreprocessExtenderManager $extender */
     $extender = Drupal::service('zero.preprocess.extender');
 
-    $extender->preprocess($vars, $info['zero'], $info);
-    $extender->includePreprocess($vars, $info);
+    if (isset($info['zero'])) {
+      $extender->preprocess($vars, $info['zero'], $info);
+      $extender->includePreprocess($vars, $info);
+    }
   }
 
   public static function getDefaultField(ContentWrapper $wrapper, string $field = NULL): string {
