@@ -50,7 +50,7 @@ class AutoWrapperIncludeExtender implements PreprocessExtenderInterface {
       }
     }
 
-    if (str_starts_with($zero['wrapper']['content']['wrapper'], 'views_view') && $vars['view'] instanceof ViewExecutable) {
+    if (!empty($zero['wrapper']['content']['wrapper']) && str_starts_with($zero['wrapper']['content']['wrapper'], 'views_view') && $vars['view'] instanceof ViewExecutable) {
       $vars['zero']['local']['wrapper'] = ViewWrapper::create($vars['view']);
     } else {
       foreach ($zero['wrapper']['content'] as $name => $type) {
