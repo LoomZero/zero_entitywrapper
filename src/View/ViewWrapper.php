@@ -237,7 +237,13 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
       'current' => $this->getCurrentPage(),
       'page' => $this->getCurrentPage(),
     ];
-    $meta['total_pages'] = (int)ceil($meta['total'] / $meta['items']);
+
+    if ($meta['items'] === 0) {
+      $meta['total_pages'] = 0;
+    } else {
+      $meta['total_pages'] = (int)ceil($meta['total'] / $meta['items']);
+    }
+    
     $meta['remain'] = $meta['total'] - $meta['items'] * ($meta['current'] + 1);
     return $meta;
   }
