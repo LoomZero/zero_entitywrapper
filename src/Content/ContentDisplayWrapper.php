@@ -215,6 +215,8 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
       throw new EntityWrapperException('The media display is only allowed with entity reference media.');
     }
 
+    if ($field !== NULL && $this->wrapper->isEmpty($field)) return $this->process([]);
+
     return $this->process(array_merge([
       '#theme' => 'zero_media',
       '#media' => ($field === NULL ? $this->wrapper : $this->wrapper->getEntity($field, $index)),
@@ -231,6 +233,8 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
     if ($this->wrapper->metaReferenceTargetType($field) !== 'media') {
       throw new EntityWrapperException('The media display is only allowed with entity reference media.');
     }
+
+    if ($this->wrapper->isEmpty($field)) return $this->process([]);
 
     $output = [];
     foreach ($this->wrapper->getEntities($field) as $media) {
