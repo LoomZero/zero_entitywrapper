@@ -1,5 +1,10 @@
 <?php
 
+use Drupal\Core\Render\Markup;
+use Drupal\Core\Template\Attribute;
+use Drupal\zero_entitywrapper\Base\ContentWrapperInterface;
+use Drupal\zero_entitywrapper\Content\ContentWrapper;
+
 function zero_entitywrapper_page_attachments(array &$attachments) {
   /** @var \Drupal\zero_entitywrapper\Service\StaticWrapperService $cache */
   $cache = Drupal::service('zero.entitywrapper.static');
@@ -26,5 +31,114 @@ function zero_entitywrapper_theme($existing, $type, $theme, $path) {
       ],
       'pattern' => 'zero_component__',
     ],
+    'zero_media' => [
+      'variables' => [
+        'media' => NULL,
+        'type' => NULL,
+        'options' => FALSE,
+        'attributes' => [],
+        'alt' => NULL,
+        'title' => NULL,
+      ],
+      'pattern' => 'zero_media__',
+    ],
   ];
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK_alter().
+ */
+function zero_entitywrapper_theme_suggestions_zero_media(array $vars) {
+  if (!$vars['media'] instanceof ContentWrapperInterface) {
+    $vars['media'] = ContentWrapper::create($vars['media']);
+  }
+
+  /** @var ContentWrapperInterface $media */
+  $media = $vars['media'];
+  $type = $vars['type'] ?? $media->bundle();
+
+  return [
+    'zero_media',
+    'zero_media__' . $type,
+    'zero_media__' . $media->id(),
+    'zero_media__' . $type . '__' . $media->id(),
+  ];
+}
+
+function template_preprocess_zero_media(&$vars) {
+  if (!$vars['media'] instanceof ContentWrapperInterface) {
+    $vars['media'] = ContentWrapper::create($vars['media']);
+  }
+
+  /** @var ContentWrapperInterface $media */
+  $media = $vars['media'];
+  $type = $vars['type'] ?? $media->bundle();
+
+  $options = [];
+  if (is_array($vars['options']) && isset($vars['options'][$type])) {
+    $options = array_merge($options, $vars['options'][$type]);
+  }
+
+  if (isset($options['embed']) && $options['embed']) {
+    $vars['uri'] = $media->getEntity($media->metaMediaSourceField())->entity()->getFileUri();
+    $vars['formatted'] = Markup::create(file_get_contents($vars['uri']));
+  } else if (isset($options['video']) && $options['video']) {
+    $vars['video'] = TRUE;
+
+    $id = NULL;
+    preg_match_all('/(?:https?:\/{2})?(?:w{3}\.)?youtu(?:be)?\.(?:com|be)(?:\/watch\?v=|\/)([^\s&]+)/m', $media->getUrl()->toString(), $id, PREG_SET_ORDER, 0);
+
+    if (!empty($id[0][1])) {
+      $vars['provider'] = 'youtube';
+      $vars['url'] = 'https://www.youtube.com/embed/' . $id[0][1];
+      $vars['attributes'] = new Attribute(array_merge([
+        'data-src' => $vars['url'] . '?autoplay=1',
+        'allowfullscreen' => TRUE,
+        'allowtransparency' => TRUE,
+        'allow' => 'autoplay',
+        'frameBorder' => 0,
+      ], $options['attributes'] ?? $vars['attributes']));
+    }
+
+    if (empty($vars['provider'])) {
+      $vars['provider'] = 'local';
+      $vars['mime'] = $media->getEntity($media->metaMediaSourceField())->entity()->getMimeType();
+      $vars['url'] = $media->getUrl()->toString();
+      $vars['attributes'] = new Attribute(array_merge([
+        'playsinline' => TRUE,
+        'controls' => TRUE,
+      ], $options['attributes'] ?? $vars['attributes']));
+    }
+
+  } else {
+    $vars['uri'] = $media->getEntity($media->metaMediaSourceField())->entity()->getFileUri();
+
+    if (isset($options['responsive'])) {
+      $vars['formatted'] = [
+        '#theme' => 'responsive_image',
+        '#uri' => $vars['uri'],
+        '#responsive_image_style_id' => $options['responsive'],
+      ];
+    } else if (isset($options['style'])) {
+      $vars['formatted'] = [
+        '#theme' => 'image_style',
+        '#uri' => $vars['uri'],
+        '#style_name' => $options['style'],
+      ];
+    } else {
+      $vars['formatted'] = [
+        '#theme' => 'image',
+        '#uri' => $vars['uri'],
+      ];
+    }
+
+    $raw = $media->getRaw($media->metaMediaSourceField());
+    $vars['formatted']['#alt'] = $vars['#alt'] ?? $raw['alt'] ?? 'media';
+    $title = $vars['#title'] ?? $raw['title'] ?? FALSE;
+    if ($title) {
+      $vars['formatted']['#title'] = $title;
+    }
+    $vars['formatted']['#attributes'] = array_merge($vars['attributes'], $options['attributes'] ?? []);
+    $vars['formatted'] = array_merge($vars['formatted'], $options['element'] ?? []);
+  }
 }

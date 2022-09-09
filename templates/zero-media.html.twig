@@ -1,0 +1,12 @@
+{% if video %}
+  {% if provider == 'youtube' %}
+    <iframe{{ attributes }}></iframe>
+  {% elseif provider == 'local' %}
+    <video{{ attributes }}>
+      <source src="{{ url }}" type="{{ mime }}" />
+    </video>
+  {% endif %}
+
+{% else %}
+  {{ formatted }}
+{% endif %}

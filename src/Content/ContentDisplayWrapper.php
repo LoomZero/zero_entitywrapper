@@ -4,6 +4,7 @@ namespace Drupal\zero_entitywrapper\Content;
 
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
+use Drupal\Tests\views_ui\Functional\NewViewConfigSchemaTest;
 use Drupal\zero_entitywrapper\Base\BaseWrapperExtensionInterface;
 use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
 use Drupal\zero_entitywrapper\Base\ContentDisplayWrapperInterface;
@@ -204,6 +205,42 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
       return $this->process($output);
     }
     return $this->formatters($field, 'image', ['image_style' => $image_style, 'image_link' => $image_link]);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function media(string $field = NULL, int $index = 0, array $options = [], array $additions = []) {
+    if ($field === NULL && $this->wrapper->type() !== 'media' || $field !== NULL && $this->wrapper->metaReferenceTargetType($field) !== 'media') {
+      throw new EntityWrapperException('The media display is only allowed with entity reference media.');
+    }
+
+    return $this->process(array_merge([
+      '#theme' => 'zero_media',
+      '#media' => ($field === NULL ? $this->wrapper : $this->wrapper->getEntity($field, $index)),
+      '#options' => $options,
+    ], $additions));
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function medias(string $field = NULL, array $options = [], array $additions = []) {
+    if ($field === NULL) return $this->media($field, 0, $options, $additions);
+
+    if ($this->wrapper->metaReferenceTargetType($field) !== 'media') {
+      throw new EntityWrapperException('The media display is only allowed with entity reference media.');
+    }
+
+    $output = [];
+    foreach ($this->wrapper->getEntities($field) as $media) {
+      $output[] = array_merge([
+        '#theme' => 'zero_media',
+        '#media' => $media,
+        '#options' => $options,
+      ], $additions);
+    }
+    return $this->process($output);
   }
 
   /**
