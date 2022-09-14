@@ -48,12 +48,13 @@ class RenderWrapperCollection extends ArrayObject implements RenderableInterface
   }
 
   /**
-   * @deprecated
+   * @deprecated Will be removed at version 1.0.0, use instead <code>$wrapper->display()</code>
    * @param string $name
    * @param callable|* $value
    * @return $this
    */
   public function setItemData(string $name, $value): self {
+    $this->getWrapper()->getService()->logDeprecation();
     $copy = $this->getArrayCopy();
     foreach (Element::children($copy) as $index) {
       $this[$index][$name] = $this->getValue($value, $this[$index], $index);
@@ -62,22 +63,24 @@ class RenderWrapperCollection extends ArrayObject implements RenderableInterface
   }
 
   /**
-   * @deprecated
+   * @deprecated Will be removed at version 1.0.0, use instead <code>$wrapper->display()</code>
    * @param callable|array $value
    * @return $this
    */
   public function setItemAttributes($value): self {
+    $this->getWrapper()->getService()->logDeprecation();
     $this['#item_attributes'] = $this->getValue($value);
     return $this;
   }
 
   /**
-   * @deprecated
+   * @deprecated Will be removed at version 1.0.0, use instead <code>$wrapper->display()</code>
    * @param string ...$classes
    *
    * @return $this
    */
   public function addItemClass(string ...$classes): self {
+    $this->getWrapper()->getService()->logDeprecation();
     if (empty($this['#item_attributes']['class'])) {
       $this['#item_attributes']['class'] = [];
     }
