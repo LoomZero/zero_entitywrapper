@@ -42,7 +42,17 @@ function zero_entitywrapper_theme($existing, $type, $theme, $path) {
       ],
       'pattern' => 'zero_media__',
     ],
+    'field__entitywrapper' => [
+      'base hook' => 'field',
+    ],
   ];
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK_alter().
+ */
+function zero_entitywrapper_theme_suggestions_field_alter(array &$suggestions, array $vars) {
+  array_unshift($suggestions, 'field__entitywrapper');
 }
 
 /**

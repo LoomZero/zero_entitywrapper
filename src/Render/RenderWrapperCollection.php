@@ -48,11 +48,12 @@ class RenderWrapperCollection extends ArrayObject implements RenderableInterface
   }
 
   /**
+   * @deprecated
    * @param string $name
    * @param callable|* $value
-   * @return RenderWrapperCollection
+   * @return $this
    */
-  public function setItemData(string $name, $value): RenderWrapperCollection {
+  public function setItemData(string $name, $value): self {
     $copy = $this->getArrayCopy();
     foreach (Element::children($copy) as $index) {
       $this[$index][$name] = $this->getValue($value, $this[$index], $index);
@@ -61,15 +62,22 @@ class RenderWrapperCollection extends ArrayObject implements RenderableInterface
   }
 
   /**
+   * @deprecated
    * @param callable|array $value
-   * @return RenderWrapperCollection
+   * @return $this
    */
-  public function setItemAttributes($value): RenderWrapperCollection {
+  public function setItemAttributes($value): self {
     $this['#item_attributes'] = $this->getValue($value);
     return $this;
   }
 
-  public function addItemClass(string ...$classes): RenderWrapperCollection {
+  /**
+   * @deprecated
+   * @param string ...$classes
+   *
+   * @return $this
+   */
+  public function addItemClass(string ...$classes): self {
     if (empty($this['#item_attributes']['class'])) {
       $this['#item_attributes']['class'] = [];
     }
@@ -77,6 +85,74 @@ class RenderWrapperCollection extends ArrayObject implements RenderableInterface
       $this['#item_attributes']['class'][] = $class;
     }
     return $this;
+  }
+
+  public function each(callable $callback): self {
+    $vars = $this->getArrayCopy();
+    foreach (Element::children($vars) as $delta) {
+      $callback(new RenderItemWrapper($this, $delta));
+    }
+    return $this;
+  }
+
+  public function getInfo(string $key) {
+    return $this['#_preprocess'][$key] ?? NULL;
+  }
+
+  public function setInfo(string $key, $value, bool $merge = FALSE): self {
+    if ($merge && isset($this['#_preprocess'][$key])) {
+      $this['#_preprocess'][$key] = array_merge_recursive($this['#_preprocess'][$key], $value);
+    } else {
+      $this['#_preprocess'][$key] = $value;
+    }
+    return $this;
+  }
+
+  public function getItemInfo($delta, string $key) {
+    return $this['#_preprocess']['items'][$delta][$key] ?? NULL;
+  }
+
+  public function setItemInfo($delta, string $key, $value, bool $merge = FALSE): self {
+    if ($merge && isset($this['#_preprocess']['items'][$delta][$key])) {
+      $this['#_preprocess']['items'][$delta][$key] = array_merge_recursive($this['#_preprocess']['items'][$delta][$key], $value);
+    } else {
+      $this['#_preprocess']['items'][$delta][$key] = $value;
+    }
+    return $this;
+  }
+
+  /**
+   * Set the wrapper for all items
+   *
+   * @param array $options = [
+   *     'none' => TRUE,
+   *     'attribute' => 'div',
+   *     'class' => ['wrapper', 'wrapper--field'],
+   *     'data-src' => '/path/to/src',
+   * ]
+   * @param bool $merge
+   *
+   * @return $this
+   */
+  public function setWrapper(array $options, bool $merge = TRUE): self {
+    return $this->setInfo('wrapper', $options, $merge);
+  }
+
+  /**
+   * Set the wrapper for every item
+   *
+   * @param array $options = [
+   *     'none' => TRUE,
+   *     'attribute' => 'div',
+   *     'class' => ['wrapper', 'wrapper--field'],
+   *     'data-src' => '/path/to/src',
+   * ]
+   * @param bool $merge
+   *
+   * @return $this
+   */
+  public function setItemWrapper(array $options, bool $merge = TRUE): self {
+    return $this->setItemInfo('_all', 'wrapper', $options, $merge);
   }
 
   public function toRenderable(): array {
