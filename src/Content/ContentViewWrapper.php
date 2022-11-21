@@ -133,6 +133,7 @@ class ContentViewWrapper implements BaseWrapperExtensionInterface {
     $field = WrapperHelper::getDefaultField($this->wrapper, $field);
     if ($this->wrapper->metaReferenceTargetType($field) === 'media') {
       $media = $this->wrapper->getEntity($field, $index);
+      if ($media === NULL) return [];
       return new RenderWrapperCollection($this->doFormatter($media, $media->metaMediaSourceField(), 0, 'image', ['image_style' => $image_style, 'image_link' => $image_link]), $this->wrapper);
     }
     return $this->formatter($field, $index, 'image', ['image_style' => $image_style, 'image_link' => $image_link]);
@@ -155,6 +156,7 @@ class ContentViewWrapper implements BaseWrapperExtensionInterface {
     $field = WrapperHelper::getDefaultField($this->wrapper, $field);
     if ($this->wrapper->metaReferenceTargetType($field) === 'media') {
       $media = $this->wrapper->getEntity($field, $index);
+      if ($media === NULL) return [];
       return new RenderWrapperCollection($this->doFormatter($media, $media->metaMediaSourceField(), 0, 'responsive_image', ['responsive_image_style' => $responsive_image_style, 'image_link' => $image_link]), $this->wrapper);
     }
     return $this->formatter($field, $index, 'responsive_image', ['responsive_image_style' => $responsive_image_style, 'image_link' => $image_link]);

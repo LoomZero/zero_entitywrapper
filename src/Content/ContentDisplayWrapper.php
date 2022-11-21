@@ -182,10 +182,11 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
   /**
    * @inheritDoc
    */
-  public function image(string $field, int $index = 0, string $image_style = '', string $image_link = '') {
+  public function image(string $field = NULL, int $index = 0, string $image_style = '', string $image_link = '') {
     $field = WrapperHelper::getDefaultField($this->wrapper, $field);
     if ($this->wrapper->metaReferenceTargetType($field) === 'media') {
       $media = $this->wrapper->getEntity($field, $index);
+      if ($media === NULL) return $this->process([]);
       return $this->process($this->doFormatter($media, $media->metaMediaSourceField(), 0, 'image', ['image_style' => $image_style, 'image_link' => $image_link]));
     }
     return $this->formatter($field, $index, 'image', ['image_style' => $image_style, 'image_link' => $image_link]);
@@ -194,7 +195,7 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
   /**
    * @inheritDoc
    */
-  public function images(string $field, string $image_style = '', string $image_link = '') {
+  public function images(string $field = NULL, string $image_style = '', string $image_link = '') {
     $field = WrapperHelper::getDefaultField($this->wrapper, $field);
     if ($this->wrapper->metaReferenceTargetType($field) === 'media') {
       $medias = $this->wrapper->getEntities($field);
@@ -250,10 +251,11 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
   /**
    * @inheritDoc
    */
-  public function responsiveImage(string $field, int $index = 0, string $responsive_image_style = '', string $image_link = '') {
+  public function responsiveImage(string $field = NULL, int $index = 0, string $responsive_image_style = '', string $image_link = '') {
     $field = WrapperHelper::getDefaultField($this->wrapper, $field);
     if ($this->wrapper->metaReferenceTargetType($field) === 'media') {
       $media = $this->wrapper->getEntity($field, $index);
+      if ($media === NULL) return $this->process([]);
       return $this->process($this->doFormatter($media, $media->metaMediaSourceField(), 0, 'responsive_image', ['responsive_image_style' => $responsive_image_style, 'image_link' => $image_link]));
     }
     return $this->formatter($field, $index, 'responsive_image', ['responsive_image_style' => $responsive_image_style, 'image_link' => $image_link]);
@@ -262,7 +264,7 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
   /**
    * @inheritDoc
    */
-  public function responsiveImages(string $field, string $responsive_image_style = '', string $image_link = '') {
+  public function responsiveImages(string $field = NULL, string $responsive_image_style = '', string $image_link = '') {
     $field = WrapperHelper::getDefaultField($this->wrapper, $field);
     if ($this->wrapper->metaReferenceTargetType($field) === 'media') {
       $medias = $this->wrapper->getEntities($field);
