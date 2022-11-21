@@ -4,7 +4,6 @@ namespace Drupal\zero_entitywrapper\Content;
 
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
-use Drupal\Tests\views_ui\Functional\NewViewConfigSchemaTest;
 use Drupal\zero_entitywrapper\Base\BaseWrapperExtensionInterface;
 use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
 use Drupal\zero_entitywrapper\Base\ContentDisplayWrapperInterface;
