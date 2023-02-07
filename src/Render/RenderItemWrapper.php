@@ -43,7 +43,7 @@ class RenderItemWrapper {
    *
    * @param array $options = [
    *     'none' => TRUE,
-   *     'attribute' => 'div',
+   *     'element' => 'div',
    *     'class' => ['wrapper', 'wrapper--field'],
    *     'data-src' => '/path/to/src',
    * ]

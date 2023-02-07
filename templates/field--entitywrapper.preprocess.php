@@ -20,7 +20,7 @@ foreach ($vars['items'] as $delta => $item) {
   }
 
   if (empty($attributes['none']) && count($attributes)) {
-    $vars['items'][$delta]['wrapper_attribute'] = $attributes['attribute'] ?? 'div';
+    $vars['items'][$delta]['wrapper_element'] = $attributes['attribute'] ?? 'div';
     unset($attributes['attribute']);
     if (!empty($attributes['class'])) {
       foreach ($attributes['class'] as $index => $class) {
@@ -38,7 +38,7 @@ foreach ($vars['items'] as $delta => $item) {
 if (isset($vars['element']['#_preprocess']['wrapper'])) {
   $wrapper = $vars['element']['#_preprocess']['wrapper'];
   if (empty($wrapper['none'])) {
-    $vars['wrapper_attribute'] = $wrapper['attribute'] ?? 'div';
+    $vars['wrapper_element'] = $wrapper['attribute'] ?? 'div';
     unset($wrapper['attribute']);
     $vars['attributes'] = array_merge_recursive($vars['attributes'], $wrapper);
   } else {

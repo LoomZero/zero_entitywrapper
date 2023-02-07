@@ -3,7 +3,7 @@
     {% if item.clean %}
       {{ item.content }}
     {% else %}
-      <{{ item.wrapper_attribute }}{{ item.attributes }}>{{ item.content }}</{{ item.wrapper_attribute }}>
+      <{{ item.wrapper_element }}{{ item.attributes }}>{{ item.content }}</{{ item.wrapper_element }}>
     {% endif %}
   {% endfor %}
 {% endset %}
@@ -11,5 +11,5 @@
 {% if clean %}
   {{ field_content }}
 {% else %}
-  <{{ wrapper_attribute }}{{ attributes }}>{{ field_content }}</{{ wrapper_attribute }}>
+  <{{ wrapper_element }}{{ attributes }}>{{ field_content }}</{{ wrapper_element }}>
 {% endif %}
