@@ -30,6 +30,9 @@ class ViewSortWrapper extends ViewHandlerWrapper {
     return $this;
   }
 
+  /**
+   * @return ViewWrapperInterface
+   */
   public function asc(): ViewWrapperInterface {
     return $this->addSort('ASC');
   }

@@ -3,6 +3,8 @@
 namespace Drupal\zero_entitywrapper\Base;
 
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Link;
+use Drupal\Core\Url;
 use Drupal\views\ResultRow;
 use Drupal\views\ViewExecutable;
 use Drupal\zero_entitywrapper\Content\ContentWrapperCollection;
@@ -240,5 +242,24 @@ interface ViewWrapperInterface extends BaseWrapperInterface {
    * @return ViewSortWrapper
    */
   public function addSort(string $table, string $field): ViewSortWrapper;
+
+  /**
+   * Get a URL from the view display if possible.
+   *
+   * @param array $options
+   *
+   * @return Url|null
+   */
+  public function url(array $options = []): ?Url;
+
+  /**
+   * Get a Link from the view display if possible.
+   *
+   * @param string $text
+   * @param array $options
+   *
+   * @return Link|null
+   */
+  public function link(string $text, array $options = []): ?Link;
 
 }

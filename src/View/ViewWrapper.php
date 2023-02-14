@@ -4,6 +4,8 @@ namespace Drupal\zero_entitywrapper\View;
 
 use Drupal;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Link;
+use Drupal\Core\Url;
 use Drupal\views\ViewEntityInterface;
 use Drupal\views\ViewExecutable;
 use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
@@ -243,7 +245,7 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
     } else {
       $meta['total_pages'] = (int)ceil($meta['total'] / $meta['items']);
     }
-    
+
     $meta['remain'] = $meta['total'] - $meta['items'] * ($meta['current'] + 1);
     return $meta;
   }
@@ -327,6 +329,27 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
   public function addSort(string $table, string $field): ViewSortWrapper {
     $this->checkFixed('addSort($table, $field)');
     return new ViewSortWrapper($this, $table, $field);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function url(array $options = []): ?Url {
+    if (!$this->executable()->hasUrl()) return NULL;
+    $url = $this->executable()->getUrl();
+    foreach ($options as $option => $value) {
+      $url->setOption($option, $value);
+    }
+    return $url;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function link(string $text, array $options = []): ?Link {
+    $url = $this->url($options);
+    if ($url === NULL) return NULL;
+    return Link::fromTextAndUrl($text, $url);
   }
 
 }
