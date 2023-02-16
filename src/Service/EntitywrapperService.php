@@ -2,23 +2,56 @@
 
 namespace Drupal\zero_entitywrapper\Service;
 
+use Drupal;
 use Drupal\Core\Link;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Render\Markup;
+use Drupal\Core\Site\Settings;
 
 class EntitywrapperService {
 
   public function hasLogPermission() {
-    return \Drupal::currentUser()->hasPermission('see zero_entitywrapper info');
+    return Drupal::currentUser()->hasPermission('see zero_entitywrapper info');
   }
 
-  public function config($key, $fallback = NULL) {
-    $state = \Drupal::state()->get('zero_entitywrapper_config', []);
-    if (isset($state[$key])) return $state[$key] ?? $fallback;
-    $config = \Drupal::config('zero_entitywrapper.config');
-    $value = $config->get($key);
-    if (isset($value)) return $value ?? $fallback;
+  public function config($key, $fallback = NULL, string $type = NULL) {
+    if ($type === NULL || $type === 'state') {
+      $state = Drupal::state()->get('zero_entitywrapper_config', []);
+      if ($type === 'state') return $state[$key] ?? $fallback;
+      if (isset($state[$key])) return $state[$key];
+    }
+    if ($type === NULL || $type === 'settings') {
+      $settings = Settings::get('zero_entitywrapper');
+      if ($type === 'settings') return $settings[$key] ?? $fallback;
+      if (isset($settings[$key])) return $settings[$key];
+    }
+    if ($type === NULL || $type === 'config') {
+      $config = Drupal::config('zero_entitywrapper.config');
+      $value = $config->get($key);
+      if (isset($value)) return $value;
+    }
     return $fallback;
+  }
+
+  public function getConfigState($key) {
+    return [
+      'state' => $this->config($key, NULL, 'state'),
+      'settings' => $this->config($key, NULL, 'settings'),
+      'config' => $this->config($key, NULL, 'config'),
+    ];
+  }
+
+  public function resetConfig($key, string $type = NULL) {
+    if ($type === NULL || $type === 'state') {
+      $state = Drupal::state()->get('zero_entitywrapper_config', []);
+      unset($state[$key]);
+      Drupal::state()->set('zero_entitywrapper_config', $state);
+    }
+    if ($type === NULL || $type === 'config') {
+      $config = Drupal::configFactory()->getEditable('zero_entitywrapper.config');
+      $config->clear($key);
+      $config->save();
+    }
   }
 
   public function getBacktracerInfo(int $call = 0) {
@@ -52,7 +85,7 @@ class EntitywrapperService {
       }
       $warning .= '<span style="margin-left: 2em;"><i>in <code style="background: rgba(0, 0, 0, .3); padding: 0.2em 0.3em; border-radius: 3px;">' . $info['call'] . '</i></code></span><br />';
       $warning .= '<span style="margin-left: 2em;">' . Link::createFromRoute('Config ⇒', 'zero_entitywrapper.config.form')->toString() . '</span>';
-      \Drupal::messenger()->addWarning(Markup::create($warning));
+      Drupal::messenger()->addWarning(Markup::create($warning));
     }
   }
 
@@ -88,7 +121,7 @@ class EntitywrapperService {
       }
     }, $message);
 
-    \Drupal::messenger()->addMessage(Markup::create($message), $type);
+    Drupal::messenger()->addMessage(Markup::create($message), $type);
   }
 
 }
