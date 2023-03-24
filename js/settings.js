@@ -1,4 +1,4 @@
-(function ($) {
+(function () {
 
   Drupal.zero.Settings = {
 
@@ -11,15 +11,7 @@
       if (typeof element === 'string') {
         return element;
       } else {
-        return element.data('zero-uuid') || null;
-      }
-    },
-
-    element(uuid) {
-      if (typeof uuid === 'string') {
-        return $('[data-zero-uuid="' + uuid + '"]');
-      } else {
-        return uuid;
+        return element.dataset.zeroUuid || null;
       }
     },
 
@@ -48,6 +40,10 @@
       return list;
     },
 
+    getConfig(uuid, namespace, defaults = {}) {
+      return {...defaults, ...(this.fallback(drupalSettings && drupalSettings['zero_entitywrapper__' + uuid] && drupalSettings['zero_entitywrapper__' + uuid][namespace] || null) || {})};
+    },
+
   };
 
-})(jQuery);
+})();
