@@ -295,9 +295,13 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     return $entity->access($operation, $account);
   }
 
+  /**
+   * @param EntityInterface $entity
+   *
+   * @param bool $ignoreAccess DEPRECATED
+   */
   protected function transformEntity(EntityInterface $entity = NULL, bool $ignoreAccess = FALSE): ?EntityInterface {
     if ($entity === NULL) return NULL;
-    $revision = NULL;
 
     $entity = WrapperHelper::applyLanguage($entity, $this->entity());
     $this->renderContext()->cacheAddEntity($entity);
@@ -464,20 +468,35 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
    * @inheritDoc
    */
   public function getEntities(string $field, bool $ignoreAccess = FALSE): ContentWrapperCollection {
-    return new ContentWrapperCollection($this->metaForeach([$this, 'getEntity'], $field, $ignoreAccess), ['message' => 'Please use method <code>getEntitiesCollection()</code> instead of <code>getEntities()</code> to use collection features.', 'lines' => ['Collection support will be removed at version 1.0.0']]);
+    if (count(func_get_args()) > 1) trigger_error('param $ignoreAccess of method ' . __METHOD__ . ' is deprecated, please use instead `$wrapper->setConfig(ContentWrapperInterface::CONTENT_BYPASS_ACCESS)`');
+
+    $entities = $this->metaItems($field)->referencedEntities();
+    $values = [];
+    foreach ($entities as $entity) {
+      $entity = $this->transformEntity($entity, $ignoreAccess);
+      if ($entity) $values[] = self::create($entity, $this);
+    }
+    return new ContentWrapperCollection($entities, ['message' => 'Please use method <code>getEntitiesCollection()</code> instead of <code>getEntities()</code> to use collection features.', 'lines' => ['Collection support will be removed at version 1.0.0']]);
   }
 
   /**
    * @inheritDoc
    */
   public function getEntitiesCollection(string $field): ContentWrapperCollection {
-    return new ContentWrapperCollection($this->metaForeach([$this, 'getEntity'], $field));
+    $entities = $this->metaItems($field)->referencedEntities();
+    $values = [];
+    foreach ($entities as $entity) {
+      $entity = $this->transformEntity($entity);
+      if ($entity) $values[] = self::create($entity, $this);
+    }
+    return new ContentWrapperCollection($entities);
   }
 
   /**
    * @inheritDoc
    */
   public function getAuthor(bool $ignoreAccess = FALSE): ?ContentWrapperInterface {
+    if (count(func_get_args()) > 0) trigger_error('param $ignoreAccess of method ' . __METHOD__ . ' is deprecated, please use instead `$wrapper->setConfig(ContentWrapperInterface::CONTENT_BYPASS_ACCESS)`');
     return $this->getEntity('uid', 0, $ignoreAccess);
   }
 

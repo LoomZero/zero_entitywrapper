@@ -5,12 +5,17 @@ namespace Drupal\zero_entitywrapper\Content;
 use Drupal;
 use Drupal\zero_entitywrapper\Service\EntitywrapperService;
 use Drupal\zero_preprocess\Collection\ProxyCollection;
+use Drupal\zero_entitywrapper\Base\ContentWrapperInterface;
 
 class ContentWrapperCollection extends ProxyCollection {
 
   private $service;
   private $unsafe;
 
+  /**
+   * @param ContentWrapperInterface[] $array
+   * @param array $unsafe
+   */
   public function __construct($array = [], $unsafe = FALSE) {
     parent::__construct($array);
 

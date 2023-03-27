@@ -328,7 +328,7 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    *
    * @param string $field
    * @param int $index
-   * @param bool $ignoreAccess
+   * @param bool $ignoreAccess DEPRECATED
    * @return ContentWrapperInterface|null
    */
   public function getEntity(string $field, int $index = 0, bool $ignoreAccess = FALSE): ?ContentWrapperInterface;
@@ -343,6 +343,7 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    * @see ContentWrapperInterface::getEntitiesCollection()
    *
    * @param string $field
+   * @param bool $ignoreAccess DEPRECATED
    *
    * @return ContentWrapperInterface|ContentWrapperInterface[]
    */
@@ -362,7 +363,8 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    *
    * Please don't use the parameter $ignoreAccess, instead use `$wrapper->setConfig(ContentWrapperInterface::CONTENT_BYPASS_ACCESS)`
    *
-   * @param bool $ignoreAccess
+   * @param bool $ignoreAccess DEPRECATED
+   *
    * @return ContentWrapperInterface|null
    */
   public function getAuthor(bool $ignoreAccess = FALSE): ?ContentWrapperInterface;
