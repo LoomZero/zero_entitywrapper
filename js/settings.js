@@ -1,5 +1,7 @@
 (function () {
 
+  if (Drupal.zero === undefined) Drupal.zero = {};
+
   Drupal.zero.Settings = {
 
     fallback(value, fallback) {

@@ -1,5 +1,3 @@
 settings:
   js:
     js/settings.js: {}
-  dependencies:
-    - zero_preprocess/base
