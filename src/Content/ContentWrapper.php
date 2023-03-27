@@ -489,7 +489,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
       $entity = $this->transformEntity($entity);
       if ($entity) $values[] = self::create($entity, $this);
     }
-    return new ContentWrapperCollection($entities);
+    return new ContentWrapperCollection($values);
   }
 
   /**
