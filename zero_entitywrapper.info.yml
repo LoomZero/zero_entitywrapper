@@ -3,7 +3,7 @@ type: module
 description: 'Base EntityWrapper module'
 core_version_requirement: ">=8"
 package: zero
-version: 0.15.4
+version: 0.15.5
 
 configure: zero_entitywrapper.config.form
 dependencies:
