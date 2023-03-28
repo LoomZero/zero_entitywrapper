@@ -476,7 +476,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
       $entity = $this->transformEntity($entity, $ignoreAccess);
       if ($entity) $values[] = self::create($entity, $this);
     }
-    return new ContentWrapperCollection($entities, ['message' => 'Please use method <code>getEntitiesCollection()</code> instead of <code>getEntities()</code> to use collection features.', 'lines' => ['Collection support will be removed at version 1.0.0']]);
+    return new ContentWrapperCollection($values, ['message' => 'Please use method <code>getEntitiesCollection()</code> instead of <code>getEntities()</code> to use collection features.', 'lines' => ['Collection support will be removed at version 1.0.0']]);
   }
 
   /**
