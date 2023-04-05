@@ -39,6 +39,11 @@ class AutoWrapperIncludeExtender implements PreprocessExtenderInterface {
       $zero['wrapper']['content']['wrapper'] = 'comment';
       $zero['wrapper']['content']['commented'] = 'commented_entity';
     }
+
+    // add block content support
+    if (strpos($item['template'], 'block') === 0) {
+      $zero['wrapper']['content']['wrapper'] = 'block_content';
+    }
   }
 
   public function preprocess(array &$vars, array $zero, array $template) {
@@ -62,6 +67,10 @@ class AutoWrapperIncludeExtender implements PreprocessExtenderInterface {
 
         if ($entity === NULL && isset($vars['elements']['#' . $type])) {
           $entity = $vars['elements']['#' . $type];
+        }
+
+        if ($entity === NULL && isset($vars['content']['#' . $type])) {
+          $entity = $vars['content']['#' . $type];
         }
 
         if ($entity instanceof ContentEntityBase) {
