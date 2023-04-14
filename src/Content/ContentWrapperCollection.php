@@ -94,6 +94,19 @@ class ContentWrapperCollection extends ProxyCollection {
     return parent::join($glue);
   }
 
+  public function joinAsElement(string $element = 'div', string $attributes = '', string $glue = ''): ?string {
+    if ($this->unsafe) {
+      $this->getService()->log('deprecation', $this->unsafe['message'], [...($this->unsafe['lines'] ?? []), 'Called in <code>' . $this->unsafe['info']['call'] . '</code>']);
+    }
+    if ($this->length() > 0) {
+      $before = '<' . $element . ($attributes ? ' ' . $attributes : '') . '>';
+      $after = '</' . $element . '>';
+      return $before . $this->join($after . $glue . $before) . $after;
+    } else {
+      return NULL;
+    }
+  }
+
   public function map(callable $callback, ...$args): array {
     if ($this->unsafe) {
       $this->getService()->log('deprecation', $this->unsafe['message'], [...($this->unsafe['lines'] ?? []), 'Called in <code>' . $this->unsafe['info']['call'] . '</code>']);
