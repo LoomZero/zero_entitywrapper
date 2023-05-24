@@ -564,11 +564,15 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
    * @inheritDoc
    */
   public function getLink(string $field, int $index = 0, array $options = [], string $title_overwrite = NULL): ?Link {
-    /** @var FieldItemInterface */
     $item = $this->metaItem($field, $index);
     if ($item === NULL) return NULL;
 
-    $values = $item->getValue();
+    // use entity label or try to get title of item values
+    if ($this->metaFieldType($field) === 'entity_reference') {
+      $values['title'] = $this->getEntity($field, $index)->getLabel();
+    } else {
+      $values = $item->getValue();
+    }
     $url = $this->getUrl($field, $index, $options);
     return Link::fromTextAndUrl($title_overwrite ?? $values['title'] ?? $url->toString(), $url);
   }
