@@ -131,6 +131,17 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
   /**
    * @inheritDoc
    */
+  public function setShowAllPager(int $offset = NULL): self {
+    $this->checkFixed('setFullPager($offset)');
+    $pager = $this->executable()->getDisplay()->getOption('pager');
+    $pager['type'] = 'none';
+    $this->executable()->getDisplay()->setOption('pager', $pager);
+    return $this->setRange(NULL, NULL, $offset);
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function setRange(int $itemsPerPage = NULL, int $page = NULL, int $offset = NULL): self {
     $this->checkFixed('setRange($itemsPerPage, $page, $offset)');
     if ($itemsPerPage !== NULL) $this->executable()->setItemsPerPage($itemsPerPage);
@@ -171,13 +182,13 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
    * @inheritDoc
    * @noinspection PhpParamsInspection
    */
-  public function getContentResultsCollection(): ContentWrapperCollection {
+  public function getContentResultsCollection(bool $returnArray = FALSE): ContentWrapperCollection {
     $results = [];
     foreach ($this->getResults() as $row) {
       $results[] = ContentWrapper::create($row->_entity, $this)
         ->setLanguage($this->getResultLanguage());
     }
-    return new ContentWrapperCollection($results);
+    return new ContentWrapperCollection($results, FALSE, $returnArray);
   }
 
   /**

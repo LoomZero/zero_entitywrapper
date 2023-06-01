@@ -11,14 +11,17 @@ class ContentWrapperCollection extends ProxyCollection {
 
   private $service;
   private $unsafe;
+  private bool $returnArray;
 
   /**
    * @param ContentWrapperInterface[] $array
    * @param array $unsafe
+   * @param bool $returnArray return after the first collection method the always an array
    */
-  public function __construct($array = [], $unsafe = FALSE) {
+  public function __construct($array = [], $unsafe = FALSE, bool $returnArray = FALSE) {
     parent::__construct($array);
 
+    $this->returnArray = $returnArray;
     if ($unsafe) {
       $this->unsafe = $unsafe;
       $this->unsafe['info'] = $this->getService()->getBacktracerInfo($this->unsafe['caller'] ?? 0);
@@ -59,7 +62,7 @@ class ContentWrapperCollection extends ProxyCollection {
         }
       }
     }
-    if ($is_array) {
+    if ($is_array || $this->returnArray) {
       return $results;
     } else {
       return new self($results);

@@ -73,6 +73,14 @@ interface ViewWrapperInterface extends BaseWrapperInterface {
   public function setFullPager(int $itemsPerPage = NULL, int $page = NULL, int $offset = NULL): self;
 
   /**
+   * Set the pager to show all items pager
+   *
+   * @param int|NULL $offset
+   * @return self
+   */
+  public function setShowAllPager(int $offset = NULL): self;
+
+  /**
    * Set the pager range
    *
    * @param int|NULL $itemsPerPage
@@ -99,9 +107,10 @@ interface ViewWrapperInterface extends BaseWrapperInterface {
   /**
    * Get the result of the view as ContentWrapperCollection
    *
+   * @param bool $returnArray return after the first collection method the always an array
    * @return ContentWrapperInterface|ContentWrapperInterface[]|ContentWrapperCollection
    */
-  public function getContentResultsCollection(): ContentWrapperCollection;
+  public function getContentResultsCollection(bool $returnArray = FALSE): ContentWrapperCollection;
 
   /**
    * Set the language code for the results array used by getContentResults()
