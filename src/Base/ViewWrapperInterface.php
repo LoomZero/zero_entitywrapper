@@ -107,7 +107,7 @@ interface ViewWrapperInterface extends BaseWrapperInterface {
   /**
    * Get the result of the view as ContentWrapperCollection
    *
-   * @param bool $returnArray return after the first collection method the always an array
+   * @param bool $returnArray return always an array after the first collection method
    * @return ContentWrapperInterface|ContentWrapperInterface[]|ContentWrapperCollection
    */
   public function getContentResultsCollection(bool $returnArray = FALSE): ContentWrapperCollection;

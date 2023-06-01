@@ -16,7 +16,7 @@ class ContentWrapperCollection extends ProxyCollection {
   /**
    * @param ContentWrapperInterface[] $array
    * @param array $unsafe
-   * @param bool $returnArray return after the first collection method the always an array
+   * @param bool $returnArray return always an array after the first collection method
    */
   public function __construct($array = [], $unsafe = FALSE, bool $returnArray = FALSE) {
     parent::__construct($array);
@@ -26,6 +26,24 @@ class ContentWrapperCollection extends ProxyCollection {
       $this->unsafe = $unsafe;
       $this->unsafe['info'] = $this->getService()->getBacktracerInfo($this->unsafe['caller'] ?? 0);
     }
+  }
+
+  /**
+   * Set if the collection will return always an array after the first method
+   * 
+   * @param bool $returnArray
+   * @return self
+   */
+  public function setReturnArray(bool $returnArray = TRUE): self {
+    $this->returnArray = $returnArray;
+    return $this;
+  }
+
+  /**
+   * @return bool if the collection will return always an array after the first method
+   */
+  public function getReturnArray(): bool {
+    return $this->returnArray;
   }
 
   public function getService(): EntitywrapperService {

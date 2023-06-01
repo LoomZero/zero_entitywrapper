@@ -116,6 +116,13 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   /**
    * @inheritDoc
    */
+  public function link(array $options = [], string $rel = 'canonical', string $text = NULL): Link {
+    return $this->entity()->toLink($text ?? $this->getLabel(), $rel, $options);
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function hasField(string $field): bool {
     return $this->entity()->hasField($field);
   }
@@ -482,14 +489,14 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   /**
    * @inheritDoc
    */
-  public function getEntitiesCollection(string $field): ContentWrapperCollection {
+  public function getEntitiesCollection(string $field, bool $returnArray = FALSE): ContentWrapperCollection {
     $entities = $this->metaItems($field)->referencedEntities();
     $values = [];
     foreach ($entities as $entity) {
       $entity = $this->transformEntity($entity);
       if ($entity) $values[] = self::create($entity, $this);
     }
-    return new ContentWrapperCollection($values);
+    return new ContentWrapperCollection($values, FALSE, $returnArray);
   }
 
   /**

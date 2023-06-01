@@ -40,6 +40,18 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
   public function url(array $options = [], string $rel = 'canonical'): ?Url;
 
   /**
+   * Get the link from this entity
+   *
+   * @see ContentEntityBase::toLink()
+   *
+   * @param array $options
+   * @param string $rel
+   * @param string $text if empty the label of the entity will be used
+   * @return Url|null
+   */
+  public function link(array $options = [], string $rel = 'canonical', string $text = NULL): Link;
+
+  /**
    * If this entity has a field
    *
    * @see ContentEntityBase::hasField()
@@ -353,10 +365,11 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    * Get all entities of the reference field as collection
    *
    * @param string $field
+   * @param bool $returnArray return always an array after the first collection method
    *
    * @return ContentWrapperInterface|ContentWrapperInterface[]|ContentWrapperCollection
    */
-  public function getEntitiesCollection(string $field): ContentWrapperCollection;
+  public function getEntitiesCollection(string $field, bool $returnArray = FALSE): ContentWrapperCollection;
 
   /**
    * Get the author of this entity
