@@ -477,9 +477,9 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   public function getEntities(string $field, bool $ignoreAccess = FALSE): ContentWrapperCollection {
     if (count(func_get_args()) > 1) trigger_error('param $ignoreAccess of method ' . __METHOD__ . ' is deprecated, please use instead `$wrapper->setConfig(ContentWrapperInterface::CONTENT_BYPASS_ACCESS)`');
 
-    $entities = $this->metaItems($field)->referencedEntities();
     $values = [];
-    foreach ($entities as $entity) {
+    foreach ($this->metaItems($field) as $item) {
+      $entity = $item->get('entity')->getValue();
       $entity = $this->transformEntity($entity, $ignoreAccess);
       if ($entity) $values[] = self::create($entity, $this);
     }
@@ -490,9 +490,9 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
    * @inheritDoc
    */
   public function getEntitiesCollection(string $field, bool $returnArray = FALSE): ContentWrapperCollection {
-    $entities = $this->metaItems($field)->referencedEntities();
     $values = [];
-    foreach ($entities as $entity) {
+    foreach ($this->metaItems($field) as $item) {
+      $entity = $item->get('entity')->getValue();
       $entity = $this->transformEntity($entity);
       if ($entity) $values[] = self::create($entity, $this);
     }
