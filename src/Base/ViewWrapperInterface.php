@@ -192,6 +192,13 @@ interface ViewWrapperInterface extends BaseWrapperInterface {
   public function setExposedInput(array $input): self;
 
   /**
+   * Get the exposed input of the view
+   *
+   * @return array
+   */
+  public function getExposedInput(): array;
+
+  /**
    * Render the view with display
    *
    * @see ViewExecutable::preview()
@@ -253,6 +260,18 @@ interface ViewWrapperInterface extends BaseWrapperInterface {
   public function addSort(string $table, string $field): ViewSortWrapper;
 
   /**
+   * Get a render element to show an exposed sort field
+   *
+   * @param string $type
+   * @param array $options = [
+   *   'ignore' => ['title__ASC'],
+   * ]
+   *
+   * @return array
+   */
+  public function getSortInput(string $type = 'links', array $options = []): array;
+
+  /**
    * Get a URL from the view display if possible.
    *
    * @param array $options
@@ -270,5 +289,14 @@ interface ViewWrapperInterface extends BaseWrapperInterface {
    * @return Link|null
    */
   public function link(string $text, array $options = []): ?Link;
+
+  /**
+   * Get the display option
+   *
+   * @param string $option
+   *
+   * @return mixed
+   */
+  public function getDisplayOption(string $option);
 
 }

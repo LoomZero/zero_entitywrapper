@@ -3,7 +3,9 @@
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Template\Attribute;
 use Drupal\zero_entitywrapper\Base\ContentWrapperInterface;
+use Drupal\zero_entitywrapper\Base\ViewWrapperInterface;
 use Drupal\zero_entitywrapper\Content\ContentWrapper;
+use Drupal\zero_entitywrapper\View\ViewWrapper;
 
 function zero_entitywrapper_page_attachments(array &$attachments) {
   /** @var \Drupal\zero_entitywrapper\Service\StaticWrapperService $cache */
@@ -45,6 +47,14 @@ function zero_entitywrapper_theme($existing, $type, $theme, $path) {
     'field__entitywrapper' => [
       'base hook' => 'field',
     ],
+    'view_wrapper_sort' => [
+      'variables' => [
+        'type' => 'select',
+        'view' => NULL,
+        'options' => [],
+      ],
+      'pattern' => 'view_wrapper_sort__',
+    ],
   ];
 }
 
@@ -72,6 +82,24 @@ function zero_entitywrapper_theme_suggestions_zero_media(array $vars) {
     'zero_media__' . $type,
     'zero_media__' . $media->id(),
     'zero_media__' . $type . '__' . $media->id(),
+  ];
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK_alter().
+ */
+function zero_entitywrapper_theme_suggestions_view_wrapper_sort(array $vars) {
+  if (!$vars['view'] instanceof ViewWrapperInterface) {
+    $vars['view'] = ViewWrapper::create($vars['view']);
+  }
+
+  /** @var ViewWrapperInterface $view */
+  $view = $vars['view'];
+
+  return [
+    'view_wrapper_sort__' . $vars['type'],
+    'view_wrapper_sort__' . $vars['type'] . '__' . $view->id(),
+    'view_wrapper_sort__' . $vars['type'] . '__' . $view->id() . '__' . $view->getDisplay(),
   ];
 }
 

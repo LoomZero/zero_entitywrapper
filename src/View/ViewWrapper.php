@@ -282,6 +282,13 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
   /**
    * @inheritDoc
    */
+  public function getExposedInput(): array {
+    return $this->executable()->getExposedInput();
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function render(string $display = NULL, array $options = []): array {
     return $this->executable()->preview($display);
   }
@@ -345,6 +352,18 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
   /**
    * @inheritDoc
    */
+  public function getSortInput(string $type = 'links', array $options = []): array {
+    return [
+      '#theme' => 'view_wrapper_sort',
+      '#view' => $this,
+      '#type' => $type,
+      '#options' => $options,
+    ];
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function url(array $options = []): ?Url {
     if (!$this->executable()->hasUrl()) return NULL;
     $url = $this->executable()->getUrl();
@@ -361,6 +380,13 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
     $url = $this->url($options);
     if ($url === NULL) return NULL;
     return Link::fromTextAndUrl($text, $url);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getDisplayOption(string $option) {
+    return $this->executable()->display_handler->getOption($option);
   }
 
 }

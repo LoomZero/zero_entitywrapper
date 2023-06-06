@@ -1,0 +1,9 @@
+<div class="view-wrapper-sort view-wrapper-sort--{{ type }}">
+  {% if current.url %}
+    <span {{ current.attributes.addClass('view-wrapper-sort__current') }}>{{ current.text }} {{ current.order }}</span>
+  {% endif %}
+  {% for link in links %}
+    <a href="{{ link.url }}"{{ link.attributes }}>{{ link.text }} {{ link.order }}</a>
+  {% endfor %}
+  {% if reset %}<a href="{{ reset }}" class="view-wrapper-sort__reset">X</a>{% endif %}
+</div>
