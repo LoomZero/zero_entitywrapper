@@ -455,6 +455,8 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
   /**
    * Get link as render ready
    *
+   * @see BaseWrapper::extractLinkData()
+   *
    * @param string $field
    * @param int $index
    * @param array $options = [
@@ -472,6 +474,7 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    *     'options' => [
    *        'attributes' => [':name' => 'value'],
    *     ],
+   *     'attributes' => new Attribute($options['attributes'] ?? []),
    * ]
    */
   public function getLinkData(string $field, int $index = 0, array $options = [], string $title_overwrite = NULL): array;

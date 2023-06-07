@@ -597,11 +597,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   public function getLinkData(string $field, int $index = 0, array $options = [], string $title_overwrite = NULL): array {
     $link = $this->getLink($field, $index, $options, $title_overwrite);
 
-    return [
-      'text' => $link->getText(),
-      'url' => $link->getUrl()->toString(),
-      'options' => $link->getUrl()->getOptions(),
-    ];
+    return static::extractLinkData($link);
   }
 
   /**

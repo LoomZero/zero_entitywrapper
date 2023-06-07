@@ -8,6 +8,8 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Link;
+use Drupal\Core\Template\Attribute;
 use Drupal\zero_entitywrapper\Base\BaseWrapperExtensionInterface;
 use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
 use Drupal\zero_entitywrapper\Base\RenderContextWrapperInterface;
@@ -31,6 +33,33 @@ abstract class BaseWrapper implements BaseWrapperInterface {
   protected $configs = [];
   /** @var EntitywrapperService */
   protected $service = NULL;
+
+  /**
+   * Get link data render ready
+   *
+   * @param ?Link $link
+   *
+   * @return array = [
+   *     'text' => $link->getText(),
+   *     'url' => $link->getUrl()->toString(),
+   *     'options' => [
+   *        'attributes' => [':name' => 'value'],
+   *     ],
+   *     'attributes' => new Attributes($options['attributes'] ?? []),
+   * ]
+   */
+  public static function extractLinkData(Link $link = NULL): array {
+    if (empty($link)) return [];
+
+    $options = $link->getUrl()->getOptions();
+
+    return [
+      'text' => $link->getText(),
+      'url' => $link->getUrl()->toString(),
+      'options' => $options,
+      'attributes' => new Attribute($options['attributes'] ?? []),
+    ];
+  }
 
   /**
    * @param EntityInterface|string $entity_type
