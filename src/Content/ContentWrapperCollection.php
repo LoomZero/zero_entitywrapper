@@ -98,14 +98,14 @@ class ContentWrapperCollection extends ProxyCollection {
     if ($this->unsafe) {
       $this->getService()->log('deprecation', $this->unsafe['message'], [...($this->unsafe['lines'] ?? []), 'Called in <code>' . $this->unsafe['info']['call'] . '</code>']);
     }
-    return parent::arrayCall($array_function, $args);
+    return parent::arrayCall($array_function, ...$args);
   }
 
   public function itemCall(callable $array_function, ...$args) {
     if ($this->unsafe) {
       $this->getService()->log('deprecation', $this->unsafe['message'], [...($this->unsafe['lines'] ?? []), 'Called in <code>' . $this->unsafe['info']['call'] . '</code>']);
     }
-    return parent::itemCall($array_function, $args);
+    return parent::itemCall($array_function, ...$args);
   }
 
   public function join($glue = ' ') {
