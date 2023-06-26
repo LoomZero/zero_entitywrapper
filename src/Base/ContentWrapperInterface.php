@@ -52,6 +52,32 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
   public function link(array $options = [], string $rel = 'canonical', string $text = NULL): Link;
 
   /**
+   * Get link data
+   *
+   * @see BaseWrapper::extractLinkData()
+   *
+   * @param array $options = [
+   *     'attributes' => [':name' => 'value'],
+   *     'query' => [':name' => 'value'],
+   *     'fragment' => 'jumpmark',
+   *     'absolute' => FALSE,
+   *     'language' => LanguageInterface::TYPE_URL,
+   *     'https' => NULL,
+   *     'rel' => 'canonical',
+   * ]
+   * @param string|NULL $title_overwrite
+   * @return array = [
+   *     'text' => $link->getText(),
+   *     'url' => $link->getUrl()->toString(),
+   *     'options' => [
+   *        'attributes' => [':name' => 'value'],
+   *     ],
+   *     'attributes' => new Attribute($options['attributes'] ?? []),
+   * ]
+   */
+  public function linkData(array $options = [], string $title_overwrite = NULL): array;
+
+  /**
    * If this entity has a field
    *
    * @see ContentEntityBase::hasField()

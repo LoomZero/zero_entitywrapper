@@ -123,6 +123,13 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   /**
    * @inheritDoc
    */
+  public function linkData(array $options = [], string $title_overwrite = NULL): array {
+    return BaseWrapper::extractLinkData($this->link($options, $options['rel'] ?? 'canonical', $title_overwrite));
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function hasField(string $field): bool {
     return $this->entity()->hasField($field);
   }

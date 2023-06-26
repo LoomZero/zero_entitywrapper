@@ -1,5 +1,7 @@
 <?php
 
+use Drupal\Component\Utility\Html;
+use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Template\Attribute;
 use Drupal\zero_entitywrapper\Base\ContentWrapperInterface;
@@ -44,8 +46,8 @@ function zero_entitywrapper_theme($existing, $type, $theme, $path) {
       ],
       'pattern' => 'zero_media__',
     ],
-    'field__entitywrapper' => [
-      'base hook' => 'field',
+    'entitywrapper_field' => [
+      'render element' => 'element',
     ],
     'view_wrapper_sort' => [
       'variables' => [
@@ -56,13 +58,6 @@ function zero_entitywrapper_theme($existing, $type, $theme, $path) {
       'pattern' => 'view_wrapper_sort__',
     ],
   ];
-}
-
-/**
- * Implements hook_theme_suggestions_HOOK_alter().
- */
-function zero_entitywrapper_theme_suggestions_field_alter(array &$suggestions, array $vars) {
-  array_unshift($suggestions, 'field__entitywrapper');
 }
 
 /**
@@ -180,3 +175,53 @@ function template_preprocess_zero_media(&$vars) {
     $vars['formatted'] = array_merge($vars['formatted'], $options['element'] ?? []);
   }
 }
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function template_preprocess_entitywrapper_field(&$vars) {
+  foreach (Element::children($vars['element']) as $delta) {
+    $vars['items'][$delta]['content'] = $vars['element'][$delta];
+    /** @var \Drupal\Core\Template\Attribute $attribute */
+    $attribute = $vars['element'][$delta]['attributes'] ?? new Attribute();
+    $vars['items'][$delta]['attributes'] = $attribute;
+
+    $attributes = [];
+    if (isset($vars['element']['#entitywrapper_info']['items']['_all']['wrapper'])) {
+      $attributes = array_merge_recursive($attributes, $vars['element']['#entitywrapper_info']['items']['_all']['wrapper']);
+    }
+    if (isset($vars['element']['#entitywrapper_info']['items'][$delta]['wrapper'])) {
+      unset($attributes['none']);
+      $attributes = array_merge_recursive($attributes, $vars['element']['#entitywrapper_info']['items'][$delta]['wrapper']);
+    }
+
+    if (empty($attributes['none']) && count($attributes)) {
+      $vars['items'][$delta]['wrapper_element'] = $attributes['element'] ?? 'div';
+      unset($attributes['element']);
+      if (!empty($attributes['class'])) {
+        foreach ($attributes['class'] as $index => $class) {
+          $attributes['class'][$index] = Html::getClass($class);
+        }
+      }
+      foreach ($attributes as $attr => $value) {
+        $attribute->setAttribute($attr, $value);
+      }
+    } else {
+      $vars['items'][$delta]['clean'] = TRUE;
+    }
+  }
+
+  if (isset($vars['element']['#entitywrapper_info']['wrapper'])) {
+    $wrapper = $vars['element']['#entitywrapper_info']['wrapper'];
+    if (empty($wrapper['none'])) {
+      $vars['wrapper_element'] = $wrapper['element'] ?? 'div';
+      unset($wrapper['element']);
+      $vars['attributes'] = array_merge_recursive($vars['attributes'], $wrapper);
+    } else {
+      $vars['clean'] = TRUE;
+    }
+  } else {
+    $vars['clean'] = TRUE;
+  }
+}
+$vars['attributes'] = new Attribute($vars['attributes'] ?? []);

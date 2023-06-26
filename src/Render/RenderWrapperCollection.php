@@ -4,6 +4,7 @@
 namespace Drupal\zero_entitywrapper\Render;
 
 use ArrayObject;
+use Drupal;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\RenderableInterface;
@@ -30,7 +31,7 @@ class RenderWrapperCollection extends ArrayObject implements RenderableInterface
 
   protected function getRenderer(): RendererInterface {
     if ($this->renderer === NULL) {
-      $this->renderer = \Drupal::service('renderer');
+      $this->renderer = Drupal::service('renderer');
     }
     return $this->renderer;
   }
@@ -99,27 +100,29 @@ class RenderWrapperCollection extends ArrayObject implements RenderableInterface
   }
 
   public function getInfo(string $key) {
-    return $this['#_preprocess'][$key] ?? NULL;
+    return $this['#entitywrapper_info'][$key] ?? NULL;
   }
 
   public function setInfo(string $key, $value, bool $merge = FALSE): self {
-    if ($merge && isset($this['#_preprocess'][$key])) {
-      $this['#_preprocess'][$key] = array_merge_recursive($this['#_preprocess'][$key], $value);
+    $this['#theme'] = 'entitywrapper_field';
+    if ($merge && isset($this['#entitywrapper_info'][$key])) {
+      $this['#entitywrapper_info'][$key] = array_merge_recursive($this['#entitywrapper_info'][$key], $value);
     } else {
-      $this['#_preprocess'][$key] = $value;
+      $this['#entitywrapper_info'][$key] = $value;
     }
     return $this;
   }
 
   public function getItemInfo($delta, string $key) {
-    return $this['#_preprocess']['items'][$delta][$key] ?? NULL;
+    return $this['#entitywrapper_info']['items'][$delta][$key] ?? NULL;
   }
 
   public function setItemInfo($delta, string $key, $value, bool $merge = FALSE): self {
-    if ($merge && isset($this['#_preprocess']['items'][$delta][$key])) {
-      $this['#_preprocess']['items'][$delta][$key] = array_merge_recursive($this['#_preprocess']['items'][$delta][$key], $value);
+    $this['#theme'] = 'entitywrapper_field';
+    if ($merge && isset($this['#entitywrapper_info']['items'][$delta][$key])) {
+      $this['#entitywrapper_info']['items'][$delta][$key] = array_merge_recursive($this['#entitywrapper_info']['items'][$delta][$key], $value);
     } else {
-      $this['#_preprocess']['items'][$delta][$key] = $value;
+      $this['#entitywrapper_info']['items'][$delta][$key] = $value;
     }
     return $this;
   }
@@ -129,7 +132,7 @@ class RenderWrapperCollection extends ArrayObject implements RenderableInterface
    *
    * @param array $options = [
    *     'none' => TRUE,
-   *     'attribute' => 'div',
+   *     'element' => 'div',
    *     'class' => ['wrapper', 'wrapper--field'],
    *     'data-src' => '/path/to/src',
    * ]
@@ -146,7 +149,7 @@ class RenderWrapperCollection extends ArrayObject implements RenderableInterface
    *
    * @param array $options = [
    *     'none' => TRUE,
-   *     'attribute' => 'div',
+   *     'element' => 'div',
    *     'class' => ['wrapper', 'wrapper--field'],
    *     'data-src' => '/path/to/src',
    * ]
