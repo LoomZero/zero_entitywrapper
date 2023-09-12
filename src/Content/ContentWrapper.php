@@ -770,6 +770,8 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
       if ($i !== 0 && str_contains($ignore_symbols, substr($data['start'], $i, 1))) continue;
       if (substr($data['start'], $i) === substr($data['end'], $i)) break;
     }
+    // if the same date
+    if ($i === 0) return $data['end'];
     return substr($data['start'], 0, $i) . $seperator . $data['end'];
   }
 
