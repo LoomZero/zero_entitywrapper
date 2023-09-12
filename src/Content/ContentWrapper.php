@@ -763,9 +763,11 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   /**
    * @inheritDoc
    */
-  public function getDateRangeMerged(string $field, int $index = 0, string $type = 'medium', string $format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $seperator = ' - '): string {
+  public function getDateRangeMerged(string $field, int $index = 0, string $type = 'medium', string $format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $seperator = ' - ', string $ignore_symbols = '.,;'): string {
     $data = $this->getDateRange($field, $index, $type, $format, $format);
     for ($i = 0; $i < strlen($data['start']); $i++) {
+      // if symbol is ignored add it and go further
+      if ($i !== 0 && str_contains($ignore_symbols, substr($data['start'], $i, 1))) continue;
       if (substr($data['start'], $i) === substr($data['end'], $i)) break;
     }
     return substr($data['start'], 0, $i) . $seperator . $data['end'];
@@ -774,8 +776,8 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   /**
    * @inheritDoc
    */
-  public function getDateRangesMerged(string $field, string $type = 'medium', string $format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $seperator = ' - '): array {
-    return $this->metaForeach([$this, 'getDateRangeMerged'], $field, $type, $format, $seperator);
+  public function getDateRangesMerged(string $field, string $type = 'medium', string $format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $seperator = ' - ', string $ignore_symbols = '.,;'): array {
+    return $this->metaForeach([$this, 'getDateRangeMerged'], $field, $type, $format, $seperator, $ignore_symbols);
   }
 
   /**

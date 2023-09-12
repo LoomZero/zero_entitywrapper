@@ -682,9 +682,10 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    * @param string $type
    * @param string $format
    * @param $seperator
+   * @param string $ignore_symbols
    * @return string
    */
-  public function getDateRangeMerged(string $field, int $index = 0, string $type = 'medium', string $format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $seperator = ' - '): string;
+  public function getDateRangeMerged(string $field, int $index = 0, string $type = 'medium', string $format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $seperator = ' - ', string $ignore_symbols = '.,'): string;
 
   /**
    * Get date range formatted and merged equals
@@ -693,9 +694,10 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    * @param string $type
    * @param string $format
    * @param $seperator
+   * @param string $ignore_symbols
    * @return array
    */
-  public function getDateRangesMerged(string $field, string $type = 'medium', string $format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $seperator = ' - '): array;
+  public function getDateRangesMerged(string $field, string $type = 'medium', string $format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $seperator = ' - ', string $ignore_symbols = '.,'): array;
 
   /**
    * Get the view wrapper of a field with key as `<view>:<display>`
