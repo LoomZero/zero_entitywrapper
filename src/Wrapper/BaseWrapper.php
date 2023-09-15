@@ -16,6 +16,7 @@ use Drupal\zero_entitywrapper\Base\RenderContextWrapperInterface;
 use Drupal\zero_entitywrapper\Helper\WrapperHelper;
 use Drupal\zero_entitywrapper\Service\WrapperExtenderManager;
 use Drupal\zero_entitywrapper\Service\EntitywrapperService;
+use Drupal\zero_entitywrapper\Exception\EntityWrapperException;
 
 abstract class BaseWrapper implements BaseWrapperInterface {
 
@@ -70,6 +71,9 @@ abstract class BaseWrapper implements BaseWrapperInterface {
       $this->entity = $entity_type;
     } else {
       $this->entity = Drupal::entityTypeManager()->getStorage($entity_type)->load($entity_id);
+      if ($this->entity === NULL) {
+        throw new EntityWrapperException('Could not load entity ' . $entity_type . ' with id ' . $entity_id);
+      }
     }
   }
 
