@@ -534,7 +534,9 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
         if (!empty($raw['title'])) {
           $options['attributes']['title'] = $raw['title'];
         }
-        return Url::fromUri(file_create_url($entity->getFileUri()), $options);
+        /** @var Drupal\Core\File\FileUrlGeneratorInterface $urlGenerator */
+        $urlGenerator = Drupal::service('file_url_generator');
+        return Url::fromUri($urlGenerator->generateAbsoluteString($entity->getFileUri()), $options);
       } else if ($wrapper->type() === 'media') {
         return $wrapper->getUrl($wrapper->metaMediaSourceField(), 0, $options);
       } else {
@@ -549,6 +551,10 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
 
     if ($this->metaFieldType($field) === 'string') {
       return Url::fromUri($item->getValue()['value'], $options);
+    } else if ($this->metaFieldType($field) === 'file_uri') {
+      /** @var Drupal\Core\File\FileUrlGeneratorInterface $urlGenerator */
+      $urlGenerator = Drupal::service('file_url_generator');
+      return Url::fromUri($urlGenerator->generateAbsoluteString($item->getValue()['value']), $options);
     } else {
       // Assume we have a link field
       $value = $item->getValue();

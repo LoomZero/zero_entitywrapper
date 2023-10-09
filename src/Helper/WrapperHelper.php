@@ -131,6 +131,8 @@ class WrapperHelper {
     if ($field === NULL) {
       if ($wrapper->type() === 'media') {
         $field = $wrapper->metaMediaSourceField();
+      } else if ($wrapper->type() === 'file') {
+        $field = 'uri';
       } else {
         throw new EntityWrapperException('Undefined $field is currently only allowed on entity type "Media".');
       }
