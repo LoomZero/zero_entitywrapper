@@ -409,7 +409,14 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
   public function getAuthor(bool $ignoreAccess = FALSE): ?ContentWrapperInterface;
 
   /**
-   * Get the url of entity field or media field or url field or link field
+   * Get the url of entity field or media field or url field or link field.
+   * 
+   * If fieldtype is:
+   *   - url: Create an Url object of the Url value
+   *   - link: Create an Url object of the Link value
+   *   - string: Create an Url object of the String value
+   *   - media entity_reference: Create an Url object of the media field inside of the Media Entity
+   *   - entity_reference: Create an Url object by using EntityBase::toUrl()
    *
    * @see WrapperHelper::getDefaultField()
    *
