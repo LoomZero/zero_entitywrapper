@@ -410,8 +410,8 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
 
   /**
    * Get the url of entity field or media field or url field or link field.
-   * 
-   * If fieldtype is:
+   *
+   * IF fieldtype is:
    *   - url: Create an Url object of the Url value
    *   - link: Create an Url object of the Link value
    *   - string: Create an Url object of the String value

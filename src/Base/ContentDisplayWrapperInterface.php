@@ -153,19 +153,51 @@ interface ContentDisplayWrapperInterface {
    * @param int $index
    * @param string $responsive_image_style
    * @param string $image_link
+   * @param ?array|callable $item_attributes Use this parameter to add attributes to items. Allowed all parameter from Attribute object.
+   *  Alternativ you can use a callable to adjust the attributes for every item.<br />
+   *  CALLABLE ARGUMENTS:<br />
+   *    - array $item The current item to add attributes<br />
+   *    - NULL $key The render key from $parent (WARNING: is NULL for single call)<br />
+   *    - int $index The delta of the item<br />
+   *    - NULL $parent The parent render array (mostly theme field) (WARNING: is NULL for single call)<br />
+   *  CALLABLE RETURN: array Attributes array supported by Attribute object.<br />
+   *  CALLABLE EXAMPLE:<br />
+   *  ```
+   *  $wrapper
+   *  ->display()
+   *  ->responsiveImages('field_image', 'responsive_image_style', '', function($item, $key, $index, $parent) {
+   *    return ['class' => ['additional-class']];
+   *  });
+   *  ```
    *
    * @return array
    */
-  public function responsiveImage(string $field, int $index = 0, string $responsive_image_style = '', string $image_link = '');
+  public function responsiveImage(string $field, int $index = 0, string $responsive_image_style = '', string $image_link = '', $item_attributes = NULL);
 
   /**
    * @param string $field
    * @param string $responsive_image_style
    * @param string $image_link
+   * @param ?array|callable $item_attributes Use this parameter to add attributes to items. Allowed all parameter from Attribute object.
+   *   Alternativ you can use a callable to adjust the attributes for every item.<br />
+   *   CALLABLE ARGUMENTS:<br />
+   *     - array $item The current item to add attributes<br />
+   *     - string|int $key The render key from $parent<br />
+   *     - int $index The delta of the item<br />
+   *     - array $parent The parent render array (mostly theme field)<br />
+   *   CALLABLE RETURN: array Attributes array supported by Attribute object.<br />
+   *   CALLABLE EXAMPLE:<br />
+   *   ```
+   *   $wrapper
+   *   ->display()
+   *   ->responsiveImages('field_image', 'responsive_image_style', '', function($item, $key, $index, $parent) {
+   *     return ['class' => ['additional-class']];
+   *   });
+   *   ```
    *
    * @return array
    */
-  public function responsiveImages(string $field, string $responsive_image_style = '', string $image_link = '');
+  public function responsiveImages(string $field, string $responsive_image_style = '', string $image_link = '', $item_attributes = NULL);
 
   /**
    * @param string $field

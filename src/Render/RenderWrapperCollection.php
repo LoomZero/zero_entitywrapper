@@ -64,7 +64,17 @@ class RenderWrapperCollection extends ArrayObject implements RenderableInterface
   }
 
   /**
-   * @deprecated Will be removed at version 1.0.0, use instead <code>$wrapper->display()</code>
+   * @deprecated Will be removed at version 1.0.0, info for migrate:<br />
+   *   <strong>if used with <code>$wrapper->display()->responsiveImage()</code></strong><br />
+   *     - remove this method<br />
+   *     - add <code>$value</code> as last parameter <code>$item_attributes</code> to <code>$wrapper->display()->responsiveImage()</code><br />
+   *   <br />
+   *   <strong>if used another way, try to rebuild the result with:</strong>
+   *     ```
+   *     $wrapper->displayCollection()->{...}->setWrapper($value)
+   *     // or
+   *     $wrapper->displayCollection()->{...}->setItemWrapper($value)
+   *     ```
    * @param callable|array $value
    * @return $this
    */
@@ -75,7 +85,17 @@ class RenderWrapperCollection extends ArrayObject implements RenderableInterface
   }
 
   /**
-   * @deprecated Will be removed at version 1.0.0, use instead <code>$wrapper->display()</code>
+   * @deprecated Will be removed at version 1.0.0, info for migrate:<br />
+   *    <strong>if used with <code>$wrapper->display()->responsiveImage()</code></strong><br />
+   *      - remove this method<br />
+   *      - add <code>['class' => [...$classes]]</code> as last parameter <code>$item_attributes</code> to <code>$wrapper->display()->responsiveImage()</code><br />
+   *    <br />
+   *    <strong>if used another way, try to rebuild the result with:</strong>
+   *      ```
+   *      $wrapper->displayCollection()->{...}->setWrapper(['class' => [...$classes]])
+   *      // or
+   *      $wrapper->displayCollection()->{...}->setItemWrapper(['class' => [...$classes]])
+   *      ```
    * @param string ...$classes
    *
    * @return $this
@@ -103,7 +123,20 @@ class RenderWrapperCollection extends ArrayObject implements RenderableInterface
     return $this['#entitywrapper_info'][$key] ?? NULL;
   }
 
+  /**
+   * EXPERIMENTAL: Because it is not testet with all display functions and break the standard fields templates in older versions.<br /><br />
+   * Set info for the entitywrapper_info theme
+   *
+   * @param string $key the key to set
+   * @param $value the value to set
+   * @param bool $merge merge the values of the key instead of override it
+   * @return $this
+   */
   public function setInfo(string $key, $value, bool $merge = FALSE): self {
+    // if render array has no element, create element 0 with values
+    $array = $this->getArrayCopy();
+    if (!count(Element::children($array))) $this[] = $array;
+
     $this['#theme'] = 'entitywrapper_field';
     if ($merge && isset($this['#entitywrapper_info'][$key])) {
       $this['#entitywrapper_info'][$key] = array_merge_recursive($this['#entitywrapper_info'][$key], $value);
@@ -113,11 +146,32 @@ class RenderWrapperCollection extends ArrayObject implements RenderableInterface
     return $this;
   }
 
+  /**
+   * Get item info
+   *
+   * @param $delta
+   * @param string $key
+   * @return mixed
+   */
   public function getItemInfo($delta, string $key) {
     return $this['#entitywrapper_info']['items'][$delta][$key] ?? NULL;
   }
 
+  /**
+   * EXPERIMENTAL: Because it is not testet with all display functions and break the standard fields templates in older versions.<br /><br />
+   * Set item info for the entitywrapper_info theme
+   *
+   * @param string|int $delta render key for the item
+   * @param string $key the key to set EXAMPLE: loading
+   * @param $value the value to set EXAMPLE: lazy
+   * @param bool $merge merge the values of the key instead of override it
+   * @return $this
+   */
   public function setItemInfo($delta, string $key, $value, bool $merge = FALSE): self {
+    // if render array has no element, create element 0 with values
+    $array = $this->getArrayCopy();
+    if (!count(Element::children($array))) $this[] = $array;
+
     $this['#theme'] = 'entitywrapper_field';
     if ($merge && isset($this['#entitywrapper_info']['items'][$delta][$key])) {
       $this['#entitywrapper_info']['items'][$delta][$key] = array_merge_recursive($this['#entitywrapper_info']['items'][$delta][$key], $value);
@@ -128,6 +182,7 @@ class RenderWrapperCollection extends ArrayObject implements RenderableInterface
   }
 
   /**
+   * EXPERIMENTAL: Because it is not testet with all display functions and break the standard fields templates in older versions.<br /><br />
    * Set the wrapper for all items
    *
    * @param array $options = [
@@ -145,6 +200,7 @@ class RenderWrapperCollection extends ArrayObject implements RenderableInterface
   }
 
   /**
+   * EXPERIMENTAL: Because it is not testet with all display functions and break the standard fields templates in older versions.<br /><br />
    * Set the wrapper for every item
    *
    * @param array $options = [

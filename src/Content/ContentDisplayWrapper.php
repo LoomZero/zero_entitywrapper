@@ -3,6 +3,7 @@
 namespace Drupal\zero_entitywrapper\Content;
 
 use Drupal\Core\Field\FieldItemInterface;
+use Drupal\Core\Render\Element;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 use Drupal\zero_entitywrapper\Base\BaseWrapperExtensionInterface;
 use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
@@ -250,30 +251,50 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
   /**
    * @inheritDoc
    */
-  public function responsiveImage(string $field = NULL, int $index = 0, string $responsive_image_style = '', string $image_link = '') {
+  public function responsiveImage(string $field = NULL, int $index = 0, string $responsive_image_style = '', string $image_link = '', $item_attributes = NULL) {
     $field = WrapperHelper::getDefaultField($this->wrapper, $field);
     if ($this->wrapper->metaReferenceTargetType($field) === 'media') {
       $media = $this->wrapper->getEntity($field, $index);
       if ($media === NULL) return $this->process([]);
-      return $this->process($this->doFormatter($media, $media->metaMediaSourceField(), 0, 'responsive_image', ['responsive_image_style' => $responsive_image_style, 'image_link' => $image_link]));
+      $formatted = $this->doFormatter($media, $media->metaMediaSourceField(), 0, 'responsive_image', ['responsive_image_style' => $responsive_image_style, 'image_link' => $image_link]);
+    } else {
+      $formatted = $this->doFormatter($this->wrapper, $field, $index, 'responsive_image', ['responsive_image_style' => $responsive_image_style, 'image_link' => $image_link]);
     }
-    return $this->formatter($field, $index, 'responsive_image', ['responsive_image_style' => $responsive_image_style, 'image_link' => $image_link]);
+
+    if (is_array($item_attributes)) {
+      $formatted['#item_attributes'] = $item_attributes;
+    } else if (is_callable($item_attributes)) {
+      $formatted['#item_attributes'] = $item_attributes($formatted, NULL, $index, NULL);
+    }
+
+    return $this->process($formatted);
   }
 
   /**
    * @inheritDoc
    */
-  public function responsiveImages(string $field = NULL, string $responsive_image_style = '', string $image_link = '') {
+  public function responsiveImages(string $field = NULL, string $responsive_image_style = '', string $image_link = '', $item_attributes = NULL) {
     $field = WrapperHelper::getDefaultField($this->wrapper, $field);
     if ($this->wrapper->metaReferenceTargetType($field) === 'media') {
       $medias = $this->wrapper->getEntities($field);
-      $output = [];
+      $formatted = [];
       foreach ($medias as $media) {
-        $output[] = $this->doFormatter($media, $media->metaMediaSourceField(), 0, 'responsive_image', ['responsive_image_style' => $responsive_image_style, 'image_link' => $image_link]);
+        $formatted[] = $this->doFormatter($media, $media->metaMediaSourceField(), 0, 'responsive_image', ['responsive_image_style' => $responsive_image_style, 'image_link' => $image_link]);
       }
-      return $this->process($output);
+    } else {
+      $formatted = $this->doFormatters($this->wrapper, $field, 'responsive_image', ['responsive_image_style' => $responsive_image_style, 'image_link' => $image_link]);
     }
-    return $this->formatters($field, 'responsive_image', ['responsive_image_style' => $responsive_image_style, 'image_link' => $image_link]);
+
+    if (is_array($item_attributes) || is_callable($item_attributes)) {
+      foreach (Element::children($formatted) as $index => $child) {
+        if (is_array($item_attributes)) {
+          $formatted[$child]['#item_attributes'] = $item_attributes;
+        } else {
+          $formatted[$child]['#item_attributes'] = $item_attributes($formatted[$child], $child, $index, $formatted);
+        }
+      }
+    }
+    return $this->process($formatted);
   }
 
   /**
