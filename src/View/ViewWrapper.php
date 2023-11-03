@@ -81,6 +81,20 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
   /**
    * @inheritDoc
    */
+  public function getLabel(): string {
+    return $this->entity()->label();
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getTitle(): string {
+    return $this->executable()->getTitle();
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function executable(): ViewExecutable {
     if ($this->executable === NULL) {
       $this->executable = $this->entity()->getExecutable();

@@ -36,6 +36,21 @@ interface ViewWrapperInterface extends BaseWrapperInterface {
   public function executable(): ViewExecutable;
 
   /**
+   * Get the administrative label of the view
+   * 
+   * @return String
+   */
+  public function getLabel(): string;
+
+  /**
+   * Get the display title of the view.
+   * Make sure you have set the display before using this method.
+   * 
+   * @return String
+   */
+  public function getTitle(): string;
+
+  /**
    * Set the pager config
    *
    * @param array $config = [
