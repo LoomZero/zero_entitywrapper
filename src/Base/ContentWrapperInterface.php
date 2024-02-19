@@ -28,6 +28,8 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
   public const CONTENT_BYPASS_ACCESS = 'content_bypass_access';
   public const CONTENT_ACCESS_FOR_ACCOUNT = 'content_access_for_account';
 
+  public function map(string $field, callable $mapper): array;
+
   /**
    * Get the url from this entity
    *

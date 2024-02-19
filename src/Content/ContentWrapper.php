@@ -109,6 +109,17 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   /**
    * @inheritDoc
    */
+  public function map(string $field, callable $mapper): array {
+    return $this->metaForeach(function(string $field, $index) use ($mapper) {
+      $item = $this->metaItem($field, $index);
+      if ($item === NULL) return NULL;
+      return $mapper($field, $index, $this);
+    }, $field);
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function url(array $options = [], string $rel = 'canonical'): ?Url {
     return $this->entity()->toUrl($rel, $options);
   }
