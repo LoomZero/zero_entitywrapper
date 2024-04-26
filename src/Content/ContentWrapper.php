@@ -30,6 +30,8 @@ use Drupal\zero_entitywrapper\Base\ViewWrapperInterface;
 use Drupal\zero_entitywrapper\Helper\WrapperHelper;
 use Drupal\zero_entitywrapper\View\ViewWrapper;
 use Drupal\zero_entitywrapper\Wrapper\BaseWrapper;
+use Drupal\zero_entitywrapper\Wrapper\EntityWrapper;
+use Symfony\Component\HttpFoundation\Request;
 
 class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
 
@@ -45,6 +47,26 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   }
 
   /**
+   * @usage ContentWrapper::createFromRequest('node', NodeInterface::class, $vars)
+   * @param string $request_key
+   * @param string $entity_class
+   * @param array|NULL $vars
+   * @param Request|NULL $request
+   *
+   * @return ContentWrapperInterface|NULL
+   */
+  public static function createFromRequest(string $request_key, string $entity_class, array &$vars = NULL, Request $request = NULL): ?ContentWrapperInterface {
+    if ($request === NULL) $request = Drupal::request();
+    $entity = $request->get($request_key);
+    if ($entity instanceof $entity_class) {
+      $wrapper = new ContentWrapper($entity);
+      $wrapper->setRenderContext($vars);
+      return $wrapper;
+    }
+    return NULL;
+  }
+
+  /**
    * @param string $entity_type
    * @param int|string $entity_id
    * @param BaseWrapperInterface|null $parent
@@ -56,7 +78,9 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   }
 
   /**
-   * @param string[]|ContentEntityBase[] $entities Item can by either a string <strong>[entity_type]:[entity_id]</strong> or a <strong>ContentEntityBase</strong>
+   * @param string[]|ContentEntityBase[] $entities Item can by either a string
+   *   <strong>[entity_type]:[entity_id]</strong> or a
+   *   <strong>ContentEntityBase</strong>
    * @param BaseWrapperInterface|null $parent
    *
    * @return ContentWrapperInterface[]
