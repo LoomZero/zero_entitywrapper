@@ -75,7 +75,7 @@ class WrapperHelper {
    */
   public static function getViewDisplay(BaseWrapperInterface $entity, string $view_mode = 'default', $fallback = TRUE): ?EntityViewDisplayInterface {
     WrapperHelper::checkViewMode($view_mode);
-    
+
     /** @var EntityViewDisplayInterface $display */
     $display = Drupal::entityTypeManager()
       ->getStorage('entity_view_display')
@@ -134,7 +134,7 @@ class WrapperHelper {
       } else if ($wrapper->type() === 'file') {
         $field = 'uri';
       } else {
-        throw new EntityWrapperException('Undefined $field is currently only allowed on entity type "Media".');
+        throw new EntityWrapperException('Undefined $field is currently only allowed on entity type "Media" or "File".');
       }
     }
     return $field;
