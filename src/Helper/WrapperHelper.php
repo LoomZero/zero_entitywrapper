@@ -3,6 +3,7 @@
 namespace Drupal\zero_entitywrapper\Helper;
 
 use Drupal;
+use Drupal\Core\DrupalKernel;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -13,6 +14,7 @@ use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
 use Drupal\zero_entitywrapper\Content\ContentWrapper;
 use Drupal\zero_entitywrapper\Exception\EntityWrapperException;
 use Drupal\zero_preprocess\Service\PreprocessExtenderManager;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 
 class WrapperHelper {
@@ -143,6 +145,16 @@ class WrapperHelper {
   public static function checkViewMode(string $view_mode): string {
     if (str_contains($view_mode, '-')) throw new EntityWrapperException('The view mode is a maschine key, don`t use "-".');
     return $view_mode;
+  }
+
+  /**
+   * @param Request|NULL $request
+   * @return string
+   */
+  public static function getMultiSite(Request $request = NULL): string {
+    $site = DrupalKernel::findSitePath($request ?? Drupal::request());
+    $site = explode('/', $site);
+    return array_pop($site);
   }
 
 }

@@ -17,6 +17,7 @@ use Drupal\zero_entitywrapper\Helper\WrapperHelper;
 use Drupal\zero_entitywrapper\Service\WrapperExtenderManager;
 use Drupal\zero_entitywrapper\Service\EntitywrapperService;
 use Drupal\zero_entitywrapper\Exception\EntityWrapperException;
+use Symfony\Component\HttpFoundation\Request;
 
 abstract class BaseWrapper implements BaseWrapperInterface {
 
@@ -295,6 +296,13 @@ abstract class BaseWrapper implements BaseWrapperInterface {
    */
   public function setCurrentLanguage(): self {
     return $this->setLanguage(Drupal::languageManager()->getCurrentLanguage());
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getMultiSite(Request $request = NULL): string {
+    return WrapperHelper::getMultiSite($request);
   }
 
 }

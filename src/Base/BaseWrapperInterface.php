@@ -6,6 +6,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\zero_entitywrapper\Service\EntitywrapperService;
+use Symfony\Component\HttpFoundation\Request;
 
 interface BaseWrapperInterface {
 
@@ -206,5 +207,11 @@ interface BaseWrapperInterface {
    * @return self
    */
   public function setCurrentLanguage(): self;
+
+  /**
+   * @param Request|NULL $request
+   * @return string
+   */
+  public function getMultiSite(Request $request = NULL): string;
 
 }
