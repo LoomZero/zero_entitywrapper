@@ -371,7 +371,12 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
    * @inheritDoc
    */
   public function getLabel() {
-    return $this->getValue($this->metaEntityKey('label'));
+    if ($this->type() === 'user') {
+      $label = 'name';
+    } else {
+      $label = $this->metaEntityKey('label');
+    }
+    return $this->getValue($label);
   }
 
   /**
