@@ -755,6 +755,29 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
   public function getFilePaths(string $field = NULL): array;
 
   /**
+   * Get the property from a image or file field. For example the alt text.
+   *
+   * @param string|NULL $field
+   * @param int $index
+   * @param string|NULL $property
+   *
+   * @return mixed
+   */
+  public function getFileProp(string $field = NULL, int $index = 0, string $property = NULL);
+
+  /**
+   * Get the property from a image or file field. For example the alt text.
+   *
+   * @see ContentWrapperInterface::getFileProp()
+   *
+   * @param string|NULL $field
+   * @param string|NULL $property
+   *
+   * @return array
+   */
+  public function getFileProps(string $field = NULL, string $property = NULL): array;
+
+  /**
    * Get the streamwrapper of a file reference field
    *
    * @param string|NULL $field

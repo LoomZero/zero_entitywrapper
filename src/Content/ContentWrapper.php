@@ -868,6 +868,26 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   /**
    * @inheritDoc
    */
+  public function getFileProp(string $field = NULL, int $index = 0, string $property = NULL) {
+    $field = WrapperHelper::getDefaultField($this, $field);
+    if ($this->metaReferenceTargetType($field) === 'media') {
+      $media = $this->getEntity($field, $index);
+      return $media->getRaw($media->metaMediaSourceField(), 0, $property);
+    } else {
+      return $this->getRaw($field, $index, $property);
+    }
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getFileProps(string $field = NULL, string $property = NULL): array {
+    return $this->metaForeach([$this, 'getFileProp'], $field, $property);
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function getStreamWrapper(string $field = NULL, int $index = 0): StreamWrapperInterface {
     $field = WrapperHelper::getDefaultField($this, $field);
     $wrapper = $this->getEntity($field, $index);
