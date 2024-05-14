@@ -3,6 +3,7 @@
 namespace Drupal\zero_entitywrapper\View;
 
 use Drupal;
+use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
@@ -401,6 +402,35 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
    */
   public function getDisplayOption(string $option) {
     return $this->executable()->display_handler->getOption($option);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getSelectCount(): int {
+    return (int)$this->getSelect()->countQuery()->execute()->fetchField();
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getSelect(): SelectInterface {
+    $this->executable()->preExecute();
+    $this->executable()->build();
+    $query = $this->executable()->createDuplicate()->getQuery();
+    return $query->query();
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function reset(): self {
+    $display = $this->getDisplay();
+    $this->executable()->destroy();
+    $this->executable = NULL;
+    $this->setFixed(FALSE);
+    $this->setDisplay($display);
+    return $this;
   }
 
 }

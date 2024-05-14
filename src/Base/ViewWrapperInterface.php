@@ -2,6 +2,7 @@
 
 namespace Drupal\zero_entitywrapper\Base;
 
+use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
@@ -313,5 +314,31 @@ interface ViewWrapperInterface extends BaseWrapperInterface {
    * @return mixed
    */
   public function getDisplayOption(string $option);
+
+  /**
+   * Get the count of the current view query.
+   * 
+   * @see ViewWrapperInterface::getSelect()
+   * @see ViewWrapperInterface::reset()
+   * 
+   * @return int
+   */
+  public function getSelectCount(): int;
+
+  /**
+   * Get a select query from current view. Make sure to use reset for multi invokation.
+   * 
+   * @see ViewWrapperInterface::reset()
+   * 
+   * @return SelectInterface
+   */
+  public function getSelect(): SelectInterface;
+
+  /**
+   * Reset the view executable. Only the display will be reapplied, other configs will be removed.
+   * 
+   * @return self
+   */
+  public function reset(): self;
 
 }
