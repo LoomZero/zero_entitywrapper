@@ -425,6 +425,7 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
    * @inheritDoc
    */
   public function reset(): self {
+    if ($this->executable === NULL) return $this;
     $display = $this->getDisplay();
     $this->executable()->destroy();
     $this->executable = NULL;
