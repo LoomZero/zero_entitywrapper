@@ -417,7 +417,7 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
   public function getSelect(): SelectInterface {
     $this->executable()->preExecute();
     $this->executable()->build();
-    $query = $this->executable()->createDuplicate()->getQuery();
+    $query = $this->executable()->getQuery();
     return $query->query();
   }
 
