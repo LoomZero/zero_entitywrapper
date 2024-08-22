@@ -27,6 +27,7 @@ use Drupal\zero_entitywrapper\Base\ContentDisplayCollectionWrapperInterface;
 use Drupal\zero_entitywrapper\Base\ContentDisplayWrapperInterface;
 use Drupal\zero_entitywrapper\Base\ContentWrapperInterface;
 use Drupal\zero_entitywrapper\Base\ViewWrapperInterface;
+use Drupal\zero_entitywrapper\Exception\EntityWrapperException;
 use Drupal\zero_entitywrapper\Helper\WrapperHelper;
 use Drupal\zero_entitywrapper\View\ViewWrapper;
 use Drupal\zero_entitywrapper\Wrapper\BaseWrapper;
@@ -531,6 +532,59 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
       if ($entity) $values[] = self::create($entity, $this);
     }
     return new ContentWrapperCollection($values, ['message' => 'Please use method <code>getEntitiesCollection()</code> instead of <code>getEntities()</code> to use collection features.', 'lines' => ['Collection support will be removed at version 1.0.0']]);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function hasHost(): bool {
+    return method_exists($this->entity(), 'getParentEntity');
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getHost(string $entity_class = NULL): ?ContentWrapperInterface {
+    if (!$this->hasHost()) {
+      throw new EntityWrapperException('This entity can not have a host entity. Did you mean to use that on a paragraph? If not than check hasHost() before.');
+    }
+    $parent = $this->entity()->getParentEntity();
+    if (empty($parent)) return NULL;
+    if ($entity_class === NULL || $parent instanceof $entity_class) {
+      $parent = $this->transformEntity($parent);
+      if ($parent === NULL) return NULL;
+      return ContentWrapper::create($parent, $this);
+    }
+    return NULL;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getHostNext(string $entity_class): ?ContentWrapperInterface {
+    $entity = $this->entity();
+    do {
+      if (!method_exists($entity, 'getParentEntity')) return NULL;
+      $entity = $entity->getParentEntity();
+    } while (!$entity instanceof $entity_class);
+    $entity = $this->transformEntity($entity);
+    if ($entity === NULL) return NULL;
+    return ContentWrapper::create($entity, $this);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getHostRoot(): ?ContentWrapperInterface {
+    $parent = $this->entity();
+    do {
+      $entity = $parent;
+      if (!method_exists($entity, 'getParentEntity')) break;
+      $parent = $entity->getParentEntity();
+    } while ($parent !== NULL);
+    $parent = $this->transformEntity($parent);
+    if ($parent === NULL) return NULL;
+    return ContentWrapper::create($parent, $this);
   }
 
   /**

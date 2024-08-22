@@ -390,6 +390,38 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
   public function getEntities(string $field, bool $ignoreAccess = FALSE): ContentWrapperCollection;
 
   /**
+   * Check if this entity can have a host entity
+   *
+   * @return bool
+   */
+  public function hasHost(): bool;
+
+  /**
+   * Get the host entity from a paragraph.
+   *
+   * @param string|NULL $entity_class check the class of the host
+   *
+   * @return ContentWrapperInterface|null
+   */
+  public function getHost(string $entity_class = NULL): ?ContentWrapperInterface;
+
+  /**
+   * Get the next entity with class equals $entity_class
+   *
+   * @param string $entity_class
+   *
+   * @return \Drupal\zero_entitywrapper\Base\ContentWrapperInterface|null
+   */
+  public function getHostNext(string $entity_class): ?ContentWrapperInterface;
+
+  /**
+   * Get the root host of this entity - root host is the first entity without the getParentEntity() method
+   *
+   * @return ContentWrapperInterface|NULL
+   */
+  public function getHostRoot(): ?ContentWrapperInterface;
+
+  /**
    * Get all entities of the reference field as collection
    *
    * @param string $field
