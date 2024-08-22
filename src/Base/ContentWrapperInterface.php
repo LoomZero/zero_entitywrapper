@@ -417,9 +417,11 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
   /**
    * Get the root host of this entity - root host is the first entity without the getParentEntity() method
    *
+   * @param string $entity_class
+   *
    * @return ContentWrapperInterface|NULL
    */
-  public function getHostRoot(): ?ContentWrapperInterface;
+  public function getHostRoot(string $entity_class = NULL): ?ContentWrapperInterface;
 
   /**
    * Get all entities of the reference field as collection

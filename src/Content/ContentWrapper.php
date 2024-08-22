@@ -575,13 +575,14 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   /**
    * @inheritDoc
    */
-  public function getHostRoot(): ?ContentWrapperInterface {
+  public function getHostRoot(string $entity_class = NULL): ?ContentWrapperInterface {
     $parent = $this->entity();
     do {
       $entity = $parent;
       if (!method_exists($entity, 'getParentEntity')) break;
       $parent = $entity->getParentEntity();
     } while ($parent !== NULL);
+    if ($entity_class !== NULL && !$parent instanceof $entity_class) return NULL;
     $parent = $this->transformEntity($parent);
     if ($parent === NULL) return NULL;
     return ContentWrapper::create($parent, $this);
