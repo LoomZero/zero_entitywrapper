@@ -134,7 +134,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   /**
    * @inheritDoc
    */
-  public function map(string $field, callable $mapper): array {
+  public function mapField(string $field, callable $mapper): array {
     return $this->metaForeach(function(string $field, $index) use ($mapper) {
       $item = $this->metaItem($field, $index);
       if ($item === NULL) return NULL;
@@ -537,7 +537,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   /**
    * @inheritDoc
    */
-  public function hasHost(): bool {
+  public function hasHostField(): bool {
     return method_exists($this->entity(), 'getParentEntity');
   }
 
@@ -545,8 +545,8 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
    * @inheritDoc
    */
   public function getHost(string $entity_class = NULL): ?ContentWrapperInterface {
-    if (!$this->hasHost()) {
-      throw new EntityWrapperException('This entity can not have a host entity. Did you mean to use that on a paragraph? If not than check hasHost() before.');
+    if (!$this->hasHostField()) {
+      throw new EntityWrapperException('This entity can not have a host entity. Did you mean to use that on a paragraph? If not than check hasHostField() before.');
     }
     $parent = $this->entity()->getParentEntity();
     if (empty($parent)) return NULL;
