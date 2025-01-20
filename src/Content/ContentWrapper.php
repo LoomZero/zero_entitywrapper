@@ -414,7 +414,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     if ($property === NULL) {
       return $item->getValue();
     }
-    return $item->getValue()[$property];
+    return $item->getValue()[$property] ?? NULL;
   }
 
   /**
