@@ -114,6 +114,25 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   }
 
   /**
+   * @param string $entity_type
+   * @param array $conditions
+   * @param BaseWrapperInterface|null $parent
+   * @param bool $access_check
+   * @return ?ContentWrapperInterface
+   */
+  public static function loadFirstByProperties(string $entity_type, array $conditions = [], BaseWrapperInterface $parent = NULL, bool $access_check = TRUE): ?ContentWrapperInterface {
+    $query = Drupal::entityTypeManager()->getStorage($entity_type)->getQuery();
+    foreach ($conditions as $key => $condition) {
+      $query->condition($key, $condition);
+    }
+    $query->range(0, 1);
+    $query->accessCheck($access_check);
+    $ids = $query->execute();
+    if (count($ids) === 0) return NULL;
+    return ContentWrapper::load($entity_type, array_shift($ids), $parent);
+  }
+
+  /**
    * @param ContentEntityBase|string $entity_type
    * @param int|string|null $entity_id
    * @param BaseWrapperInterface|null $parent
