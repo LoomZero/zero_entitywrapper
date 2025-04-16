@@ -1,0 +1,17 @@
+zero_generator:
+  css:
+    component:
+      css/zero-generator.css: {}
+  js:
+    js/prism-manual.js: {}
+    js/zero-generator.js: {}
+  dependencies:
+    - zero_wrapper_generator/library-prism
+    - core/drupal
+
+library-prism:
+  css:
+    component:
+      library/prism/prism.css: {}
+  js:
+    library/prism/prism.js: {}
