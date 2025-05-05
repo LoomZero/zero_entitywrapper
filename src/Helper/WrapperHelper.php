@@ -142,7 +142,8 @@ class WrapperHelper {
     return $field;
   }
 
-  public static function checkViewMode(string $view_mode): string {
+  public static function checkViewMode(string $view_mode = NULL): ?string {
+    if ($view_mode === NULL) return NULL;
     if (str_contains($view_mode, '-')) throw new EntityWrapperException('The view mode is a maschine key, don`t use "-".');
     return $view_mode;
   }
