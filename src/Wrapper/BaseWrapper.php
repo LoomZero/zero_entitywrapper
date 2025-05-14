@@ -17,11 +17,12 @@ use Drupal\zero_entitywrapper\Helper\WrapperHelper;
 use Drupal\zero_entitywrapper\Service\WrapperExtenderManager;
 use Drupal\zero_entitywrapper\Service\EntitywrapperService;
 use Drupal\zero_entitywrapper\Exception\EntityWrapperException;
+use Drupal\zero_entitywrapper\Service\WrapperExtenderPluginManager;
 use Symfony\Component\HttpFoundation\Request;
 
 abstract class BaseWrapper implements BaseWrapperInterface {
 
-  /** @var WrapperExtenderManager */
+  /** @var WrapperExtenderPluginManager */
   private $extenderManager;
   /** @var EntityInterface */
   protected $entity;
@@ -251,7 +252,7 @@ abstract class BaseWrapper implements BaseWrapperInterface {
    */
   public function getExtension(string $name, ...$args): BaseWrapperExtensionInterface {
     if ($this->extenderManager === NULL) {
-      $this->extenderManager = Drupal::service('zero.entitywrapper.extender');
+      $this->extenderManager = Drupal::service('plugin.manager.plugin_builder');
     }
     if (!isset($this->extenders[$name])) {
       $extension = $this->extenderManager->getExtension($this, $name, $args);
