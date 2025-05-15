@@ -1,0 +1,6 @@
+services:
+
+  zero_wrapper_generator.commands:
+    class: Drupal\zero_wrapper_generator\Command\ZeroWrapperGeneratorCommand
+    tags:
+      - { name: drush.command }
