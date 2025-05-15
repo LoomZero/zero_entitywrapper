@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\zero_entitywrapper\Extender;
+namespace Drupal\zero_entitywrapper\Plugin\Zero\EntityWrapper;
 
 use Drupal\Core\Annotation\Translation;
 use Drupal\zero_entitywrapper\Annotation\ZeroPluginBuilder;

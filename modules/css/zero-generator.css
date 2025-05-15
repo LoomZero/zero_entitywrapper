@@ -1,0 +1,33 @@
+.zero-generator__button {
+  position: fixed;
+  bottom: 2em;
+  left: 2em;
+  background: rgba(0, 0, 0, .6);
+  padding: .2em .4em;
+  box-shadow: 0 0 5px white;
+  color: white;
+  cursor: pointer;
+  transition: box-shadow .2s;
+}
+
+.zero-generator__button:hover {
+  box-shadow: 0 0 10px white;
+}
+
+.zero-generator__item {
+  margin-top: 1em;
+  background: #00475d;
+  background: #444655;
+  color: white;
+  border-radius: .3em;
+}
+
+.zero-generator__item > pre {
+  margin: 0;
+}
+
+.zero-generator__path {
+  padding: .5em 1em;
+  font-size: 1.4em;
+  font-weight: bold;
+}

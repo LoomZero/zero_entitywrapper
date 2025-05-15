@@ -252,7 +252,7 @@ abstract class BaseWrapper implements BaseWrapperInterface {
    */
   public function getExtension(string $name, ...$args): BaseWrapperExtensionInterface {
     if ($this->extenderManager === NULL) {
-      $this->extenderManager = Drupal::service('plugin.manager.plugin_builder');
+      $this->extenderManager = Drupal::service('plugin.manager.wrapper_extender');
     }
     if (!isset($this->extenders[$name])) {
       $extension = $this->extenderManager->getExtension($this, $name, $args);

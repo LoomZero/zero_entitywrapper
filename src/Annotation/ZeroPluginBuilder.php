@@ -17,4 +17,5 @@ class ZeroPluginBuilder extends Plugin {
 
   /** @var string */
   public $label;
+
 }

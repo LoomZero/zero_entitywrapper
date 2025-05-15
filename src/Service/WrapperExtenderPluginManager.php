@@ -20,7 +20,7 @@ class WrapperExtenderPluginManager extends DefaultPluginManager {
   }
 
   public function getExtenders(): array {
-    $manager = Drupal::service('plugin.manager.plugin_builder');
+    $manager = Drupal::service('plugin.manager.wrapper_extender');
     $extender = [];
     forEach($manager->getDefinitions() as $pluginId => $definition) {
       $extender[] = $manager->createInstance($pluginId);

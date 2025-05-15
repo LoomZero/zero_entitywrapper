@@ -26,6 +26,6 @@ services:
     tags:
       - { name: zero_preprocess_extender }
 
-  plugin.manager.plugin_builder:
+  plugin.manager.wrapper_extender:
     class: Drupal\zero_entitywrapper\Service\WrapperExtenderPluginManager
     parent: default_plugin_manager

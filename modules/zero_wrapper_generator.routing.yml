@@ -1,0 +1,7 @@
+zero_wrapper_generator.controller:
+  path: '/ajax/zero_wrapper_generator'
+  defaults:
+    _controller: '\Drupal\zero_wrapper_generator\Controller\ZeroWrapperGeneratorController::serve'
+    _title: 'Zero Wrapper Generator AJAX'
+  requirements:
+    _permission: 'access content'
