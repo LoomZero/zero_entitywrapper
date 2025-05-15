@@ -1,8 +1,0 @@
-services:
-
-  zero_wrapper_generator.service:
-    class: Drupal\zero_wrapper_generator\Service\ZeroWrapperGeneratorService
-
-  plugin.manager.wrapper_generator:
-    class: Drupal\zero_wrapper_generator\Service\ZeroWrapperGeneratorPluginManager
-    parent: default_plugin_manager

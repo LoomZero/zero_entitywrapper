@@ -1,8 +1,0 @@
-name: ZERO Wrapper Generator
-type: module
-description: "Generate preprocess files"
-core_version_requirement: ">=8"
-package: zero
-
-dependencies:
-  - zero_entitywrapper
