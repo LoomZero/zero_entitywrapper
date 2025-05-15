@@ -16,12 +16,6 @@ services:
     tags:
       - { name: wrapper_extender }
 
-  zero.entitywrapper.auto.wrapper.extender:
-    class: Drupal\zero_entitywrapper\Extender\AutoWrapperIncludeExtender
-    tags:
-      - { name: zero_preprocess_extender }
-
-  zero.entitywrapper.auto.extend.extender:
-    class: Drupal\zero_entitywrapper\Extender\AutoWrapperExtendsExtender
-    tags:
-      - { name: zero_preprocess_extender }
+  plugin.manager.wrapper_extender:
+    class: Drupal\zero_entitywrapper\Service\WrapperExtenderPluginManager
+    parent: default_plugin_manager
