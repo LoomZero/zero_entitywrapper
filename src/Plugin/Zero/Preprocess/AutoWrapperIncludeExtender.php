@@ -6,7 +6,7 @@ use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\views\ViewExecutable;
 use Drupal\zero_entitywrapper\Content\ContentWrapper;
 use Drupal\zero_entitywrapper\View\ViewWrapper;
-use Drupal\zero_preprocess\Base\PreprocessExtenderInterface;
+use Drupal\zero_preprocess\Annotation\PreprocessPluginBuilder;
 use Drupal\zero_preprocess\Base\PreprocessPluginBuilderInterface;
 
 /**
