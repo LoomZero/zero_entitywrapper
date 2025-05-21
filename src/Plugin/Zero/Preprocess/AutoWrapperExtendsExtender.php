@@ -1,10 +1,19 @@
 <?php
 
-namespace Drupal\zero_entitywrapper\Extender;
+namespace Drupal\zero_entitywrapper\Plugin\Zero\Preprocess;
 
-use Drupal\zero_preprocess\Base\PreprocessExtenderInterface;
+use Drupal\zero_preprocess\Annotation\PreprocessPluginBuilder;
+use Drupal\zero_preprocess\Base\PreprocessPluginBuilderInterface;
 
-class AutoWrapperExtendsExtender implements PreprocessExtenderInterface {
+/**
+ * @PreprocessPluginBuilder(
+ *   id = "auto_wrapper_extend_extender",
+ *   label = "Auto wrapper extend extender",
+ *   description = "Automatically extend $wrapper in all preprocess files."
+ * )
+ */
+class AutoWrapperExtendsExtender implements PreprocessPluginBuilderInterface
+{
 
   public function weight(): int {
     return -900000;
