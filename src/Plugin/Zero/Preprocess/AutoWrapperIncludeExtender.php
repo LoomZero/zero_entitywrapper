@@ -1,24 +1,25 @@
 <?php
 
-namespace Drupal\zero_entitywrapper\Extender;
+namespace Drupal\zero_entitywrapper\Plugin\Zero\Preprocess;
 
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\views\ViewExecutable;
 use Drupal\zero_entitywrapper\Content\ContentWrapper;
 use Drupal\zero_entitywrapper\View\ViewWrapper;
-use Drupal\zero_preprocess\Base\PreprocessExtenderInterface;
+use Drupal\zero_preprocess\Annotation\PreprocessPluginBuilder;
+use Drupal\zero_preprocess\Base\PreprocessPluginBuilderInterface;
 
-class AutoWrapperIncludeExtender implements PreprocessExtenderInterface {
+/**
+ * @PreprocessPluginBuilder(
+ *   id = "auto_wrapper_include_extender",
+ *   label = "Auto wrapper include extender",
+ *   description = "Automatically include $wrapper in all preprocess files."
+ * )
+ */
+class AutoWrapperIncludeExtender implements PreprocessPluginBuilderInterface {
 
   public function weight(): int {
     return -1000000;
-  }
-
-  public function config(): array {
-    return [
-      'title' => 'Auto wrapper include extender',
-      'description' => 'Automatically include $wrapper in all preprocess files.',
-    ];
   }
 
   public function registry(array &$zero, array $item, $name, array $theme_registry) {
