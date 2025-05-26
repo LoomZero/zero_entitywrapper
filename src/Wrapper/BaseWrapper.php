@@ -14,7 +14,6 @@ use Drupal\zero_entitywrapper\Base\BaseWrapperExtensionInterface;
 use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
 use Drupal\zero_entitywrapper\Base\RenderContextWrapperInterface;
 use Drupal\zero_entitywrapper\Helper\WrapperHelper;
-use Drupal\zero_entitywrapper\Service\WrapperExtenderManager;
 use Drupal\zero_entitywrapper\Service\EntitywrapperService;
 use Drupal\zero_entitywrapper\Exception\EntityWrapperException;
 use Drupal\zero_entitywrapper\Service\WrapperExtenderPluginManager;
@@ -68,7 +67,7 @@ abstract class BaseWrapper implements BaseWrapperInterface {
    * @param EntityInterface|string $entity_type
    * @param string|int|null $entity_id
    */
-  public function __construct($entity_type, $entity_id = NULL) {
+  public function __construct($entity_type, $entity_id = NULL, BaseWrapperInterface $parent = NULL) {
     if ($entity_type instanceof EntityInterface) {
       $this->entity = $entity_type;
     } else {
@@ -76,6 +75,11 @@ abstract class BaseWrapper implements BaseWrapperInterface {
       if ($this->entity === NULL) {
         throw new EntityWrapperException('Could not load entity ' . $entity_type . ' with id ' . $entity_id);
       }
+    }
+    if ($parent !== NULL) {
+      $this->setParent($parent);
+      $this->renderContext()->cacheAddEntity($this->entity());
+      $this->setLanguage($parent->language());
     }
   }
 
@@ -124,6 +128,16 @@ abstract class BaseWrapper implements BaseWrapperInterface {
   public function setConfigs(array $configs): self {
     $this->configs = $configs;
     return $this;
+  }
+
+  /**
+   * @inheritDoc
+   * @throws EntityWrapperException
+   */
+  public function config(string $config, $value = TRUE): static {
+    $wrapper = new static($this->entity(), NULL, $this);
+    $wrapper->setConfig($config, $value);
+    return $wrapper;
   }
 
   /**

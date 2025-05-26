@@ -137,13 +137,8 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
    * @param int|string|null $entity_id
    * @param BaseWrapperInterface|null $parent
    */
-  private function __construct($entity_type, $entity_id = NULL, BaseWrapperInterface $parent = NULL) {
-    parent::__construct($entity_type, $entity_id);
-    if ($parent !== NULL) {
-      $this->setParent($parent);
-      $this->renderContext()->cacheAddEntity($this->entity());
-      $this->setLanguage($parent->language());
-    }
+  protected function __construct($entity_type, $entity_id = NULL, BaseWrapperInterface $parent = NULL) {
+    parent::__construct($entity_type, $entity_id, $parent);
   }
 
   protected function getConfigAccessAccount(): ?AccountInterface {
