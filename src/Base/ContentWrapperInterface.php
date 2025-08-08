@@ -752,41 +752,68 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
   public function getView(string $field, string $explode = ':'): ?ViewWrapperInterface;
 
   /**
-   * Get the file content of a file reference field
+   * Get the file content of a file reference field vie stream wrapper.
    *
+   * @param string|NULL $field
+   * @param int $index
+   * @param string $strategy Options: 'realpath', 'uri', 'external'
+   * @return string
    * @see file_get_contents()
    * @see ContentWrapperInterface::getFilePath()
    *
+   */
+  public function getFileContent(?string $field = NULL, int $index = 0, string $strategy = 'realpath'): string;
+
+  /**
+   * Get all file content of a file reference field via stream wrapper.
+   *
+   * @param string|NULL $field
+   * @param string $strategy Options: 'realpath', 'uri', 'external'
+   * @return string[]
+   * @see ContentWrapperInterface::getFilePath()
+   */
+  public function getFileContents(?string $field = NULL, string $strategy = 'realpath'): array;
+
+  /**
+   * Get a file path of a file reference field via stream wrapper.
+   * Use the strategy 'realpath', 'uri' or 'external' for the path generation.
+   *
    * @param string|NULL $field
    * @param int $index
+   * @param string $strategy Options: 'realpath', 'uri', 'external'
    * @return string
    */
-  public function getFileContent(string $field = NULL, int $index = 0): string;
+  public function getFilePath(?string $field = NULL, int $index = 0, string $strategy = 'realpath'): string;
 
   /**
-   * Get all file content of a file reference field
+   * Get all file paths fo a file reference field via stream wrapper realpath.
    *
    * @param string|NULL $field
-   * @return array
+   * @param string $strategy Options: 'realpath', 'uri', 'external'
+   * @return string[]
    */
-  public function getFileContents(string $field = NULL): array;
+  public function getFilePaths(?string $field = NULL, string $strategy = 'realpath'): array;
 
   /**
-   * Get a file path of a file reference field
+   * Get the file path extension.
    *
    * @param string|NULL $field
    * @param int $index
+   * @param string $strategy Options: 'realpath', 'uri', 'external'
    * @return string
+   * @see pathinfo()
    */
-  public function getFilePath(string $field = NULL, int $index = 0): string;
+  public function getFileExtension(?string $field = NULL, int $index = 0, string $strategy = 'realpath'): string;
 
   /**
-   * Get all file paths fo a file reference field
+   * Get the file path extension.
    *
    * @param string|NULL $field
-   * @return array
+   * @param string $strategy Options: 'realpath', 'uri', 'external'
+   * @return string[]
+   * @see pathinfo()
    */
-  public function getFilePaths(string $field = NULL): array;
+  public function getFileExtensions(?string $field = NULL, string $strategy = 'realpath'): array;
 
   /**
    * Get the property from a image or file field. For example the alt text.

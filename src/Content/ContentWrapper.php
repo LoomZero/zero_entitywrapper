@@ -914,29 +914,50 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   /**
    * @inheritDoc
    */
-  public function getFileContent(string $field = NULL, int $index = 0): string {
-    return file_get_contents($this->getFilePath($field, $index));
+  public function getFileContent(?string $field = NULL, int $index = 0, string $strategy = 'realpath'): string {
+    return file_get_contents($this->getFilePath($field, $index, $strategy));
   }
 
   /**
    * @inheritDoc
    */
-  public function getFileContents(string $field = NULL): array {
-    return $this->metaForeach([$this, 'getFileContent'], $field);
+  public function getFileContents(?string $field = NULL, string $strategy = 'realpath'): array {
+    return $this->metaForeach([$this, 'getFileContent'], $field, $strategy);
   }
 
   /**
    * @inheritDoc
    */
-  public function getFilePath(string $field = NULL, int $index = 0): string {
-    return $this->getStreamWrapper($field, $index)->realpath();
+  public function getFilePath(?string $field = NULL, int $index = 0, string $strategy = 'realpath'): string {
+    if ($strategy === 'realpath') {
+      return $this->getStreamWrapper($field, $index)->realpath();
+    } else if ($strategy === 'uri') {
+      return $this->getStreamWrapper($field, $index)->getUri();
+    } else if ($strategy === 'external') {
+      return $this->getStreamWrapper($field, $index)->getExternalUrl();
+    }
+    throw new \Exception('Strategy "' . $strategy . '" unknown for file path generation.');
   }
 
   /**
    * @inheritDoc
    */
-  public function getFilePaths(string $field = NULL): array {
-    return $this->metaForeach([$this, 'getFilePath'], $field);
+  public function getFilePaths(string $field = NULL, string $strategy = 'realpath'): array {
+    return $this->metaForeach([$this, 'getFilePath'], $field, $strategy);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getFileExtension(string $field = NULL, int $index = 0, string $strategy = 'realpath'): string {
+    return pathinfo($this->getFilePath($field, $index, $strategy), PATHINFO_EXTENSION);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getFileExtensions(string $field = NULL, string $strategy = 'realpath'): array {
+    return $this->metaForeach([$this, 'getFileExtension'], $field, $strategy);
   }
 
   /**
