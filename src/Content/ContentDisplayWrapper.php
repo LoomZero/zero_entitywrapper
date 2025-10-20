@@ -49,7 +49,7 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
   /**
    * @inheritDoc
    */
-  public function getDisplaySettings(string $view_mode = NULL, string $field = NULL): ?array {
+  public function getDisplaySettings(?string $view_mode = NULL, ?string $field = NULL): ?array {
     WrapperHelper::checkViewMode($view_mode);
 
     $display = WrapperHelper::getViewDisplay($this->getWrapper(), $view_mode ?? $this->getWrapper()->renderContext()->getViewMode(), $view_mode === NULL);
@@ -68,7 +68,7 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
   /**
    * @inheritDoc
    */
-  public function as(string $field, string $view_mode = NULL) {
+  public function as(string $field, ?string $view_mode = NULL) {
     $view = $this->getDisplaySettings(WrapperHelper::checkViewMode($view_mode), $field);
     return $this->process($this->getWrapper()->entity()->get($field)->view($view));
   }
@@ -182,7 +182,7 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
   /**
    * @inheritDoc
    */
-  public function image(string $field = NULL, int $index = 0, string $image_style = '', string $image_link = '') {
+  public function image(?string $field = NULL, int $index = 0, string $image_style = '', string $image_link = '') {
     $field = WrapperHelper::getDefaultField($this->wrapper, $field);
     if ($this->wrapper->metaReferenceTargetType($field) === 'media') {
       $media = $this->wrapper->getEntity($field, $index);
@@ -195,7 +195,7 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
   /**
    * @inheritDoc
    */
-  public function images(string $field = NULL, string $image_style = '', string $image_link = '') {
+  public function images(?string $field = NULL, string $image_style = '', string $image_link = '') {
     $field = WrapperHelper::getDefaultField($this->wrapper, $field);
     if ($this->wrapper->metaReferenceTargetType($field) === 'media') {
       $medias = $this->wrapper->getEntities($field);
@@ -211,7 +211,7 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
   /**
    * @inheritDoc
    */
-  public function media(string $field = NULL, int $index = 0, array $options = [], array $additions = []) {
+  public function media(?string $field = NULL, int $index = 0, array $options = [], array $additions = []) {
     if ($field === NULL && $this->wrapper->type() !== 'media' || $field !== NULL && $this->wrapper->metaReferenceTargetType($field) !== 'media') {
       throw new EntityWrapperException('The media display is only allowed with entity reference media.');
     }
@@ -228,7 +228,7 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
   /**
    * @inheritDoc
    */
-  public function medias(string $field = NULL, array $options = [], array $additions = []) {
+  public function medias(?string $field = NULL, array $options = [], array $additions = []) {
     if ($field === NULL) return $this->media($field, 0, $options, $additions);
 
     if ($this->wrapper->metaReferenceTargetType($field) !== 'media') {
@@ -251,7 +251,7 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
   /**
    * @inheritDoc
    */
-  public function responsiveImage(string $field = NULL, int $index = 0, string $responsive_image_style = '', string $image_link = '', $item_attributes = NULL) {
+  public function responsiveImage(?string $field = NULL, int $index = 0, string $responsive_image_style = '', string $image_link = '', $item_attributes = NULL) {
     $field = WrapperHelper::getDefaultField($this->wrapper, $field);
     if ($this->wrapper->metaReferenceTargetType($field) === 'media') {
       $media = $this->wrapper->getEntity($field, $index);
@@ -273,7 +273,7 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
   /**
    * @inheritDoc
    */
-  public function responsiveImages(string $field = NULL, string $responsive_image_style = '', string $image_link = '', $item_attributes = NULL) {
+  public function responsiveImages(?string $field = NULL, string $responsive_image_style = '', string $image_link = '', $item_attributes = NULL) {
     $field = WrapperHelper::getDefaultField($this->wrapper, $field);
     if ($this->wrapper->metaReferenceTargetType($field) === 'media') {
       $medias = $this->wrapper->getEntities($field);
@@ -329,7 +329,7 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
   /**
    * @inheritDoc
    */
-  public function component(string $path, $vars = [], string $pattern = NULL) {
+  public function component(string $path, $vars = [], ?string $pattern = NULL) {
     $theme = [];
     if ($pattern) {
       $theme[] = 'zero_component__' . $pattern;

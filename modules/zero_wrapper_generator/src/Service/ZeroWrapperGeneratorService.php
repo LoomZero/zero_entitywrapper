@@ -47,7 +47,7 @@ class ZeroWrapperGeneratorService {
     return \Drupal::service('kernel')->getAppRoot();
   }
 
-  public function getThemeTemplatePath(string $theme = NULL): ?string {
+  public function getThemeTemplatePath(?string $theme = NULL): ?string {
     $themeManager = \Drupal::service('theme.manager');
     $pathResolver = \Drupal::service('extension.path.resolver');
 
@@ -58,7 +58,7 @@ class ZeroWrapperGeneratorService {
     return $pathResolver->getPath('theme', $theme) . '/templates';
   }
 
-  public function getTemplatePath(string $entity_type, string $bundle, string $view_mode = NULL, string $extension = '.html.twig'): string {
+  public function getTemplatePath(string $entity_type, string $bundle, ?string $view_mode = NULL, string $extension = '.html.twig'): string {
     return "$entity_type/$bundle/$entity_type--$bundle" . ($view_mode === NULL ? '' : '--' . $view_mode) . $extension;
   }
 
@@ -127,7 +127,7 @@ class ZeroWrapperGeneratorService {
     return $field;
   }
 
-  public function define(GeneratePackage $package, array $fields = NULL): array {
+  public function define(GeneratePackage $package, ?array $fields = NULL): array {
     /** @var ZeroWrapperGeneratorPluginManager $manager */
     $manager = \Drupal::service('plugin.manager.wrapper_generator');
 
@@ -171,7 +171,7 @@ class ZeroWrapperGeneratorService {
     return $this;
   }
 
-  public function generateFields(GeneratePackage $package, array $fields, array $context = NULL): self {
+  public function generateFields(GeneratePackage $package, array $fields, ?array $context = NULL): self {
     /** @var ZeroWrapperGeneratorPluginManager $manager */
     $manager = \Drupal::service('plugin.manager.wrapper_generator');
     $plugins = $manager->getPlugins();

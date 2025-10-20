@@ -29,7 +29,7 @@ class TwigGeneratorFile extends GeneratorFileBase {
     return $this;
   }
 
-  public function openFor(string $key, string $item = 'item', callable $callback = NULL): string {
+  public function openFor(string $key, string $item = 'item', ?callable $callback = NULL): string {
     $item_key = $key . '_' . $item;
     if (str_ends_with($key, 's')) {
       $item_key = substr($key, 0, -1);
@@ -61,7 +61,7 @@ class TwigGeneratorFile extends GeneratorFileBase {
     return '{{ ' . $key . ' }}';
   }
 
-  public function el(string $el, array $attributes = [], callable $callback = NULL): self {
+  public function el(string $el, array $attributes = [], ?callable $callback = NULL): self {
     $this->open("<$el" . new Attribute($attributes) . ">");
     if ($callback) {
       $callback();
@@ -84,7 +84,7 @@ class TwigGeneratorFile extends GeneratorFileBase {
     return $this;
   }
 
-  public function addModifier(string $query, string $value = NULL, string $append = ''): self {
+  public function addModifier(string $query, ?string $value = NULL, string $append = ''): self {
     $this->package->addModifier($query, $value, $append);
     return $this;
   }

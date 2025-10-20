@@ -137,7 +137,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
    * @param int|string|null $entity_id
    * @param BaseWrapperInterface|null $parent
    */
-  protected function __construct($entity_type, $entity_id = NULL, BaseWrapperInterface $parent = NULL) {
+  protected function __construct($entity_type, $entity_id = NULL, ?BaseWrapperInterface $parent = NULL) {
     parent::__construct($entity_type, $entity_id, $parent);
   }
 
@@ -360,32 +360,19 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   }
 
   /**
-   * @param EntityInterface $entity
-   *
-   * @param bool $ignoreAccess DEPRECATED
+   * @param ?EntityInterface $entity
    */
-  protected function transformEntity(?EntityInterface $entity = NULL, bool $ignoreAccess = FALSE): ?EntityInterface {
+  protected function transformEntity(?EntityInterface $entity = NULL): ?EntityInterface {
     if ($entity === NULL) return NULL;
 
     $entity = WrapperHelper::applyLanguage($entity, $this->entity());
     $this->renderContext()->cacheAddEntity($entity);
 
-    if ($ignoreAccess || $this->access('view', $entity)) {
+    if ($this->access('view', $entity)) {
       return $entity;
     } else {
       return NULL;
     }
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function view(): ContentViewWrapper {
-    $this->getService()->logDeprecation();
-
-    /** @var ContentViewWrapper $extension */
-    $extension = $this->getExtension('view');
-    return $extension;
   }
 
   /**
@@ -476,7 +463,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     $original = $this->getValues($field);
 
     $values = [];
-    foreach ($original as $index => $value) {
+    foreach ($original as $value) {
       $values[$value] = $allowed_values[$value];
     }
 
@@ -516,7 +503,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   /**
    * @inheritDoc
    */
-  public function getEntity(string $field, int $index = 0, bool $ignoreAccess = FALSE): ?ContentWrapperInterface {
+  public function getEntity(string $field, int $index = 0): ?ContentWrapperInterface {
     /** @var FieldItemInterface $item */
     $item = $this->metaItem($field, $index);
 
@@ -526,7 +513,7 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
 
     if ($entity === NULL) return NULL;
 
-    $entity = $this->transformEntity($entity, $ignoreAccess);
+    $entity = $this->transformEntity($entity);
 
     if ($entity === NULL) return NULL;
 
@@ -536,16 +523,14 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   /**
    * @inheritDoc
    */
-  public function getEntities(string $field, bool $ignoreAccess = FALSE): ContentWrapperCollection {
-    if (count(func_get_args()) > 1) trigger_error('param $ignoreAccess of method ' . __METHOD__ . ' is deprecated, please use instead `$wrapper->setConfig(ContentWrapperInterface::CONTENT_BYPASS_ACCESS)`');
-
+  public function getEntities(string $field): array {
     $values = [];
     foreach ($this->metaItems($field) as $item) {
       $entity = $item->get('entity')->getValue();
-      $entity = $this->transformEntity($entity, $ignoreAccess);
+      $entity = $this->transformEntity($entity);
       if ($entity) $values[] = self::create($entity, $this);
     }
-    return new ContentWrapperCollection($values, ['message' => 'Please use method <code>getEntitiesCollection()</code> instead of <code>getEntities()</code> to use collection features.', 'lines' => ['Collection support will be removed at version 1.0.0']]);
+    return $values;
   }
 
   /**
@@ -618,9 +603,8 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
   /**
    * @inheritDoc
    */
-  public function getAuthor(bool $ignoreAccess = FALSE): ?ContentWrapperInterface {
-    if (count(func_get_args()) > 0) trigger_error('param $ignoreAccess of method ' . __METHOD__ . ' is deprecated, please use instead `$wrapper->setConfig(ContentWrapperInterface::CONTENT_BYPASS_ACCESS)`');
-    return $this->getEntity('uid', 0, $ignoreAccess);
+  public function getAuthor(): ?ContentWrapperInterface {
+    return $this->getEntity('uid', 0);
   }
 
   /**

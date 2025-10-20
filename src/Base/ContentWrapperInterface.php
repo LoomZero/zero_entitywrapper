@@ -233,16 +233,6 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
   public function access($operation = 'view', ?EntityInterface $entity = NULL, ?AccountInterface $account = NULL): bool;
 
   /**
-   * @deprecated Will be removed at version 1.0.0, use instead <code>$wrapper->display()</code>
-   *   <i>More Info:</i>
-   *   Use <code>$wrapper->displayCollection()</code> if you used the collection feature of the <code>ContentViewWrapper</code>.
-   *   <i>Example:</i>
-   *   <code>$wrapper->displayCollection()->responsiveImage('field_placeholder', 0, 'video_placeholder')->addItemClass('idle--fit');</code>
-   * @return ContentViewWrapper
-   */
-  public function view(): ContentViewWrapper;
-
-  /**
    * Get the render arrays for fields.
    *
    * @return ContentDisplayWrapperInterface
@@ -364,30 +354,23 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
   /**
    * Get the entity of the reference field
    *
-   * Please don't use the parameter $ignoreAccess, instead use `$wrapper->setConfig(ContentWrapperInterface::CONTENT_BYPASS_ACCESS)`
-   *
    * @param string $field
    * @param int $index
-   * @param bool $ignoreAccess DEPRECATED
    * @return ContentWrapperInterface|null
    */
-  public function getEntity(string $field, int $index = 0, bool $ignoreAccess = FALSE): ?ContentWrapperInterface;
+  public function getEntity(string $field, int $index = 0): ?ContentWrapperInterface;
 
   /**
-   * Get all entities of the reference field
-   * Please use the method "getEntitiesCollection()" to get the ContentWrapperCollection.
-   *
-   * Please don't use the parameter $ignoreAccess, instead use `$wrapper->setConfig(ContentWrapperInterface::CONTENT_BYPASS_ACCESS)`
+   * Get all entities of the reference field.
    *
    * @see ContentWrapperInterface::getEntity()
    * @see ContentWrapperInterface::getEntitiesCollection()
    *
    * @param string $field
-   * @param bool $ignoreAccess DEPRECATED
    *
-   * @return ContentWrapperInterface|ContentWrapperInterface[]
+   * @return ContentWrapperInterface[]
    */
-  public function getEntities(string $field, bool $ignoreAccess = FALSE): ContentWrapperCollection;
+  public function getEntities(string $field): array;
 
   /**
    * Check if this entity can have a host entity
@@ -436,13 +419,9 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
   /**
    * Get the author of this entity
    *
-   * Please don't use the parameter $ignoreAccess, instead use `$wrapper->setConfig(ContentWrapperInterface::CONTENT_BYPASS_ACCESS)`
-   *
-   * @param bool $ignoreAccess DEPRECATED
-   *
    * @return ContentWrapperInterface|null
    */
-  public function getAuthor(bool $ignoreAccess = FALSE): ?ContentWrapperInterface;
+  public function getAuthor(): ?ContentWrapperInterface;
 
   /**
    * Get the url of entity field or media field or url field or link field.

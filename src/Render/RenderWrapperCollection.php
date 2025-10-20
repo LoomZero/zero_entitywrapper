@@ -24,7 +24,7 @@ class RenderWrapperCollection extends ArrayObject implements RenderableInterface
    * @param array $array
    * @param BaseWrapperInterface $wrapper
    */
-  public function __construct(array $array = [], BaseWrapperInterface $wrapper = NULL) {
+  public function __construct(array $array = [], ?BaseWrapperInterface $wrapper = NULL) {
     parent::__construct($array);
     $this->wrapper = $wrapper;
   }
@@ -46,69 +46,6 @@ class RenderWrapperCollection extends ArrayObject implements RenderableInterface
     } else {
       return $value;
     }
-  }
-
-  /**
-   * @deprecated Will be removed at version 1.0.0, use instead <code>$wrapper->display()</code>
-   * @param string $name
-   * @param callable|* $value
-   * @return $this
-   */
-  public function setItemData(string $name, $value): self {
-    $this->getWrapper()->getService()->logDeprecation();
-    $copy = $this->getArrayCopy();
-    foreach (Element::children($copy) as $index) {
-      $this[$index][$name] = $this->getValue($value, $this[$index], $index);
-    }
-    return $this;
-  }
-
-  /**
-   * @deprecated Will be removed at version 1.0.0, info for migrate:<br />
-   *   <strong>if used with <code>$wrapper->display()->responsiveImage()</code></strong><br />
-   *     - remove this method<br />
-   *     - add <code>$value</code> as last parameter <code>$item_attributes</code> to <code>$wrapper->display()->responsiveImage()</code><br />
-   *   <br />
-   *   <strong>if used another way, try to rebuild the result with:</strong>
-   *     ```
-   *     $wrapper->displayCollection()->{...}->setWrapper($value)
-   *     // or
-   *     $wrapper->displayCollection()->{...}->setItemWrapper($value)
-   *     ```
-   * @param callable|array $value
-   * @return $this
-   */
-  public function setItemAttributes($value): self {
-    $this->getWrapper()->getService()->logDeprecation();
-    $this['#item_attributes'] = $this->getValue($value);
-    return $this;
-  }
-
-  /**
-   * @deprecated Will be removed at version 1.0.0, info for migrate:<br />
-   *    <strong>if used with <code>$wrapper->display()->responsiveImage()</code></strong><br />
-   *      - remove this method<br />
-   *      - add <code>['class' => [...$classes]]</code> as last parameter <code>$item_attributes</code> to <code>$wrapper->display()->responsiveImage()</code><br />
-   *    <br />
-   *    <strong>if used another way, try to rebuild the result with:</strong>
-   *      ```
-   *      $wrapper->displayCollection()->{...}->setWrapper(['class' => [...$classes]])
-   *      // or
-   *      $wrapper->displayCollection()->{...}->setItemWrapper(['class' => [...$classes]])
-   *      ```
-   * @param string ...$classes
-   *
-   * @return $this
-   */
-  public function addItemClass(string ...$classes): self {
-    $this->getWrapper()->getService()->logDeprecation();
-    if (empty($this['#item_attributes']['class'])) {
-      $this['#item_attributes']['class'] = [];
-    }
-    foreach ($classes as $class) {
-      $this['#item_attributes']['class'][] = $class;
-    }
-    return $this;
   }
 
   public function each(callable $callback): self {

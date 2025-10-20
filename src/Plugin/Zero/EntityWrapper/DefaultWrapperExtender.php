@@ -26,11 +26,6 @@ class DefaultWrapperExtender implements ZeroPluginBuilderInterface {
 
   public function getExtension(BaseWrapperInterface $wrapper, string $name, array $args = []): ?BaseWrapperExtensionInterface {
     switch ($name) {
-      case 'view':
-        if ($wrapper instanceof ContentWrapper) {
-          return new ContentViewWrapper();
-        }
-        break;
       case 'display':
         if ($wrapper instanceof ContentWrapper) {
           return new ContentDisplayWrapper();

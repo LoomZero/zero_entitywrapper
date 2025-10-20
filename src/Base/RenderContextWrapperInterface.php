@@ -20,7 +20,7 @@ interface RenderContextWrapperInterface extends BaseWrapperExtensionInterface {
    * @param string|NULL $library
    * @return void
    */
-  public function addLibrary(string $module, string $library = NULL): void;
+  public function addLibrary(string $module, ?string $library = NULL): void;
 
   /**
    * Add js settings to render array
@@ -43,7 +43,7 @@ interface RenderContextWrapperInterface extends BaseWrapperExtensionInterface {
    *
    * @return string
    */
-  public function setElementSettings(string $name, $settings, string $uuid = NULL): string;
+  public function setElementSettings(string $name, $settings, ?string $uuid = NULL): string;
 
   ### cache methods ###
 

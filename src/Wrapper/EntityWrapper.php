@@ -35,7 +35,7 @@ class EntityWrapper extends BaseWrapper {
    * @param Request|NULL $request
    * @return EntityWrapper|null
    */
-  public static function createFromRequest(string $request_key, Request $request = NULL): ?EntityWrapper {
+  public static function createFromRequest(string $request_key, ?Request $request = NULL): ?EntityWrapper {
     if ($request === NULL) $request = Drupal::request();
     $entity = $request->get($request_key);
     if ($entity instanceof EntityInterface) {
@@ -66,7 +66,7 @@ class EntityWrapper extends BaseWrapper {
    * @param string|NULL $display
    * @return ViewWrapper
    */
-  public function wrapView(string $display = NULL): ViewWrapper {
+  public function wrapView(?string $display = NULL): ViewWrapper {
     $wrapper = new ViewWrapper($this->entity, $display);
     $this->prepareWrapper($wrapper);
     return $wrapper;

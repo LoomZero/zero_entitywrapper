@@ -29,7 +29,7 @@ class GeneratePackage {
     return $this->get('fields', []);
   }
 
-  public function addModifier(string $name, string $value = NULL, string $append = ''): self {
+  public function addModifier(string $name, ?string $value = NULL, string $append = ''): self {
     $this->info['modifiers'][] = [
       'query' => $name,
       'value' => ($value === NULL ? $this->k($name) : $value),

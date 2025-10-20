@@ -42,7 +42,7 @@ interface BaseWrapperInterface {
    * @param BaseWrapperInterface|NULL $parent
    * @return self
    */
-  public function setParent(BaseWrapperInterface $parent = NULL): self;
+  public function setParent(?BaseWrapperInterface $parent = NULL): self;
 
   /**
    * Get the parent wrapper
@@ -221,6 +221,6 @@ interface BaseWrapperInterface {
    * @param Request|NULL $request
    * @return string
    */
-  public function getMultiSite(Request $request = NULL): string;
+  public function getMultiSite(?Request $request = NULL): string;
 
 }
