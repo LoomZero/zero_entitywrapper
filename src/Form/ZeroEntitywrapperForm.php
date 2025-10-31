@@ -11,15 +11,15 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ZeroEntitywrapperForm extends ConfigFormBase {
 
-  protected function getEditableConfigNames() {
+  protected function getEditableConfigNames(): array {
     return ['zero_entitywrapper.config'];
   }
 
-  public function getFormId() {
+  public function getFormId(): string {
     return 'zero_entitywrapper_config_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     /** @var Drupal\zero_entitywrapper\Service\EntitywrapperService $service */
     $service = Drupal::service('zero_entitywrapper.service');
     if (!Drupal::request()->get('ajax_form')) {
@@ -89,7 +89,7 @@ class ZeroEntitywrapperForm extends ConfigFormBase {
     return parent::buildForm($form, $form_state);
   }
 
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $state = [
       'log_deprecation' => $form_state->getValue('log_deprecation'),
       'log_reference_invalid' => $form_state->getValue('log_reference_invalid'),
@@ -147,7 +147,7 @@ class ZeroEntitywrapperForm extends ConfigFormBase {
     return $build;
   }
 
-  public function configMarkup(string $key, string $value, array $config) {
+  public function configMarkup(string $key, string $value, array $config): array {
     $string = '<div style="padding: 0.2em 0.3em; border-radius: 3px; background: rgba(0, 0, 0, .3); margin-bottom: 1em;">';
     foreach ($config as $k => $v) {
       $string .= $k . ': ' . ($v === NULL ? 'NULL' : $v) . '<br/>';
@@ -158,7 +158,7 @@ class ZeroEntitywrapperForm extends ConfigFormBase {
     ];
   }
 
-  public function resetValue(array &$form, FormStateInterface $form_state, Request $request) {
+  public function resetValue(array &$form, FormStateInterface $form_state, Request $request): array {
     /** @var Drupal\zero_entitywrapper\Service\EntitywrapperService $service */
     $service = Drupal::service('zero_entitywrapper.service');
 

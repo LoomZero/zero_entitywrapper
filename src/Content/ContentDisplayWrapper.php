@@ -20,7 +20,7 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
   /**
    * @inheritDoc
    */
-  public function setWrapper(BaseWrapperInterface $wrapper) {
+  public function setWrapper(BaseWrapperInterface $wrapper): void {
     $this->wrapper = $wrapper;
   }
 
@@ -40,7 +40,6 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
 
   /**
    * @param $value
-   * @return array
    */
   protected function process($value) {
     return $value;
@@ -49,7 +48,7 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
   /**
    * @inheritDoc
    */
-  public function getDisplaySettings(string $view_mode = NULL, string $field = NULL): ?array {
+  public function getDisplaySettings(?string $view_mode = NULL, ?string $field = NULL): ?array {
     WrapperHelper::checkViewMode($view_mode);
 
     $display = WrapperHelper::getViewDisplay($this->getWrapper(), $view_mode ?? $this->getWrapper()->renderContext()->getViewMode(), $view_mode === NULL);
@@ -68,12 +67,12 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
   /**
    * @inheritDoc
    */
-  public function as(string $field, string $view_mode = NULL) {
+  public function as(string $field, ?string $view_mode = NULL): array {
     $view = $this->getDisplaySettings(WrapperHelper::checkViewMode($view_mode), $field);
     return $this->process($this->getWrapper()->entity()->get($field)->view($view));
   }
 
-  protected function doFormatter(ContentWrapperInterface $wrapper, string $field, int $index, string $formatter, array $settings = []) {
+  protected function doFormatter(ContentWrapperInterface $wrapper, string $field, int $index, string $formatter, array $settings = []): array {
     /** @var FieldItemInterface $item */
     $item = $wrapper->metaItem($field, $index);
     if ($item === NULL) return [];
@@ -85,7 +84,7 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
     ]);
   }
 
-  protected function doFormatters(ContentWrapperInterface $wrapper, string $field, string $formatter, array $settings = []) {
+  protected function doFormatters(ContentWrapperInterface $wrapper, string $field, string $formatter, array $settings = []): array {
     return $wrapper->metaItems($field)->view([
       'type' => $formatter,
       'label' => 'hidden',
@@ -96,49 +95,49 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
   /**
    * @inheritDoc
    */
-  public function formatter(string $field, int $index, string $formatter, array $settings = []) {
+  public function formatter(string $field, int $index, string $formatter, array $settings = []): array {
     return $this->process($this->doFormatter($this->wrapper, $field, $index, $formatter, $settings));
   }
 
   /**
    * @inheritDoc
    */
-  public function formatters(string $field, string $formatter, array $settings = []) {
+  public function formatters(string $field, string $formatter, array $settings = []): array {
     return $this->process($this->doFormatters($this->wrapper, $field, $formatter, $settings));
   }
 
   /**
    * @inheritDoc
    */
-  public function entity(string $field, int $index = 0, string $view_mode = 'full') {
+  public function entity(string $field, int $index = 0, string $view_mode = 'full'): array {
     return $this->formatter($field, $index, 'entity_reference_entity_view', ['view_mode' => WrapperHelper::checkViewMode($view_mode)]);
   }
 
   /**
    * @inheritDoc
    */
-  public function entities(string $field, string $view_mode = 'full') {
+  public function entities(string $field, string $view_mode = 'full'): array {
     return $this->formatters($field, 'entity_reference_entity_view', ['view_mode' => WrapperHelper::checkViewMode($view_mode)]);
   }
 
   /**
    * @inheritDoc
    */
-  public function string(string $field, int $index = 0, bool $linkToEntity = FALSE) {
+  public function string(string $field, int $index = 0, bool $linkToEntity = FALSE): array {
     return $this->formatter($field, $index, 'string', ['link_to_entity' => $linkToEntity]);
   }
 
   /**
    * @inheritDoc
    */
-  public function strings(string $field, bool $linkToEntity = FALSE) {
+  public function strings(string $field, bool $linkToEntity = FALSE): array {
     return $this->formatters($field, 'string', ['link_to_entity' => $linkToEntity]);
   }
 
   /**
    * @inheritDoc
    */
-  public function body(string $field, int $index = 0, int $trimmed = 0, bool $summary = FALSE) {
+  public function body(string $field, int $index = 0, int $trimmed = 0, bool $summary = FALSE): array {
     $formatter = 'text_default';
     $settings = [];
 
@@ -160,7 +159,7 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
   /**
    * @inheritDoc
    */
-  public function bodies(string $field, int $trimmed = 0, bool $summary = FALSE) {
+  public function bodies(string $field, int $trimmed = 0, bool $summary = FALSE): array {
     $formatter = 'text_default';
     $settings = [];
 
@@ -182,7 +181,7 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
   /**
    * @inheritDoc
    */
-  public function image(string $field = NULL, int $index = 0, string $image_style = '', string $image_link = '') {
+  public function image(?string $field = NULL, int $index = 0, string $image_style = '', string $image_link = ''): array {
     $field = WrapperHelper::getDefaultField($this->wrapper, $field);
     if ($this->wrapper->metaReferenceTargetType($field) === 'media') {
       $media = $this->wrapper->getEntity($field, $index);
@@ -195,7 +194,7 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
   /**
    * @inheritDoc
    */
-  public function images(string $field = NULL, string $image_style = '', string $image_link = '') {
+  public function images(?string $field = NULL, string $image_style = '', string $image_link = ''): array {
     $field = WrapperHelper::getDefaultField($this->wrapper, $field);
     if ($this->wrapper->metaReferenceTargetType($field) === 'media') {
       $medias = $this->wrapper->getEntities($field);
@@ -211,7 +210,7 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
   /**
    * @inheritDoc
    */
-  public function media(string $field = NULL, int $index = 0, array $options = [], array $additions = []) {
+  public function media(?string $field = NULL, int $index = 0, array $options = [], array $additions = []): array {
     if ($field === NULL && $this->wrapper->type() !== 'media' || $field !== NULL && $this->wrapper->metaReferenceTargetType($field) !== 'media') {
       throw new EntityWrapperException('The media display is only allowed with entity reference media.');
     }
@@ -228,7 +227,7 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
   /**
    * @inheritDoc
    */
-  public function medias(string $field = NULL, array $options = [], array $additions = []) {
+  public function medias(?string $field = NULL, array $options = [], array $additions = []): array {
     if ($field === NULL) return $this->media($field, 0, $options, $additions);
 
     if ($this->wrapper->metaReferenceTargetType($field) !== 'media') {
@@ -251,7 +250,7 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
   /**
    * @inheritDoc
    */
-  public function responsiveImage(string $field = NULL, int $index = 0, string $responsive_image_style = '', string $image_link = '', $item_attributes = NULL) {
+  public function responsiveImage(?string $field = NULL, int $index = 0, string $responsive_image_style = '', string $image_link = '', $item_attributes = NULL): array {
     $field = WrapperHelper::getDefaultField($this->wrapper, $field);
     if ($this->wrapper->metaReferenceTargetType($field) === 'media') {
       $media = $this->wrapper->getEntity($field, $index);
@@ -273,7 +272,7 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
   /**
    * @inheritDoc
    */
-  public function responsiveImages(string $field = NULL, string $responsive_image_style = '', string $image_link = '', $item_attributes = NULL) {
+  public function responsiveImages(?string $field = NULL, string $responsive_image_style = '', string $image_link = '', $item_attributes = NULL): array {
     $field = WrapperHelper::getDefaultField($this->wrapper, $field);
     if ($this->wrapper->metaReferenceTargetType($field) === 'media') {
       $medias = $this->wrapper->getEntities($field);
@@ -300,7 +299,7 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
   /**
    * @inheritDoc
    */
-  public function date(string $field, int $index = 0, string $type = 'medium', string $format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT) {
+  public function date(string $field, int $index = 0, string $type = 'medium', string $format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT): array {
     if ($type === 'custom') {
       return $this->formatter($field, $index, 'datetime_custom', ['date_format' => $format]);
     } else {
@@ -311,7 +310,7 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
   /**
    * @inheritDoc
    */
-  public function dates(string $field, string $type = 'medium', string $format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT) {
+  public function dates(string $field, string $type = 'medium', string $format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT): array {
     if ($type === 'custom') {
       return $this->formatters($field, 'datetime_custom', ['date_format' => $format]);
     } else {
@@ -322,14 +321,14 @@ class ContentDisplayWrapper implements BaseWrapperExtensionInterface, ContentDis
   /**
    * @inheritDoc
    */
-  public function template(string $template, $context = []) {
+  public function template(string $template, $context = []): array {
     return $this->process(['#type' => 'inline_template', '#template' => $template, '#context' => WrapperHelper::getArray($context, $this->wrapper)]);
   }
 
   /**
    * @inheritDoc
    */
-  public function component(string $path, $vars = [], string $pattern = NULL) {
+  public function component(string $path, $vars = [], ?string $pattern = NULL): array {
     $theme = [];
     if ($pattern) {
       $theme[] = 'zero_component__' . $pattern;

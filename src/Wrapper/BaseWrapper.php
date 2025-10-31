@@ -50,7 +50,7 @@ abstract class BaseWrapper implements BaseWrapperInterface {
    *     'attributes' => new Attributes($options['attributes'] ?? []),
    * ]
    */
-  public static function extractLinkData(Link $link = NULL): array {
+  public static function extractLinkData(?Link $link = NULL): array {
     if (empty($link)) return [];
 
     $options = $link->getUrl()->getOptions();
@@ -179,7 +179,7 @@ abstract class BaseWrapper implements BaseWrapperInterface {
   /**
    * @inheritDoc
    */
-  public function setRenderContext(array &$vars = NULL): self {
+  public function setRenderContext(?array &$vars = NULL): self {
     if ($vars !== NULL) {
       $this->vars = &$vars;
     }
@@ -209,7 +209,7 @@ abstract class BaseWrapper implements BaseWrapperInterface {
   /**
    * @inheritDoc
    */
-  public function setParent(BaseWrapperInterface $parent = NULL): self {
+  public function setParent(?BaseWrapperInterface $parent = NULL): self {
     $this->parent = $parent;
     if ($parent !== NULL) {
       $this->setConfigs($parent->getConfigs());
@@ -301,7 +301,7 @@ abstract class BaseWrapper implements BaseWrapperInterface {
   /**
    * @inheritDoc
    */
-  public function getMultiSite(Request $request = NULL): string {
+  public function getMultiSite(?Request $request = NULL): string {
     return WrapperHelper::getMultiSite($request);
   }
 

@@ -10,9 +10,9 @@
     "issues": "https://www.drupal.org/project/issues/zero_entitywrapper",
     "source": "http://cgit.drupalcode.org/zero_entitywrapper"
   },
-  "require": { 
+  "require": {
     "composer/installers": ">=1.0",
     "loomzero/zero_preprocess": ">=0.3",
-    "php": ">=7.4"
+    "php": ">=8.4"
   }
 }

@@ -12,7 +12,7 @@ interface ContentDisplayWrapperInterface {
    *
    * @return array|null
    */
-  public function getDisplaySettings(string $view_mode = NULL, string $field = NULL): ?array;
+  public function getDisplaySettings(?string $view_mode = NULL, ?string $field = NULL): ?array;
 
   /**
    * @param string $field
@@ -20,7 +20,7 @@ interface ContentDisplayWrapperInterface {
    *
    * @return array
    */
-  public function as(string $field, string $view_mode = NULL);
+  public function as(string $field, ?string $view_mode = NULL);
 
   /**
    * @param string $field
@@ -135,18 +135,18 @@ interface ContentDisplayWrapperInterface {
    *
    * @return array
    */
-  public function media(string $field = NULL, int $index = 0, array $options = [], array $additions = []);
+  public function media(?string $field = NULL, int $index = 0, array $options = [], array $additions = []);
 
   /**
-   * @see ContentDisplayWrapperInterface::media()
-   *
    * @param string|NULL $field
    * @param array $options
    * @param array $additions
    *
    * @return array
+   *@see ContentDisplayWrapperInterface::media()
+   *
    */
-  public function medias(string $field = NULL, array $options = [], array $additions = []);
+  public function medias(?string $field = NULL, array $options = [], array $additions = []);
 
   /**
    * @param string $field
@@ -229,9 +229,9 @@ interface ContentDisplayWrapperInterface {
   /**
    * @param string $path
    * @param callable|array $vars
-   * @param null|string $pattern
+   * @param string|null $pattern
    *
    * @return array
    */
-  public function component(string $path, $vars = [], string $pattern = NULL);
+  public function component(string $path, $vars = [], ?string $pattern = NULL);
 }

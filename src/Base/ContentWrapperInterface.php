@@ -44,19 +44,17 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
   /**
    * Get the link from this entity
    *
-   * @see ContentEntityBase::toLink()
-   *
    * @param array $options
    * @param string $rel
-   * @param string $text if empty the label of the entity will be used
+   * @param string|null $text if empty the label of the entity will be used
    * @return Url|null
+   *@see ContentEntityBase::toLink()
+   *
    */
-  public function link(array $options = [], string $rel = 'canonical', string $text = NULL): Link;
+  public function link(array $options = [], string $rel = 'canonical', ?string $text = NULL): Link;
 
   /**
    * Get link data
-   *
-   * @see BaseWrapper::extractLinkData()
    *
    * @param array $options = [
    *     'attributes' => [':name' => 'value'],
@@ -69,15 +67,17 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    * ]
    * @param string|NULL $title_overwrite
    * @return array = [
-   *     'text' => $link->getText(),
+      *     'text' => $link->getText(),
    *     'url' => $link->getUrl()->toString(),
    *     'options' => [
    *        'attributes' => [':name' => 'value'],
    *     ],
    *     'attributes' => new Attribute($options['attributes'] ?? []),
    * ]
+   *@see BaseWrapper::extractLinkData()
+   *
    */
-  public function linkData(array $options = [], string $title_overwrite = NULL): array;
+  public function linkData(array $options = [], ?string $title_overwrite = NULL): array;
 
   /**
    * If this entity has a field
@@ -172,14 +172,14 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
   /**
    * Get the field settings, or from property
    *
-   * @see FieldDefinitionInterface::getSettings()
-   * @see FieldStorageDefinitionInterface::getSettings()
-   *
    * @param string $field
    * @param string|NULL $property
    * @return mixed
+   *@see FieldStorageDefinitionInterface::getSettings()
+   *
+   * @see FieldDefinitionInterface::getSettings()
    */
-  public function metaFieldSettings(string $field, string $property = NULL);
+  public function metaFieldSettings(string $field, ?string $property = NULL);
 
   /**
    * Get the name of the main property
@@ -230,7 +230,7 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    * @param AccountInterface|NULL $account
    * @return bool
    */
-  public function access($operation = 'view', EntityInterface $entity = NULL, AccountInterface $account = NULL): bool;
+  public function access($operation = 'view', ?EntityInterface $entity = NULL, ?AccountInterface $account = NULL): bool;
 
   /**
    * @deprecated Will be removed at version 1.0.0, use instead <code>$wrapper->display()</code>
@@ -273,18 +273,18 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    * @param string|NULL $property
    * @return mixed
    */
-  public function getRaw(string $field, int $index = 0, string $property = NULL);
+  public function getRaw(string $field, int $index = 0, ?string $property = NULL);
 
   /**
    * Get all value of a field or property
    *
-   * @see ContentWrapperInterface::getRaw()
-   *
    * @param string $field
    * @param string|NULL $property
    * @return array
+   *@see ContentWrapperInterface::getRaw()
+   *
    */
-  public function getRaws(string $field, string $property = NULL): array;
+  public function getRaws(string $field, ?string $property = NULL): array;
 
   /**
    * Get the value of the field
@@ -341,25 +341,25 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
   /**
    * Get value of the field as markup
    *
-   * @see ContentWrapperInterface::metaMainProperty()
-   *
    * @param string $field
    * @param int $index
    * @param string|NULL $property
    * @return MarkupInterface|string
+   *@see ContentWrapperInterface::metaMainProperty()
+   *
    */
-  public function getMarkup(string $field, int $index = 0, string $property = NULL);
+  public function getMarkup(string $field, int $index = 0, ?string $property = NULL);
 
   /**
    * Get all values of the field as markup
    *
-   * @see ContentWrapperInterface::getMarkup()
-   *
    * @param string $field
    * @param string|NULL $property
    * @return MarkupInterface[]|string[]
+      *@see ContentWrapperInterface::getMarkup()
+   *
    */
-  public function getMarkups(string $field, string $property = NULL): array;
+  public function getMarkups(string $field, ?string $property = NULL): array;
 
   /**
    * Get the entity of the reference field
@@ -403,7 +403,7 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    *
    * @return ContentWrapperInterface|null
    */
-  public function getHost(string $entity_class = NULL): ?ContentWrapperInterface;
+  public function getHost(?string $entity_class = NULL): ?ContentWrapperInterface;
 
   /**
    * Get the next entity with class equals $entity_class
@@ -417,11 +417,11 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
   /**
    * Get the root host of this entity - root host is the first entity without the getParentEntity() method
    *
-   * @param string $entity_class
+   * @param string|null $entity_class
    *
    * @return ContentWrapperInterface|NULL
    */
-  public function getHostRoot(string $entity_class = NULL): ?ContentWrapperInterface;
+  public function getHostRoot(?string $entity_class = NULL): ?ContentWrapperInterface;
 
   /**
    * Get all entities of the reference field as collection
@@ -454,8 +454,6 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    *   - media entity_reference: Create an Url object of the media field inside of the Media Entity
    *   - entity_reference: Create an Url object by using EntityBase::toUrl()
    *
-   * @see WrapperHelper::getDefaultField()
-   *
    * @param string|NULL $field
    * @param int $index
    * @param array $options = [
@@ -467,8 +465,10 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    *     'https' => NULL,
    * ]
    * @return Url|null
+   *@see WrapperHelper::getDefaultField()
+   *
    */
-  public function getUrl(string $field = NULL, int $index = 0, array $options = []): ?Url;
+  public function getUrl(?string $field = NULL, int $index = 0, array $options = []): ?Url;
 
   /**
    * Get all urls of entity field or media field or url field or link field
@@ -484,7 +484,7 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    * ]
    * @return array
    */
-  public function getUrls(string $field = NULL, array $options = []): array;
+  public function getUrls(?string $field = NULL, array $options = []): array;
 
   /**
    * Get the link of a link field
@@ -502,7 +502,7 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    * @param string|NULL $title_overwrite
    * @return Link|null
    */
-  public function getLink(string $field, int $index = 0, array $options = [], string $title_overwrite = NULL): ?Link;
+  public function getLink(string $field, int $index = 0, array $options = [], ?string $title_overwrite = NULL): ?Link;
 
   /**
    * Get all links of a link field
@@ -519,12 +519,10 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    * @param string|NULL $title_overwrite
    * @return array
    */
-  public function getLinks(string $field, array $options = [], string $title_overwrite = NULL): array;
+  public function getLinks(string $field, array $options = [], ?string $title_overwrite = NULL): array;
 
   /**
    * Get link as render ready
-   *
-   * @see BaseWrapper::extractLinkData()
    *
    * @param string $field
    * @param int $index
@@ -538,20 +536,20 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    * ]
    * @param string|NULL $title_overwrite
    * @return array = [
-   *     'text' => $link->getText(),
+      *     'text' => $link->getText(),
    *     'url' => $link->getUrl()->toString(),
    *     'options' => [
    *        'attributes' => [':name' => 'value'],
    *     ],
    *     'attributes' => new Attribute($options['attributes'] ?? []),
    * ]
+   *@see BaseWrapper::extractLinkData()
+   *
    */
-  public function getLinkData(string $field, int $index = 0, array $options = [], string $title_overwrite = NULL): array;
+  public function getLinkData(string $field, int $index = 0, array $options = [], ?string $title_overwrite = NULL): array;
 
   /**
    * Get links as render ready
-   *
-   * @see ContentWrapperInterface::getLinkData()
    *
    * @param string $field
    * @param array $options = [
@@ -564,8 +562,10 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    * ]
    * @param string|NULL $title_overwrite
    * @return array
+   *@see ContentWrapperInterface::getLinkData()
+   *
    */
-  public function getLinksData(string $field, array $options = [], string $title_overwrite = NULL): array;
+  public function getLinksData(string $field, array $options = [], ?string $title_overwrite = NULL): array;
 
   /**
    * Get the image url of a image or media field
@@ -575,18 +575,18 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    * @param string $image_style
    * @return Url|null
    */
-  public function getImageUrl(string $field = NULL, int $index = 0, string $image_style = ''): ?Url;
+  public function getImageUrl(?string $field = NULL, int $index = 0, string $image_style = ''): ?Url;
 
   /**
    * Get all image urls of a image or media field
    *
-   * @see ContentWrapperInterface::getImageUrl()
-   *
    * @param string|NULL $field
    * @param string $image_style
    * @return array
+   *@see ContentWrapperInterface::getImageUrl()
+   *
    */
-  public function getImageUrls(string $field = NULL, string $image_style = ''): array;
+  public function getImageUrls(?string $field = NULL, string $image_style = ''): array;
 
   /**
    * Get the number formatted of a number field
@@ -614,14 +614,14 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
   /**
    * Get a DrupalDateTime object of a time field
    *
-   * @see DrupalDateTime
-   *
    * @param string $field
    * @param int $index
    * @param string|null $property ('value', 'end_value')
    * @return DrupalDateTime
+   *@see DrupalDateTime
+   *
    */
-  public function getDateTime(string $field, int $index = 0, string $property = NULL): DrupalDateTime;
+  public function getDateTime(string $field, int $index = 0, ?string $property = NULL): DrupalDateTime;
 
   /**
    * Get all DrupalDateTime object of a time field
@@ -630,7 +630,7 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    * @param string|null $property ('value', 'end_value')
    * @return DrupalDateTime[]
    */
-  public function getDateTimes(string $field, string $property = NULL): array;
+  public function getDateTimes(string $field, ?string $property = NULL): array;
 
   /**
    * Get DateTime object of a time field
@@ -754,14 +754,14 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
   /**
    * Get the file content of a file reference field
    *
-   * @see file_get_contents()
-   * @see ContentWrapperInterface::getFilePath()
-   *
    * @param string|NULL $field
    * @param int $index
    * @return string
+   *@see ContentWrapperInterface::getFilePath()
+   *
+   * @see file_get_contents()
    */
-  public function getFileContent(string $field = NULL, int $index = 0): string;
+  public function getFileContent(?string $field = NULL, int $index = 0): string;
 
   /**
    * Get all file content of a file reference field
@@ -769,7 +769,7 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    * @param string|NULL $field
    * @return array
    */
-  public function getFileContents(string $field = NULL): array;
+  public function getFileContents(?string $field = NULL): array;
 
   /**
    * Get a file path of a file reference field
@@ -778,7 +778,7 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    * @param int $index
    * @return string
    */
-  public function getFilePath(string $field = NULL, int $index = 0): string;
+  public function getFilePath(?string $field = NULL, int $index = 0): string;
 
   /**
    * Get all file paths fo a file reference field
@@ -786,7 +786,7 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    * @param string|NULL $field
    * @return array
    */
-  public function getFilePaths(string $field = NULL): array;
+  public function getFilePaths(?string $field = NULL): array;
 
   /**
    * Get the property from a image or file field. For example the alt text.
@@ -797,19 +797,19 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    *
    * @return mixed
    */
-  public function getFileProp(string $field = NULL, int $index = 0, string $property = NULL);
+  public function getFileProp(?string $field = NULL, int $index = 0, ?string $property = NULL);
 
   /**
    * Get the property from a image or file field. For example the alt text.
    *
-   * @see ContentWrapperInterface::getFileProp()
-   *
    * @param string|NULL $field
    * @param string|NULL $property
    *
-   * @return array
+      * @return array
+   *@see ContentWrapperInterface::getFileProp()
+   *
    */
-  public function getFileProps(string $field = NULL, string $property = NULL): array;
+  public function getFileProps(?string $field = NULL, ?string $property = NULL): array;
 
   /**
    * Get the streamwrapper of a file reference field
@@ -818,7 +818,7 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    * @param int $index
    * @return StreamWrapperInterface
    */
-  public function getStreamWrapper(string $field = NULL, int $index = 0): StreamWrapperInterface;
+  public function getStreamWrapper(?string $field = NULL, int $index = 0): StreamWrapperInterface;
 
   /**
    * Get all streamwrappers of a file reference field
@@ -826,6 +826,6 @@ interface ContentWrapperInterface extends BaseWrapperInterface {
    * @param string|NULL $field
    * @return array
    */
-  public function getStreamWrappers(string $field = NULL): array;
+  public function getStreamWrappers(?string $field = NULL): array;
 
 }
