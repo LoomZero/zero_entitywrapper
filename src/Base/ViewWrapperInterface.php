@@ -69,7 +69,7 @@ interface ViewWrapperInterface extends BaseWrapperInterface {
    * @param string|NULL $display
    * @return self
    */
-  public function setDisplay(string $display = NULL): self;
+  public function setDisplay(?string $display = NULL): self;
 
   /**
    * Get the name of the current display
@@ -86,7 +86,7 @@ interface ViewWrapperInterface extends BaseWrapperInterface {
    * @param int|NULL $offset
    * @return self
    */
-  public function setFullPager(int $itemsPerPage = NULL, int $page = NULL, int $offset = NULL): self;
+  public function setFullPager(?int $itemsPerPage = NULL, ?int $page = NULL, ?int $offset = NULL): self;
 
   /**
    * Set the pager to show all items pager
@@ -94,7 +94,7 @@ interface ViewWrapperInterface extends BaseWrapperInterface {
    * @param int|NULL $offset
    * @return self
    */
-  public function setShowAllPager(int $offset = NULL): self;
+  public function setShowAllPager(?int $offset = NULL): self;
 
   /**
    * Set the pager range
@@ -104,7 +104,7 @@ interface ViewWrapperInterface extends BaseWrapperInterface {
    * @param int|NULL $offset
    * @return self
    */
-  public function setRange(int $itemsPerPage = NULL, int $page = NULL, int $offset = NULL): self;
+  public function setRange(?int $itemsPerPage = NULL, ?int $page = NULL, ?int $offset = NULL): self;
 
   /**
    * Get the result of the view
@@ -223,7 +223,7 @@ interface ViewWrapperInterface extends BaseWrapperInterface {
    * @param array $options
    * @return array
    */
-  public function render(string $display = NULL, array $options = []): array;
+  public function render(?string $display = NULL, array $options = []): array;
 
   /**
    * Remove a handler for the execution
@@ -234,7 +234,7 @@ interface ViewWrapperInterface extends BaseWrapperInterface {
    *
    * @return self
    */
-  public function removeHandler(string $type, $table = NULL, string $field = NULL): self;
+  public function removeHandler(string $type, $table = NULL, ?string $field = NULL): self;
 
   /**
    * Remove a filter for the execution
@@ -244,7 +244,7 @@ interface ViewWrapperInterface extends BaseWrapperInterface {
    *
    * @return self
    */
-  public function removeFilter($table = NULL, string $field = NULL): self;
+  public function removeFilter($table = NULL, ?string $field = NULL): self;
 
   /**
    * Add a filter for the execution
@@ -263,7 +263,7 @@ interface ViewWrapperInterface extends BaseWrapperInterface {
    *
    * @return self
    */
-  public function removeSort($table = NULL, string $field = NULL): self;
+  public function removeSort($table = NULL, ?string $field = NULL): self;
 
   /**
    * Add a sort operation

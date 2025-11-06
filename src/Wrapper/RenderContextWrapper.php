@@ -58,7 +58,7 @@ class RenderContextWrapper implements RenderContextWrapperInterface {
     return $this->staticPageCache;
   }
 
-  public function addLibrary(string $module, string $library = NULL): void {
+  public function addLibrary(string $module, ?string $library = NULL): void {
     if ($this->renderArray() === NULL) {
       $this->getStaticPageCache()->addLibrary($module, $library);
     } else {
@@ -78,7 +78,7 @@ class RenderContextWrapper implements RenderContextWrapperInterface {
     }
   }
 
-  public function setElementSettings(string $namespace, $settings, string $uuid = NULL): string {
+  public function setElementSettings(string $namespace, $settings, ?string $uuid = NULL): string {
     if ($uuid === NULL) {
       /** @var Php $uuid_generator */
       $uuid_generator = Drupal::service('uuid');

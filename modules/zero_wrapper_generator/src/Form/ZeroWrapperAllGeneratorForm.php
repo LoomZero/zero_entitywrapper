@@ -28,7 +28,7 @@ class ZeroWrapperAllGeneratorForm extends FormBase {
     return TRUE;
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state, array $info = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, ?array $info = NULL) {
 
     $form['container'] = [
       '#type' => 'container',

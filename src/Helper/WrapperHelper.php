@@ -43,7 +43,7 @@ class WrapperHelper {
     return NULL;
   }
 
-  public static function toLanguage($entity, string $langcode = NULL) {
+  public static function toLanguage($entity, ?string $langcode = NULL) {
     if ($langcode === NULL) {
       $langcode = Drupal::languageManager()->getCurrentLanguage()->getId();
     }
@@ -129,7 +129,7 @@ class WrapperHelper {
     }
   }
 
-  public static function getDefaultField(ContentWrapper $wrapper, string $field = NULL): string {
+  public static function getDefaultField(ContentWrapper $wrapper, ?string $field = NULL): string {
     if ($field === NULL) {
       if ($wrapper->type() === 'media') {
         $field = $wrapper->metaMediaSourceField();
@@ -142,7 +142,7 @@ class WrapperHelper {
     return $field;
   }
 
-  public static function checkViewMode(string $view_mode = NULL): ?string {
+  public static function checkViewMode(?string $view_mode = NULL): ?string {
     if ($view_mode === NULL) return NULL;
     if (str_contains($view_mode, '-')) throw new EntityWrapperException('The view mode is a maschine key, don`t use "-".');
     return $view_mode;
@@ -152,7 +152,7 @@ class WrapperHelper {
    * @param Request|NULL $request
    * @return string
    */
-  public static function getMultiSite(Request $request = NULL): string {
+  public static function getMultiSite(?Request $request = NULL): string {
     $site = DrupalKernel::findSitePath($request ?? Drupal::request());
     $site = explode('/', $site);
     return array_pop($site);

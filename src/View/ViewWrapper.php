@@ -29,7 +29,7 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
    * @param string|ViewExecutable|ViewEntityInterface $value
    * @param BaseWrapperInterface|null $parent
    */
-  public static function create($value, BaseWrapperInterface $parent = NULL): ViewWrapper {
+  public static function create($value, ?BaseWrapperInterface $parent = NULL): ViewWrapper {
     return new ViewWrapper($value, NULL, $parent);
   }
 
@@ -38,7 +38,7 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
    * @param string|null $display
    * @param BaseWrapperInterface|null $parent
    */
-  public function __construct($entity, string $display = NULL, BaseWrapperInterface $parent = NULL) {
+  public function __construct($entity, ?string $display = NULL, ?BaseWrapperInterface $parent = NULL) {
     if ($entity instanceof ViewExecutable) {
       $this->executable = $entity;
       $entity = $entity->storage;
@@ -117,7 +117,7 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
   /**
    * @inheritDoc
    */
-  public function setDisplay(string $display = NULL): self {
+  public function setDisplay(?string $display = NULL): self {
     $this->checkFixed('setDisplay($display)');
     if ($display !== NULL) {
       $this->executable()->setDisplay($display);
@@ -135,7 +135,7 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
   /**
    * @inheritDoc
    */
-  public function setFullPager(int $itemsPerPage = NULL, int $page = NULL, int $offset = NULL): self {
+  public function setFullPager(?int $itemsPerPage = NULL, ?int $page = NULL, ?int $offset = NULL): self {
     $this->checkFixed('setFullPager($itemsPerPage, $page, $offset)');
     $pager = $this->executable()->getDisplay()->getOption('pager');
     $pager['type'] = 'full';
@@ -146,7 +146,7 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
   /**
    * @inheritDoc
    */
-  public function setShowAllPager(int $offset = NULL): self {
+  public function setShowAllPager(?int $offset = NULL): self {
     $this->checkFixed('setFullPager($offset)');
     $pager = $this->executable()->getDisplay()->getOption('pager');
     $pager['type'] = 'none';
@@ -157,7 +157,7 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
   /**
    * @inheritDoc
    */
-  public function setRange(int $itemsPerPage = NULL, int $page = NULL, int $offset = NULL): self {
+  public function setRange(?int $itemsPerPage = NULL, ?int $page = NULL, ?int $offset = NULL): self {
     $this->checkFixed('setRange($itemsPerPage, $page, $offset)');
     if ($itemsPerPage !== NULL) $this->executable()->setItemsPerPage($itemsPerPage);
     if ($page !== NULL) $this->executable()->setCurrentPage($page);
@@ -304,7 +304,7 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
   /**
    * @inheritDoc
    */
-  public function render(string $display = NULL, array $options = []): array {
+  public function render(?string $display = NULL, array $options = []): array {
     return $this->executable()->preview($display);
   }
 
@@ -320,7 +320,7 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
   /**
    * @inheritDoc
    */
-  public function removeHandler(string $type, $table = NULL, string $field = NULL): self {
+  public function removeHandler(string $type, $table = NULL, ?string $field = NULL): self {
     $function = $this->ensureTableFieldFilter($table, $field);
 
     $handlers = $this->executable()->getHandlers($type);
@@ -335,7 +335,7 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
   /**
    * @inheritDoc
    */
-  public function removeFilter($table = NULL, string $field = NULL): self {
+  public function removeFilter($table = NULL, ?string $field = NULL): self {
     $this->checkFixed('removeFilter($table, $field)');
     return $this->removeHandler('filter', $table, $field);
   }
@@ -351,7 +351,7 @@ class ViewWrapper extends BaseWrapper implements ViewWrapperInterface {
   /**
    * @inheritDoc
    */
-  public function removeSort($table = NULL, string $field = NULL): self {
+  public function removeSort($table = NULL, ?string $field = NULL): self {
     $this->checkFixed('removeSort($table, $field)');
     return $this->removeHandler('sort', $table, $field);
   }

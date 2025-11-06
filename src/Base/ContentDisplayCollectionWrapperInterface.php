@@ -13,7 +13,7 @@ interface ContentDisplayCollectionWrapperInterface extends ContentDisplayWrapper
    * @param string|NULL $view_mode
    * @return RenderWrapperCollection
    */
-  public function as(string $field, string $view_mode = NULL);
+  public function as(string $field, ?string $view_mode = NULL);
 
   /**
    * @param string $field
@@ -179,5 +179,5 @@ interface ContentDisplayCollectionWrapperInterface extends ContentDisplayWrapper
    *
    * @return RenderWrapperCollection
    */
-  public function component(string $path, $vars = [], string $pattern = NULL);
+  public function component(string $path, $vars = [], ?string $pattern = NULL);
 }

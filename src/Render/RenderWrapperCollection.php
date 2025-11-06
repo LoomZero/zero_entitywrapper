@@ -24,7 +24,7 @@ class RenderWrapperCollection extends ArrayObject implements RenderableInterface
    * @param array $array
    * @param BaseWrapperInterface $wrapper
    */
-  public function __construct(array $array = [], BaseWrapperInterface $wrapper = NULL) {
+  public function __construct(array $array = [], ?BaseWrapperInterface $wrapper = NULL) {
     parent::__construct($array);
     $this->wrapper = $wrapper;
   }

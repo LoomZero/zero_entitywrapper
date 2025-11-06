@@ -14,7 +14,7 @@ class EntitywrapperService {
     return Drupal::currentUser()->hasPermission('see zero_entitywrapper info');
   }
 
-  public function config($key, $fallback = NULL, string $type = NULL) {
+  public function config($key, $fallback = NULL, ?string $type = NULL) {
     if ($type === NULL || $type === 'state') {
       $state = Drupal::state()->get('zero_entitywrapper_config', []);
       if ($type === 'state') return $state[$key] ?? $fallback;
@@ -41,7 +41,7 @@ class EntitywrapperService {
     ];
   }
 
-  public function resetConfig($key, string $type = NULL) {
+  public function resetConfig($key, ?string $type = NULL) {
     if ($type === NULL || $type === 'state') {
       $state = Drupal::state()->get('zero_entitywrapper_config', []);
       unset($state[$key]);

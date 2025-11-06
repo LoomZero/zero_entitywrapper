@@ -27,7 +27,7 @@ class StaticWrapperService {
     return $this->service;
   }
 
-  public function addLibrary(string $module, string $library = NULL): void {
+  public function addLibrary(string $module, ?string $library = NULL): void {
     if ($this->libraries === NULL) $this->libraries = [];
     if ($library === NULL) {
       $this->libraries[] = $module;
