@@ -38,7 +38,7 @@ interface ViewWrapperInterface extends BaseWrapperInterface {
 
   /**
    * Get the administrative label of the view
-   * 
+   *
    * @return String
    */
   public function getLabel(): string;
@@ -46,7 +46,7 @@ interface ViewWrapperInterface extends BaseWrapperInterface {
   /**
    * Get the display title of the view.
    * Make sure you have set the display before using this method.
-   * 
+   *
    * @return String
    */
   public function getTitle(): string;
@@ -317,26 +317,26 @@ interface ViewWrapperInterface extends BaseWrapperInterface {
 
   /**
    * Get the count of the current view query.
-   * 
+   *
    * @see ViewWrapperInterface::getSelect()
    * @see ViewWrapperInterface::reset()
-   * 
+   *
    * @return int
    */
   public function getSelectCount(): int;
 
   /**
    * Get a select query from current view. Make sure to use reset for multi invokation.
-   * 
+   *
    * @see ViewWrapperInterface::reset()
-   * 
+   *
    * @return SelectInterface
    */
   public function getSelect(): SelectInterface;
 
   /**
    * Reset the view executable. Only the display will be reapplied, other configs will be removed.
-   * 
+   *
    * @return self
    */
   public function reset(): self;

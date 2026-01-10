@@ -144,7 +144,7 @@ interface BaseWrapperInterface {
   public function getConfigs(): array;
 
   /**
-   * Set the givin config
+   * Set the given config
    *
    * @param string $config
    * @param mixed $value
@@ -159,6 +159,15 @@ interface BaseWrapperInterface {
    * @return self
    */
   public function setConfigs(array $configs): self;
+
+  /**
+   * Clone the wrapper and apply given config
+   *
+   * @param string $config
+   * @param $value
+   * @return $this
+   */
+  public function config(string $config, $value = TRUE): static;
 
   /**
    * Get entity meta data to rebuild state

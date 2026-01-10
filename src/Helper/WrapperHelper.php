@@ -13,7 +13,7 @@ use Drupal\Core\Theme\Registry;
 use Drupal\zero_entitywrapper\Base\BaseWrapperInterface;
 use Drupal\zero_entitywrapper\Content\ContentWrapper;
 use Drupal\zero_entitywrapper\Exception\EntityWrapperException;
-use Drupal\zero_preprocess\Service\PreprocessExtenderManager;
+use Drupal\zero_preprocess\Service\PreprocessExtenderPluginManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 
@@ -120,8 +120,8 @@ class WrapperHelper {
 
     $vars = &$wrapper->getRenderContext();
 
-    /** @var PreprocessExtenderManager $extender */
-    $extender = Drupal::service('zero.preprocess.extender');
+    /** @var PreprocessExtenderPluginManager $extender */
+    $extender = Drupal::service('plugin.manager.preprocess_extender');
 
     if (isset($info['zero'])) {
       $extender->preprocess($vars, $info['zero'], $info);
