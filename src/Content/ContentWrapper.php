@@ -468,7 +468,9 @@ class ContentWrapper extends BaseWrapper implements ContentWrapperInterface {
     $allowed_values = $this->metaListOptions($field);
     $value = $this->getValue($field, $index);
 
-    if (empty($allowed_values[$value])) return NULL;
+    // PHP 8.5 deprecates using NULL as an array offset, and an empty field
+    // yields NULL here.
+    if ($value === NULL || empty($allowed_values[$value])) return NULL;
 
     return $allowed_values[$value];
   }
